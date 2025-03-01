@@ -1,0 +1,9 @@
+.nav-bar {
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.nav-bar a {
+  margin: 0px 10px;
+}
