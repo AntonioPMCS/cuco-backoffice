@@ -1,4 +1,4 @@
-import SearchContainer from "../components/SearchContainer"
+import SearchBar from "../components/SearchBar"
 import DevicesTable from "../components/DevicesTable"
 
 const Devices = () => {
@@ -8,10 +8,10 @@ const Devices = () => {
   }
   return (
     <div>
-      <SearchContainer handleSearch={handleSearch} />
+      <SearchBar handleSearch={handleSearch} />
       <DevicesTable />
     </div>
-  )
+  ) 
 }
 
 export default Devices

@@ -19,7 +19,7 @@ const DevicesTable = () => {
           {fetchedDevices.map((device) => (
             <tr key={device.sn}>
               <td>{device.sn}</td>
-              <td>{device.region}</td>
+              <td>{device.customer}</td>
               <td>{device.locked ? "Locked" : "Unlocked"}</td>
             </tr>
           ))}

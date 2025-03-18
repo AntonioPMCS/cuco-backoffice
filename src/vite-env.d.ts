@@ -2,15 +2,17 @@
 /// <reference types="vite/client" />
 
 interface EIP6963ProviderInfo {
-  rdns: string
-  uuid: string
-  name: string
-  icon: string
+  rdns: string; // Reverse DNS identifier, e.g., "com.metamask"
+  uuid: string; // Unique identifier for the provider instance
+  name: string; // Display name (e.g., "MetaMask")
+  icon: string; // Wallet logo URL
 }
 
 interface EIP6963ProviderDetail {
   info: EIP6963ProviderInfo
-  provider: EIP1193Provider
+  // The & below extends the provider type to include a .on member
+  provider: EIP1193Provider 
+    & { on: (event: string, callback: (data: any) => void) => void }; // Cast to include `on`
 }
 
 type EIP6963AnnounceProviderEvent = {

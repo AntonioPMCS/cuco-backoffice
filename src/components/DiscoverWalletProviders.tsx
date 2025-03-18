@@ -1,54 +1,26 @@
-import { useState } from "react"
-import { formatAddress } from "../utils/index.ts"
 import { useWalletProviders } from "../hooks/useWalletProviders"
 
-export const DiscoverWalletProviders = () => {
-  const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail | null>(null)
-  const [userAccount, setUserAccount] = useState<string>("")
+interface DiscoverWalletProvidersProps {
+  handleClick: (provider: EIP6963ProviderDetail) => void;
+}
+
+export const DiscoverWalletProviders = ({handleClick}:DiscoverWalletProvidersProps) => {
   const providers = useWalletProviders().providers;
-
-  // Connect to the selected provider using eth_requestAccounts.
-  const handleConnect = async (providerWithInfo: EIP6963ProviderDetail) => {
-    try {
-      const accounts = (await providerWithInfo.provider.request({
-        method: "eth_requestAccounts"
-      })) as string[];
-
-      setSelectedWallet(providerWithInfo)
-      setUserAccount(accounts?.[0])
-    } catch (error) {
-      console.error(error)
-    }
-  }
 
   // Display detected providers as connect buttons.
   return (
-    <>
-      <h2>Wallets Detected:</h2>
-      <div>
-        {
-          providers.length > 0 ? providers.map((provider: EIP6963ProviderDetail) => (
-            <button key={provider.info.uuid} onClick={() => handleConnect(provider)} >
-              <img src={provider.info.icon} alt={provider.info.name} />
-              <div>{provider.info.name}</div>
-            </button>
-          )) :
-            <div>
-              No Announced Wallet Providers
-            </div>
-        }
-      </div>
-      <hr />
-      <h2>{userAccount ? "" : "No "}Wallet Selected</h2>
-      {userAccount && selectedWallet &&
-        <div>
+    <div>
+      {
+        providers.length > 0 ? providers.map((provider: EIP6963ProviderDetail) => (
+          <button key={provider.info.uuid} onClick={() => handleClick(provider)} >
+            <img src={provider.info.icon} alt={provider.info.name} />
+            <div>{provider.info.name}</div>
+          </button>
+        )) :
           <div>
-            <img src={selectedWallet.info.icon} alt={selectedWallet.info.name} />
-            <div>{selectedWallet.info.name}</div>
-            <div>({formatAddress(userAccount)})</div>
+            No wallet extensions found
           </div>
-        </div>
       }
-    </>
+    </div>
   )
 }

@@ -5,3 +5,8 @@
   margin: 2em 5em;
   padding-right: 3em;
 }
+
+.modal-content button {
+  margin: 0.5em;
+  background: none;
+}

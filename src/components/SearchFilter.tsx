@@ -11,7 +11,7 @@ const SearchFilter = ({}:searchFilterProps) => {
   return (
     <div className="dropdown">
       <button className="dropdown-button" onClick={() => setIsOpen(!isOpen)}>
-        Region ▼
+        Customer ▼
       </button>
       {isOpen && (
         <ul className="dropdown-menu">

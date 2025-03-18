@@ -4,10 +4,10 @@ import SearchFilter from "./SearchFilter";
 
 interface SearchBarProps {
   placeholder?: string;
-  onSearch?: (query: string) => void;
+  handleSearch: (query: string) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ placeholder = "Serial Number...", onSearch }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ placeholder = "Serial Number...", handleSearch }) => {
   const [query, setQuery] = useState("");
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,12 +16,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ placeholder = "Serial Number...",
 
   const handleClear = () => {
     setQuery("");
-    if (onSearch) onSearch("");
+    handleSearch("");
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (onSearch) onSearch(query);
+    handleSearch(query);
   };
 
   return (
