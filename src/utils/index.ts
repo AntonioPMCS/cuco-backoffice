@@ -14,7 +14,7 @@ export const formatChainAsString = (chainIdHex: string) => {
     case 11155111:
       return "Sepolia";
     case 31337:
-      return "Anvil Localnet";
+      return "localhost";
     default:
       return "Unknown";
   }

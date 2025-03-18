@@ -1,7 +1,8 @@
 import { useCallback, useState, useEffect } from "react"
 import { devices } from "../../mocks/deviceList";
 import { useWalletProviders } from "./useWalletProviders";
-import { Contract, ethers } from "ethers";
+import { Contract } from "ethers";
+import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 
 export interface DeviceType {
   sn: string,
@@ -12,20 +13,23 @@ export interface DeviceType {
 const useBlockchain = () => {
   const { ethersProvider } = useWalletProviders();
   const [fetchedDevices, setFetchedDevices] = useState<Array<DeviceType>>(devices);
-
+  
+  const getBalance = async (address:string) => {
+    if (!ethersProvider) return null;
+    return await ethersProvider.getBalance(address);
+  }
   const fetchDevices = useCallback(async() => {
     /*setLoading(true);
     setError(null); --> implement error handling later */
     try {
       if (!ethersProvider) return;
-      console.log("Fetching device state...")
-      const contractABI = [
-        "function deviceState() public view returns (uint256)"
-      ];
-      const contractAddress = import.meta.env.VITE_DEVICE_ADDRESS; // Replace with your contract's address
-      const contract = new Contract(contractAddress, contractABI, ethersProvider);
-      const data = await contract.deviceState();
-      console.log("State: ", data);
+      console.log("Fetching devices..")
+      const contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_ADDRESS; // Replace with your contract's address
+      const contract = new Contract(contractAddress, CuCoBlockchain.abi, ethersProvider);
+      const rootCustomer:string = (await contract.getCustomers())[0];
+      console.log("Root Customer: ", rootCustomer)
+      const devices:string[] = await contract.getDevicesUnderCustomer(rootCustomer);
+      console.log("Devices: ", devices);
     } catch (error) {
       console.log(error);
     }
@@ -35,7 +39,7 @@ const useBlockchain = () => {
     fetchDevices();
   }, [fetchDevices]);
 
-  return { fetchedDevices }
+  return { fetchedDevices, getBalance }
 }
 
 export default useBlockchain

@@ -9,7 +9,7 @@ type WalletContextType = { // The context is an array of providers
   selectedAccount: string | null;
   chainId: string | null;
   //errorMessage: string | null An error message.
-  connectWallet: (providerWithInfo: EIP6963ProviderDetail) => Promise<void>
+  connectWallet: (providerWithInfo: EIP6963ProviderDetail) => Promise<void>;
   // disconnectWallet: () => void 
   // clearError: () => void
 };

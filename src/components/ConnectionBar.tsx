@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import { truncateMiddle, formatChainAsString } from "../utils";
 import { useWalletProviders } from "../hooks/useWalletProviders";
+import { ethers } from "ethers";
+import useBlockchain from "../hooks/useBlockchain";
 
 const ConnectionBar = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const {selectedAccount, chainId, connectWallet, ethersProvider} = useWalletProviders()
-
+  const { getBalance } = useBlockchain();
   // Connect to the selected provider using eth_requestAccounts.
   const handleConnect = async (providerWithInfo: EIP6963ProviderDetail) => {
     connectWallet(providerWithInfo);
@@ -24,6 +26,18 @@ const ConnectionBar = () => {
       .catch((error) => {
         console.log(`Error fetching chain ID: ${error.message}`);
       });
+
+      // Fetch the current address balance
+      if (!selectedAccount) return;
+      getBalance(selectedAccount)
+      .then((balance:bigint | null) => {
+        if (!balance) return;
+        console.log(selectedAccount + " balance: " + ethers.formatEther(balance))
+      })
+      .catch((error: any) => {
+        console.log(`Error fetching address balance: ${error.message}`);
+      });
+
   }, [ethersProvider]);
 
   return (
