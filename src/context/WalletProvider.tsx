@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState} from "react";
 import WalletContext from "./WalletContext";
+import { ethers } from "ethers";
+import { BrowserProvider } from "ethers";
 
 declare global {
   interface WindowEventMap {
@@ -10,9 +12,11 @@ declare global {
 const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   const [providers, setProviders] = useState<EIP6963ProviderDetail[]>([]);
   const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail | null>(null)
+  const [ethersProvider, setEthersProvider] = useState<ethers.BrowserProvider | null>(null)
   const [chainId, setChainId] = useState<string>("")
   const [selectedAccount, setselectedAccount] = useState<string>("")
 
+  // Effect to listen for provider announcements
   useEffect(() => {
     function onAnnouncement(event: CustomEvent<EIP6963ProviderDetail>) {
       const newProvider = event.detail;
@@ -31,10 +35,20 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     };
   }, []);
 
+  // Effect to initialize the ethers provider and listen for chain changes
   useEffect(() => {
-    if (!selectedWallet) return;
-
+    if (!selectedWallet) {
+      console.log("MetaMask not installed; using read-only default Provider")
+      setEthersProvider(ethers.getDefaultProvider("sepolia") as BrowserProvider);
+      return;
+    }
+    console.log("Initializing Ethers")
+    console.log(selectedWallet)
     const provider = selectedWallet.provider;
+    // Initialize Ethers provider from selected provider
+    const ethersProvider = new ethers.BrowserProvider(provider);
+    console.log(ethersProvider)
+    setEthersProvider(ethersProvider);
 
     // Fetch the current chain ID
     provider
@@ -53,9 +67,7 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     }
 
     return () => {
-      if (provider.on) {
-        provider.on("chainChanged", handleChainChanged);
-      }
+      // What do to when the component unmounts?
     };
   }, [selectedWallet])
 
@@ -75,13 +87,14 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
       } catch (error) {
         console.error("Failed to connect to provider:", error)
       }
-    }, [providers, selectedAccount]
+    }, [providers]
   )
 
   return (
     <WalletContext.Provider value={{ 
       providers,
       selectedWallet,
+      ethersProvider,
       selectedAccount,
       chainId,
       connectWallet

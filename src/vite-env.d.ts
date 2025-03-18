@@ -5,7 +5,7 @@ interface EIP6963ProviderInfo {
   rdns: string; // Reverse DNS identifier, e.g., "com.metamask"
   uuid: string; // Unique identifier for the provider instance
   name: string; // Display name (e.g., "MetaMask")
-  icon: string; // Wallet logo URL
+  icon: string; // Wallet logo URL  
 }
 
 interface EIP6963ProviderDetail {
