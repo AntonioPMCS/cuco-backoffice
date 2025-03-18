@@ -2,8 +2,17 @@
   display:flex;
   flex-direction: row;
   justify-content: space-between;
+  align-content: center;
+  padding-left: 3em;
+  width: 100%;
 }
 
-.nav-bar a {
+.nav-bar div {
+  display:flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.nav-bar div a {
   margin: 0px 10px;
 }

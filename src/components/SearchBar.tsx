@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/SearchBar.css"; // Import CSS file
+import SearchFilter from "./SearchFilter";
 
 interface SearchBarProps {
   placeholder?: string;
@@ -24,21 +25,25 @@ const SearchBar: React.FC<SearchBarProps> = ({ placeholder = "Serial Number...",
   };
 
   return (
-    <form className="search-bar" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        className="search-input"
-        placeholder={placeholder}
-        value={query}
-        onChange={handleChange}
-      />
-      {query && (
-        <button type="button" className="clear-btn" onClick={handleClear}>
-          ✕
-        </button>
-      )}
-      <button type="submit" className="search-btn">🔍</button>
-    </form>
+    <div className="search-container">
+      <form className="search-bar" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          className="search-input"
+          placeholder={placeholder}
+          value={query}
+          onChange={handleChange}
+        />
+        {query && (
+          <button type="button" className="clear-btn" onClick={handleClear}>
+            ✕
+          </button>
+        )}
+        <button type="submit" className="search-btn">🔍</button>
+      </form>
+      <SearchFilter />  
+    </div>
+    
   );
 };
 

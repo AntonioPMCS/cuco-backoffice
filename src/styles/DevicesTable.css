@@ -1,0 +1,21 @@
+.table-container {
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.devices-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.devices-table th, .devices-table td {
+  padding: 12px 24px; /* Increased padding for more spacing */
+  border: 1px solid #ccc;
+  text-align: left;
+  min-width: 200px; /* Increased column width */
+}
+
+.devices-table thead {
+  background-color: #f0f0f0;
+}

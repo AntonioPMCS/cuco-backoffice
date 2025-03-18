@@ -1,0 +1,7 @@
+.nav-bar {
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 2em 5em;
+  padding-right: 3em;
+}

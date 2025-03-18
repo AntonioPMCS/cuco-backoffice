@@ -1,4 +1,5 @@
-import SearchBar from "../components/SearchBar"
+import SearchContainer from "../components/SearchContainer"
+import DevicesTable from "../components/DevicesTable"
 
 const Devices = () => {
 
@@ -7,7 +8,8 @@ const Devices = () => {
   }
   return (
     <div>
-      <SearchBar onSearch={handleSearch}/>
+      <SearchContainer handleSearch={handleSearch} />
+      <DevicesTable />
     </div>
   )
 }
