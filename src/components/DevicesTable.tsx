@@ -1,5 +1,6 @@
 import "../styles/DevicesTable.css"
 import useBlockchain from '../hooks/useBlockchain'
+import { truncateMiddle } from "../utils";
 
 const DevicesTable = () => {
 
@@ -11,14 +12,14 @@ const DevicesTable = () => {
         <thead>
           <tr>
             <th>Serial Number</th>
-            <th>Admin Region</th>
+            <th>Customer</th>
             <th>State</th>
           </tr>
         </thead>
         <tbody>
           {fetchedDevices.map((device) => (
             <tr key={device.sn}>
-              <td>{device.sn}</td>
+              <td>{truncateMiddle(device.sn)}</td>
               <td>{device.customer}</td>
               <td>{device.locked ? "Locked" : "Unlocked"}</td>
             </tr>

@@ -5,17 +5,29 @@
 
 .devices-table {
   width: 100%;
+  table-layout: auto; /* Allows columns to adjust */
   border-collapse: collapse;
   border: 1px solid #ccc;
+}
+
+@media (max-width: 768px) {
+  .devices-table th, .devices-table td {
+    min-width: auto; /* Allow shrinking */
+    padding: 8px 12px; /* Reduce padding for smaller screens */
+  }
 }
 
 .devices-table th, .devices-table td {
   padding: 12px 24px; /* Increased padding for more spacing */
   border: 1px solid #ccc;
   text-align: left;
-  min-width: 200px; /* Increased column width */
 }
 
 .devices-table thead {
   background-color: #f0f0f0;
 }
+
+.devices-table td {
+  font-size:small;
+}
+
