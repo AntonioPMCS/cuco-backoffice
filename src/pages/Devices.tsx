@@ -1,5 +1,5 @@
 import SearchBar from "../components/SearchBar"
-import DevicesTable from "../components/DevicesTable"
+import DeviceManager from "../components/DeviceManager"
 
 const Devices = () => {
 
@@ -9,7 +9,7 @@ const Devices = () => {
   return (
     <div>
       <SearchBar handleSearch={handleSearch} />
-      <DevicesTable />
+      <DeviceManager />
     </div>
   ) 
 }
