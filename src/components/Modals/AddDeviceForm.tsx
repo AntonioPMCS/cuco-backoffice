@@ -1,6 +1,5 @@
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { useState } from "react";
 import { DeviceType
 
  } from "@/hooks/useBlockchain";

@@ -1,6 +1,6 @@
 import "../styles/ConnectionBar.css";
 import { DiscoverWalletProviders } from '../components/DiscoverWalletProviders';
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { truncateMiddle, formatChainAsString } from "../utils";
 import { useWalletProviders } from "../hooks/useWalletProviders";
 import { ethers } from "ethers";

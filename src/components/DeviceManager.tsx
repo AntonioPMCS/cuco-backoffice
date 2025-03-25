@@ -16,7 +16,7 @@ const DeviceManager = () => {
   const [editDevice, setEditDevice] = useState<DeviceType | null>(null)
 
   const handleEditDevice = () => {}
-  const handleDeleteDevice = (deviceSN:string) => {}
+  const handleDeleteDevice = (deviceSN:string) => {console.log(deviceSN)}
 
   const toggleSelectAll = () => {
     if (selectedDevices.length === fetchedDevices.length) {
