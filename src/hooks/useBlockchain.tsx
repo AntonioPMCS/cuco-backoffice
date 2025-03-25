@@ -11,7 +11,7 @@ export interface DeviceType {
 }
 
 const useBlockchain = () => {
-  const { ethersProvider } = useWalletProviders();
+  const { ethersProvider, chainId } = useWalletProviders();
   const [fetchedDevices, setFetchedDevices] = useState<Array<DeviceType>>([]);
 
   const getBalance = async (address:string) => {
@@ -43,7 +43,7 @@ const useBlockchain = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [ethersProvider])
+  }, [ethersProvider, chainId])
 
   const fetchDeviceInstance = async (address: string): Promise<DeviceType> => {
     const deviceContract = new Contract(address, Device.abi, ethersProvider);

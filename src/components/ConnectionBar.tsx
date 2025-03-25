@@ -1,7 +1,6 @@
 import "../styles/ConnectionBar.css";
 import { DiscoverWalletProviders } from '../components/DiscoverWalletProviders';
 import { useState, useEffect } from "react";
-import Modal from "./Modal_DELETE";
 import { truncateMiddle, formatChainAsString } from "../utils";
 import { useWalletProviders } from "../hooks/useWalletProviders";
 import { ethers } from "ethers";
@@ -10,7 +9,6 @@ import ModalTemplate from "./Modals/ModalTemplate";
 import { KeyRound } from "lucide-react";
 
 const ConnectionBar = () => {
-  const [modalOpen, setModalOpen] = useState<boolean>(false)
   const {selectedAccount, chainId, connectWallet, ethersProvider} = useWalletProviders()
   const { getBalance } = useBlockchain();
   // Connect to the selected provider using eth_requestAccounts.
