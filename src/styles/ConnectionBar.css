@@ -10,3 +10,8 @@
   margin: 0.5em;
   background: none;
 }
+
+.connection-bar button {
+  background-color: white;
+  color: black;
+}

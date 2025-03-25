@@ -1,11 +1,13 @@
 import "../styles/ConnectionBar.css";
 import { DiscoverWalletProviders } from '../components/DiscoverWalletProviders';
 import { useState, useEffect } from "react";
-import Modal from "./Modal";
+import Modal from "./Modal_DELETE";
 import { truncateMiddle, formatChainAsString } from "../utils";
 import { useWalletProviders } from "../hooks/useWalletProviders";
 import { ethers } from "ethers";
 import useBlockchain from "../hooks/useBlockchain";
+import ModalTemplate from "./Modals/ModalTemplate";
+import { KeyRound } from "lucide-react";
 
 const ConnectionBar = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false)
@@ -44,10 +46,13 @@ const ConnectionBar = () => {
     <div className="connection-bar">
       { !selectedAccount &&
         <>
-          <button onClick = {() => setModalOpen(true)} className="connect-btn">🔑 Connect</button>
-          <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+          <ModalTemplate
+            trigger={<><KeyRound className="mr-2 h-4 w-4" />CONNECT</>}
+            title="Connect Wallet"
+            handler={handleConnect}
+          >
             <DiscoverWalletProviders handleClick={handleConnect}/>
-          </Modal>
+          </ModalTemplate>
         </>
       }
       { selectedAccount && chainId &&

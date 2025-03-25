@@ -6,7 +6,7 @@ interface ModalTemplateProps {
   children: React.ReactNode;
   trigger: React.ReactNode;
   title: string;
-  handler: () => void;
+  handler: (arg0?:any) => void;
 }
 
 const ModalTemplate: React.FC<ModalTemplateProps> = ({children, trigger, title, handler}) => {

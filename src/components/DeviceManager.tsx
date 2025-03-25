@@ -14,6 +14,8 @@ import { Checkbox } from "./ui/checkbox";
 import { Badge } from "./ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import DeviceActionsBar from "./DeviceActionsBar";
+import ModalTemplate from "./Modals/ModalTemplate";
+import DeviceEditForm from "./Modals/DeviceEditForm";
 
 const DeviceManager = () => {
   const { fetchedDevices } = useBlockchain();

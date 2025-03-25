@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Edit, Plus, Upload } from "lucide-react"
-import ModalTemplate from "./Modals/modalTemplate"
+import ModalTemplate from "./Modals/ModalTemplate"
 import AddDeviceForm from "./Modals/AddDeviceForm";
 import { DeviceType } from "@/hooks/useBlockchain";
 import BatchImportForm from "./Modals/BatchImportForm";
