@@ -39,7 +39,7 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   useEffect(() => {
     if (!selectedWallet) {
       console.log("MetaMask not installed; using read-only default Provider")
-      setEthersProvider(ethers.getDefaultProvider("http://localhost:8545") as BrowserProvider);
+      setEthersProvider(ethers.getDefaultProvider("sepolia") as BrowserProvider);
       return;
     }
     console.log("Initializing Ethers")
@@ -59,6 +59,8 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     // Listen for chain changes (only if `on` exists)
     const handleChainChanged = (newChainId: string) => {
       setChainId(newChainId);
+      // Reflect network changes in the provider object v
+      setEthersProvider(new ethers.BrowserProvider(provider)); 
       //window.location.reload(); //Recommended by MetaMask
     };
 

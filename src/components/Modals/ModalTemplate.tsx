@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dialog, DialogContent, DialogClose, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { Dialog, DialogContent, DialogClose, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '../ui/dialog';
 import { Button } from '../ui/button';
 
 interface ModalTemplateProps {
@@ -7,9 +7,10 @@ interface ModalTemplateProps {
   trigger: React.ReactNode;
   title: string;
   handler: (arg0?:any) => void;
+  description?: string;
 }
 
-const ModalTemplate: React.FC<ModalTemplateProps> = ({children, trigger, title, handler}) => {
+const ModalTemplate: React.FC<ModalTemplateProps> = ({children, trigger, title, handler, description}) => {
 
   return (
     <>
@@ -24,6 +25,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({children, trigger, title, 
             <DialogTitle>
               {title}
             </DialogTitle>
+            {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>  
           <div className="grid gap-4 py-4">
             {children}

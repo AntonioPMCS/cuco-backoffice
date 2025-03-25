@@ -19,16 +19,44 @@ const useBlockchain = () => {
     return await ethersProvider.getBalance(address);
   }
 
+  // A helper function that returns a promise that rejects after a timeout.
+  const timeoutPromise = (ms: number) => new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('Request timed out')), ms)
+  );
+
+
   const fetchDevices = useCallback(async() => {
     /*setLoading(true);
     setError(null); --> implement error handling later */
+    if (!ethersProvider) return;
+    let contractAddress;
+    const network = (await ethersProvider.getNetwork()).name
+    switch (network) {
+      case "sepolia":
+        contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
+        break;
+      default:
+        contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
+        break;
+    }
+    let contract:Contract, rootCustomer:string;
+    try { // Fetch rootCustomer 
+      console.log("Fetching devices...")
+      contract = new Contract(contractAddress, CuCoBlockchain.abi, ethersProvider);
+      // Timeout logic below is because BrowserProvider doesn't timeout with a localhost node
+      rootCustomer = (await Promise.race([
+        contract.getCustomers().then(customers => customers[0]),
+        timeoutPromise(10000)
+      ])) as string;
+      console.log("Root Customer: ", rootCustomer);
+    } catch (error) {
+      console.error("Unable to fetch rootCustomer");
+      console.error(error);
+      setFetchedDevices([]);
+      return;
+    }
+
     try {
-      if (!ethersProvider) return;
-      console.log("Fetching devices..")
-      const contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_ADDRESS; // Replace with your contract's address
-      const contract = new Contract(contractAddress, CuCoBlockchain.abi, ethersProvider);
-      const rootCustomer:string = (await contract.getCustomers())[0];
-      console.log("Root Customer: ", rootCustomer)
       const devices:string[] = await contract.getDevicesUnderCustomer(rootCustomer);
       console.log("Devices: ", devices);
 
@@ -38,10 +66,10 @@ const useBlockchain = () => {
         devices.map((deviceAddress) => fetchDeviceInstance(deviceAddress))
       );
       console.log("Device Objects: ", deviceObjects);
-      setFetchedDevices(deviceObjects);
-
+      setFetchedDevices(deviceObjects); 
     } catch (error) {
       console.log(error);
+      setFetchedDevices([]);
     }
   }, [ethersProvider, chainId])
 

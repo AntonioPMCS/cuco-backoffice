@@ -48,6 +48,7 @@ const ConnectionBar = () => {
             trigger={<><KeyRound className="mr-2 h-4 w-4" />CONNECT</>}
             title="Connect Wallet"
             handler={handleConnect}
+            description="In this dialog the user chooses a provider to connect to blockchain."
           >
             <DiscoverWalletProviders handleClick={handleConnect}/>
           </ModalTemplate>

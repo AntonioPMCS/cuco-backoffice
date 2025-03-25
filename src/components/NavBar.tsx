@@ -9,6 +9,7 @@ const NavBar = () => {
         <Link to="/devices">Devices</Link> 
         <Link to="/municipalities">Municipalities</Link>
       </div>
+      <span className="navbar-info">Using Sepolia by default</span> 
       <ConnectionBar />
     </div>
   )
