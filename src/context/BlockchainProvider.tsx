@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState} from "react";
-import WalletContext from "./WalletContext";
-import { Contract, ethers } from "ethers";
-import { BrowserProvider } from "ethers";
+import { Contract } from "ethers";
 import BlockchainContext, { CustomerType, DeviceType } from "./BlockchainContext";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
@@ -146,80 +144,6 @@ const BlockchainProvider: React.FC<{children: React.ReactNode}> = ({children}) =
     <BlockchainContext.Provider value={{ fetchedDevices, refetchDevices: fetchDevices, fetchedCustomers, refetchCustomers: fetchCustomers }}>
       {children}
     </BlockchainContext.Provider>
-  );
-
-
-
-
-
-  // Effect to fetch device data from the blockchain
-  useEffect(() => {
-    if (!fetchedDevices) {
-      console.log("MetaMask not installed; using read-only default Provider")
-      setEthersProvider(ethers.getDefaultProvider("sepolia") as BrowserProvider);
-      return;
-    }
-    console.log("Initializing Ethers")
-    console.log(selectedWallet)
-    const provider = selectedWallet.provider;
-    // Initialize Ethers provider from selected provider
-    const ethersProvider = new ethers.BrowserProvider(provider);
-    console.log(ethersProvider)
-    setEthersProvider(ethersProvider);
-
-    // Fetch the current chain ID
-    provider
-      .request({ method: "eth_chainId" })
-      .then((chainId) => setChainId(chainId as string))
-      .catch(console.error);
-
-    // Listen for chain changes (only if `on` exists)
-    const handleChainChanged = (newChainId: string) => {
-      setChainId(newChainId);
-      // Reflect network changes in the provider object v
-      setEthersProvider(new ethers.BrowserProvider(provider)); 
-      //window.location.reload(); //Recommended by MetaMask
-    };
-
-    if (provider.on) {
-      provider.on("chainChanged", handleChainChanged);
-    }
-
-    return () => {
-      // What do to when the component unmounts?
-    };
-  }, [selectedWallet])
-
-  const connectWallet = useCallback(
-    async (providerWithInfo: EIP6963ProviderDetail) => {
-      try {
-        const accounts = (await providerWithInfo.provider.request ({
-          method: "eth_requestAccounts",
-        })) as string[]
-        setSelectedWallet(providerWithInfo)
-        setselectedAccount(accounts?.[0])
-
-        const chainId = (await providerWithInfo.provider.request({
-          method: "eth_chainId"
-        })) as string;
-        setChainId(chainId);
-      } catch (error) {
-        console.error("Failed to connect to provider:", error)
-      }
-    }, [providers]
-  )
-
-  return (
-    <WalletContext.Provider value={{ 
-      providers,
-      selectedWallet,
-      ethersProvider,
-      selectedAccount,
-      chainId,
-      connectWallet
-    }}>
-      {children}
-    </WalletContext.Provider>
   );
 };
 
