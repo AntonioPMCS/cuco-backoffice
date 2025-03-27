@@ -7,7 +7,7 @@ const Devices = () => {
     console.log("Search query: "+query)
   }
   return (
-    <div className="flex flex-col justify-between items-center gap-4">
+    <div className="flex flex-col justify-between items-center gap-5">
       <SearchBar handleSearch={handleSearch} />
       <DeviceManager />
     </div>

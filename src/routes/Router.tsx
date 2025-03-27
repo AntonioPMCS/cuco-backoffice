@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Layout from "../pages/Layout";
 import NotFoundPage from "../pages/NotFound";
 import Devices from "../pages/Devices";
-import Municipalities from "../pages/Municipalities";
+import Customers from "../pages/Customers";
 import { Navigate } from "react-router-dom";
 
 const router = createBrowserRouter([
@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Navigate to="/devices" replace /> },
       { path: "/devices", element: <Devices /> },
-      { path: "/municipalities", element: <Municipalities />}
+      { path: "/customers", element: <Customers />}
     ]
   }
 ])

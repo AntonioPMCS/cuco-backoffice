@@ -25,7 +25,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ placeholder = "Serial Number...",
   };
 
   return (
-    <div className="search-container">
+    <div className="flex flex-row justify-center items-center gap-4 search-container w-full search-container">
       <form className="search-bar" onSubmit={handleSubmit}>
         <input
           type="text"

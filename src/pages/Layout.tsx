@@ -11,7 +11,7 @@ const Layout = ({ }: LayoutProps) => {
   return (
     <div className="app-container">
         <NavBar />
-      <div className="content">
+      <div className="content w-full">
         <Outlet />
       </div>
     </div>

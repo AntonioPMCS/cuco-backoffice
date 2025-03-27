@@ -1,12 +1,12 @@
 import { Textarea } from "../ui/textarea";
 
-interface BatchImportFormProps {
+interface BatchDeviceImportFormProps {
   batchDevices: string;
   setBatchDevices: (batchDevices:string) => void;
 }
 
 
-const BatchImportForm: React.FC<BatchImportFormProps> = ({batchDevices, setBatchDevices}) => {
+const BatchDeviceImportForm: React.FC<BatchDeviceImportFormProps> = ({batchDevices, setBatchDevices}) => {
   return (
     <>
       <p className="text-sm text-muted-foreground">
@@ -24,4 +24,4 @@ const BatchImportForm: React.FC<BatchImportFormProps> = ({batchDevices, setBatch
   )
 }
 
-export default BatchImportForm
+export default BatchDeviceImportForm

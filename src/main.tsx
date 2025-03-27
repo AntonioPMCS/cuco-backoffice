@@ -4,11 +4,14 @@ import './index.css'
 import { RouterProvider } from 'react-router-dom'
 import router from './routes/Router.tsx'
 import WalletProvider from './context/WalletProvider.tsx'
+import BlockchainProvider from './context/BlockchainProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <WalletProvider>
-      <RouterProvider router={router} />
+      <BlockchainProvider>
+        <RouterProvider router={router} />
+      </BlockchainProvider>
     </WalletProvider>
   </StrictMode>,
 )

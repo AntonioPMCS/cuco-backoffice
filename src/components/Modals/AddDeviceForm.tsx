@@ -1,8 +1,7 @@
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { DeviceType
+import { DeviceType } from "@/context/BlockchainContext";
 
- } from "@/hooks/useBlockchain";
 interface AddDeviceFormProps {
   newDevice: DeviceType;
   setNewDevice: (newDevice:DeviceType) => void;

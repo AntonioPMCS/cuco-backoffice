@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Edit, Plus, Upload } from "lucide-react"
 import ModalTemplate from "./Modals/ModalTemplate"
 import AddDeviceForm from "./Modals/AddDeviceForm";
-import { DeviceType } from "@/hooks/useBlockchain";
-import BatchImportForm from "./Modals/BatchImportForm";
+import { DeviceType } from "@/hooks/useDevices";
+import BatchDeviceImportForm from "./Modals/BatchDeviceImportForm";
 import BatchEditForm from "./Modals/BatchEditForm";
 
 interface DeviceActionsBarProps {
@@ -39,7 +39,7 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices}) => 
         title="Batch Import Devices"
         handler={handleBatchImport}
       >
-        <BatchImportForm batchDevices={batchDevices} setBatchDevices={setBatchDevices} />
+        <BatchDeviceImportForm batchDevices={batchDevices} setBatchDevices={setBatchDevices} />
       </ModalTemplate>
 
       {selectedDevices.length > 0 && (

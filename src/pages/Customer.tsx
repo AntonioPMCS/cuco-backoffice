@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom"
 
-const Municipality = () => {
+const Customer = () => {
   return (
     <div>
-      <h4>Municipality page</h4>
+      <h4>Customer page</h4>
       <Link to="/">Home</Link>
     </div>
   )
 }
 
-export default Municipality
+export default Customer

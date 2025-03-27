@@ -7,9 +7,9 @@ import { SelectValue } from "@radix-ui/react-select";
 import { Input } from "./ui/input";
 import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
-import { DeviceType } from "@/hooks/useBlockchain";
+import { DeviceType } from "@/context/BlockchainContext";
 
-interface ActionsDropdownProps {
+interface DeviceActionsDropdownProps {
   editDevice: DeviceType | null;
   setEditDevice: (device:DeviceType) => void;
   device: DeviceType;
@@ -17,7 +17,7 @@ interface ActionsDropdownProps {
   handleDeleteDevice: (arg0?:any) => void;
 }
 
-const ActionsDropdown:React.FC<ActionsDropdownProps> = ({editDevice, setEditDevice, device, handleEditDevice, handleDeleteDevice}) => {
+const DeviceActionsDropdown:React.FC<DeviceActionsDropdownProps> = ({editDevice, setEditDevice, device, handleEditDevice, handleDeleteDevice}) => {
   return (
     <>
       <DropdownMenu>
@@ -113,4 +113,4 @@ const ActionsDropdown:React.FC<ActionsDropdownProps> = ({editDevice, setEditDevi
   )
 }
 
-export default ActionsDropdown
+export default DeviceActionsDropdown

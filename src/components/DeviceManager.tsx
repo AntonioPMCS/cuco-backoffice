@@ -1,5 +1,5 @@
 import "../styles/DeviceManager.css"
-import useBlockchain, { DeviceType } from '../hooks/useBlockchain'
+import { DeviceType } from "@/context/BlockchainContext";
 import { useState } from "react";
 import { truncateMiddle } from "../utils";
 import { Lock, Unlock } from "lucide-react";
@@ -8,7 +8,8 @@ import { Checkbox } from "./ui/checkbox";
 import { Badge } from "./ui/badge";
 
 import DeviceActionsBar from "./DeviceActionsBar";
-import ActionsDropdown from "./ActionsDropdown";
+import ActionsDropdown from "./DeviceActionsDropdown";
+import { useBlockchain } from "@/hooks/useBlockchain";
 
 const DeviceManager = () => {
   const { fetchedDevices } = useBlockchain();
@@ -35,10 +36,10 @@ const DeviceManager = () => {
 
   return (
     <>
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <div className="flex flex-col justify-between items-center gap-4">
         <DeviceActionsBar selectedDevices={selectedDevices}/>
-        <div className="border rounded-md">
+        <div className="border rounded-md w-full">
           <Table>
             <TableHeader>
               <TableRow>
