@@ -8,9 +8,10 @@ import BatchEditForm from "./Modals/BatchEditForm";
 
 interface CustomerActionsBarProps {
   selectedCustomers: string[];
+  createCustomer: (_parentAddress:string, _name:string) => void;
 }
 
-const CustomerActionsBar:React.FC<CustomerActionsBarProps> = ({selectedCustomers}) => {
+const CustomerActionsBar:React.FC<CustomerActionsBarProps> = ({selectedCustomers, createCustomer}) => {
   const [batchCustomers, setBatchCustomers] = useState<string>("")
   const [batchEditProperty, setBatchEditProperty] = useState<string>("")
   const [batchEditValue, setBatchEditValue] = useState<string>("")
@@ -20,7 +21,10 @@ const CustomerActionsBar:React.FC<CustomerActionsBarProps> = ({selectedCustomers
     address: "",
   })
 
-  const handleAddCustomer = () => {console.log(newCustomer)}
+  const handleAddCustomer = () => {
+    console.log(newCustomer);
+    createCustomer(newCustomer.parent, newCustomer.name)
+  }
   const handleBatchImport = () => {}
   const handleBatchEdit = () => {}
   
@@ -30,6 +34,7 @@ const CustomerActionsBar:React.FC<CustomerActionsBarProps> = ({selectedCustomers
         trigger={<><Plus className="mr-2 h-4 w-4" />Add Customer</>}
         title="Add New Customer"
         handler={handleAddCustomer}
+        description="Create a new customer providing a name and a parent address"
       >
         <AddCustomerForm newCustomer = {newCustomer} setNewCustomer = {setNewCustomer} />
       </ModalTemplate>

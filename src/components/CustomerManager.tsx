@@ -8,8 +8,10 @@ import CustomerActionsBar from "./CustomerActionsBar";
 import CustomerActionsDropdown from "./CustomerActionsDropdown";
 import { useBlockchain } from "@/hooks/useBlockchain";
 
+import { Link } from "react-router-dom";
+
 const CustomerManager = () => {
-  const { fetchedCustomers } = useBlockchain();
+  const { fetchedCustomers, createCustomer } = useBlockchain();
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([])
   const [editCustomer, setEditCustomer] = useState<CustomerType | null>(null)
 
@@ -35,7 +37,7 @@ const CustomerManager = () => {
     <>
     <div className="space-y-6">
       <div className="flex flex-col justify-between items-center gap-4">
-        <CustomerActionsBar selectedCustomers={selectedCustomers}/>
+        <CustomerActionsBar selectedCustomers={selectedCustomers} createCustomer={createCustomer}/>
         <div className="border rounded-md w-full">
           <Table>
             <TableHeader>
@@ -70,7 +72,11 @@ const CustomerManager = () => {
                           onCheckedChange={() => toggleCustomerSelection(customer.name)}
                         />
                       </TableCell>
-                      <TableCell>{customer.name}</TableCell>
+                      <TableCell>
+                        <Link to={`/customers/${encodeURIComponent(customer.name)}`} >
+                          {customer.name}
+                        </Link>
+                      </TableCell>
                       <TableCell>{truncateMiddle(customer.address)}</TableCell>
                       <TableCell>{customer.parent}</TableCell>
                       <TableCell>

@@ -1,9 +1,10 @@
 import CustomerManager from "@/components/CustomerManager"
+import { Outlet } from "react-router-dom"
 
 const Customers = () => {
   return (
     <div>
-      <CustomerManager />
+      <Outlet />
     </div>
   )
 }

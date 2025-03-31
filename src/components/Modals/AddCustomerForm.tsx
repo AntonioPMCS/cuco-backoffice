@@ -22,17 +22,6 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({newCustomer, setNewCus
       />
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="customerAddress">Customer Address</Label>
-        <input
-          id="customerAddress"
-          value={newCustomer.address}
-          onChange={ (e) => setNewCustomer({
-            ...newCustomer,
-            address: e.target.value
-          })}
-        />
-      </div>
-      <div className="grid gap-2">
         <Label htmlFor="customerAddress">Parent Address</Label>
         <input
           id="parentAddress"

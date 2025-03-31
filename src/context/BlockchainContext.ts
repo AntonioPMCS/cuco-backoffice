@@ -18,6 +18,7 @@ type BlockchainContextType = { // The context is an array of providers
   refetchDevices: () => void;
   fetchedCustomers: Array<CustomerType>;
   refetchCustomers: () => void;
+  createCustomer: (_parentAddress:string, _name:string) => void;
 };
 
 
@@ -26,7 +27,8 @@ const BlockchainContext = createContext<BlockchainContextType>({
     fetchedDevices: [],
     refetchDevices: () => {},
     fetchedCustomers: [],
-    refetchCustomers: () => {}
+    refetchCustomers: () => {},
+    createCustomer: () => {}
 });
 
 export default BlockchainContext;
