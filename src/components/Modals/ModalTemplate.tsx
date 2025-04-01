@@ -11,9 +11,9 @@ interface ModalTemplateProps {
   description?: string;
 }
 
-const ModalTemplate: React.FC<ModalTemplateProps> = ({children, trigger, title, isDisabled, handler, description}) => {
+const ModalTemplate: React.FC<ModalTemplateProps> = ({children, trigger, title, handler, description}) => {
   const {selectedWallet} = useWalletProviders()
-  
+
   return (
     <>
       <Dialog>

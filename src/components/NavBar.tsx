@@ -18,7 +18,7 @@ const NavBar = () => {
               <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold">C</span>
               </div>
-              <span className="font-bold text-xl hidden sm:inline-block">CuCoBlockchain</span>
+              <span className="font-bold text-xl hidden sm:inline-block">CUCoBlockchain</span>
             </Link>
           </div>
 

@@ -71,7 +71,7 @@ const DeviceManager = () => {
                           onCheckedChange={() => toggleDeviceSelection(device.sn)}
                         />
                       </TableCell>
-                      <TableCell>{truncateMiddle(device.sn)}</TableCell>
+                      <TableCell>{device.sn}</TableCell>
                       <TableCell>{truncateMiddle(device.customer)}</TableCell>
                       <TableCell>
                         <Badge variant={device.locked ? "secondary" : "outline"}>

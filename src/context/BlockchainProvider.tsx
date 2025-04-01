@@ -8,7 +8,7 @@ import { useCustomers } from "@/hooks/useCustomers";
 const BlockchainProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   const { ethersProvider, chainId } = useWalletProviders();
   const { devices, fetchDevices } = useDevices(ethersProvider, chainId);
-  const { customers, fetchCustomers, createCustomer } = useCustomers(ethersProvider, chainId);
+  const { customers, fetchCustomers, createCustomer } = useCustomers();
 
   // Fetch data once on mount or when provider changes.
   useEffect(() => {

@@ -77,7 +77,11 @@ const CustomerManager = () => {
                           {customer.name}
                         </Link>
                       </TableCell>
-                      <TableCell>{truncateMiddle(customer.address)}</TableCell>
+                      <TableCell>
+                        <Link to={`/customers/${encodeURIComponent(customer.name)}`} >
+                          {truncateMiddle(customer.address)}
+                        </Link>
+                      </TableCell>
                       <TableCell>{customer.parent}</TableCell>
                       <TableCell>
                         <CustomerActionsDropdown 

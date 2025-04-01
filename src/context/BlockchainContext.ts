@@ -9,7 +9,9 @@ export interface DeviceType {
 export interface CustomerType {
   name: string,
   parent: string,
+  parentName: string,
   address: string;
+  authorizedUsers: string[];
 }
 
 

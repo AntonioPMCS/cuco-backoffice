@@ -3,8 +3,9 @@ import { DiscoverWalletProviders } from '../components/DiscoverWalletProviders';
 import { useEffect } from "react";
 import { truncateMiddle, formatChainAsString } from "../utils";
 import { useWalletProviders } from "../hooks/useWalletProviders";
-import ModalTemplate from "./Modals/ModalTemplate";
+import { Dialog, DialogContent, DialogClose, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "./ui/dialog";
 import { KeyRound } from "lucide-react";
+import { Button } from "./ui/button";
 
 const ConnectionBar = () => {
   const {selectedAccount, chainId, connectWallet, ethersProvider} = useWalletProviders()
@@ -27,14 +28,6 @@ const ConnectionBar = () => {
 
       // Fetch the current address balance
       if (!selectedAccount) return;
-      // getBalance(selectedAccount)
-      // .then((balance:bigint | null) => {
-      //   if (!balance) return;
-      //   console.log(selectedAccount + " balance: " + ethers.formatEther(balance))
-      // })
-      // .catch((error: any) => {
-      //   console.log(`Error fetching address balance: ${error.message}`);
-      // });
 
   }, [ethersProvider]);
 
@@ -42,14 +35,29 @@ const ConnectionBar = () => {
     <div className="connection-bar">
       { !selectedAccount &&
         <>
-          <ModalTemplate
-            trigger={<><KeyRound className="mr-2 h-4 w-4" />CONNECT</>}
-            title="Connect Wallet"
-            handler={handleConnect}
-            description="In this dialog the user chooses a provider to connect to blockchain."
-          >
-            <DiscoverWalletProviders handleClick={handleConnect}/>
-          </ModalTemplate>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>
+                <KeyRound className="mr-2 h-4 w-4" />CONNECT
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  Connect your wallet
+                </DialogTitle>
+                <DialogDescription>Choose a provider to connect to the blockchain.</DialogDescription>
+              </DialogHeader>  
+              <div className="grid gap-4 py-4">
+                <DiscoverWalletProviders handleClick={handleConnect}/>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent> 
+          </Dialog>
         </>
       }
       { selectedAccount && chainId &&

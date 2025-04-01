@@ -18,7 +18,9 @@ const CustomerActionsBar:React.FC<CustomerActionsBarProps> = ({selectedCustomers
   const [newCustomer, setNewCustomer] = useState<CustomerType>({
     name: "",
     parent: "",
+    parentName: "",
     address: "",
+    authorizedUsers: []
   })
 
   const handleAddCustomer = () => {

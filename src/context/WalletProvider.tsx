@@ -71,7 +71,7 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     return () => {
       // What do to when the component unmounts?
     };
-  }, [selectedWallet])
+  }, [selectedWallet, providers])
 
   const connectWallet = useCallback(
     async (providerWithInfo: EIP6963ProviderDetail) => {
