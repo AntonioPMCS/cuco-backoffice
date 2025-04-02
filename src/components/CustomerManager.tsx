@@ -3,17 +3,19 @@ import { truncateMiddle } from "../utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Checkbox } from "./ui/checkbox";
 import { CustomerType } from "@/context/BlockchainContext";
-
 import CustomerActionsBar from "./CustomerActionsBar";
 import CustomerActionsDropdown from "./CustomerActionsDropdown";
 import { useBlockchain } from "@/hooks/useBlockchain";
-
 import { Link } from "react-router-dom";
+import { Button } from "./ui/button";
+import { Copy } from "lucide-react";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 const CustomerManager = () => {
   const { fetchedCustomers, createCustomer } = useBlockchain();
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([])
   const [editCustomer, setEditCustomer] = useState<CustomerType | null>(null)
+  const handleCopyAddress = useCopyToClipboard();
 
   const handleEditCustomer = () => {}
   const handleDeleteCustomer = (customerName:string) => {console.log(customerName)}
@@ -81,6 +83,15 @@ const CustomerManager = () => {
                         <Link to={`/customers/${encodeURIComponent(customer.name)}`} >
                           {truncateMiddle(customer.address)}
                         </Link>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleCopyAddress(customer.address)}
+                          title="Copy address"
+                        >
+                          <Copy className="h-4 w-4" />
+                          <span className="sr-only">Copy address</span>
+                        </Button>
                       </TableCell>
                       <TableCell>{customer.parent}</TableCell>
                       <TableCell>

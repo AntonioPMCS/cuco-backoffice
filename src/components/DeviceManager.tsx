@@ -2,7 +2,7 @@ import "../styles/DeviceManager.css"
 import { DeviceType } from "@/context/BlockchainContext";
 import { useState } from "react";
 import { truncateMiddle } from "../utils";
-import { Lock, Unlock } from "lucide-react";
+import { Copy, Lock, Unlock } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Checkbox } from "./ui/checkbox";
 import { Badge } from "./ui/badge";
@@ -10,14 +10,30 @@ import { Badge } from "./ui/badge";
 import DeviceActionsBar from "./DeviceActionsBar";
 import ActionsDropdown from "./DeviceActionsDropdown";
 import { useBlockchain } from "@/hooks/useBlockchain";
+import { Button } from "./ui/button";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
+import { Link } from "react-router-dom";
 
 const DeviceManager = () => {
-  const { fetchedDevices } = useBlockchain();
+  const { fetchedDevices, addDevice, fetchedCustomers } = useBlockchain();
   const [selectedDevices, setSelectedDevices] = useState<string[]>([])
   const [editDevice, setEditDevice] = useState<DeviceType | null>(null)
+  const handleCopyAddress = useCopyToClipboard();
 
   const handleEditDevice = () => {}
   const handleDeleteDevice = (deviceSN:string) => {console.log(deviceSN)}
+
+  
+  const getCustomerName = (address:string) => {
+    console.log("Getting name for customer: "+address)
+    console.log(fetchedCustomers);
+    const customer = fetchedCustomers.find((customer) => {
+      console.log("Customer address: "+ customer.address); 
+      return customer.address === address
+    });
+    console.log(customer)
+    return customer ? customer.name : "unknown";
+  };
 
   const toggleSelectAll = () => {
     if (selectedDevices.length === fetchedDevices.length) {
@@ -38,7 +54,7 @@ const DeviceManager = () => {
     <>
     <div className="space-y-6 w-full">
       <div className="flex flex-col justify-between items-center gap-4">
-        <DeviceActionsBar selectedDevices={selectedDevices}/>
+        <DeviceActionsBar selectedDevices={selectedDevices} addDevice={addDevice}/>
         <div className="border rounded-md w-full">
           <Table>
             <TableHeader>
@@ -50,7 +66,8 @@ const DeviceManager = () => {
                   />
                 </TableHead>
                 <TableHead>Serial Number</TableHead>
-                <TableHead>Customer Address</TableHead>
+                <TableHead>Contract</TableHead>
+                <TableHead>Assigned to</TableHead>
                 <TableHead>State</TableHead>
                 <TableHead className="w-[100px]">Actions</TableHead>
               </TableRow>
@@ -72,7 +89,23 @@ const DeviceManager = () => {
                         />
                       </TableCell>
                       <TableCell>{device.sn}</TableCell>
-                      <TableCell>{truncateMiddle(device.customer)}</TableCell>
+                      <TableCell>
+                        {truncateMiddle(device.address)}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleCopyAddress(device.customer)}
+                          title="Copy address"
+                        >
+                          <Copy className="h-4 w-4" />
+                          <span className="sr-only">Copy address</span>
+                        </Button>
+                      </TableCell>
+                      <Link to={`/customers/${encodeURIComponent(getCustomerName(device.customer))}`} >
+                        <TableCell>                        
+                          {getCustomerName(device.customer)}
+                        </TableCell>
+                      </Link>
                       <TableCell>
                         <Badge variant={device.locked ? "secondary" : "outline"}>
                           {device.locked ? (

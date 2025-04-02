@@ -6,21 +6,29 @@ import { DeviceType } from "@/context/BlockchainContext";
 import BatchDeviceImportForm from "./Modals/BatchDeviceImportForm";
 import BatchEditForm from "./Modals/BatchEditForm";
 
+
 interface DeviceActionsBarProps {
   selectedDevices: string[];
+  addDevice: (sn:string, _customer:string, _metadata:string ) => void;
 }
 
-const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices}) => {
+const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addDevice}) => {
   const [batchDevices, setBatchDevices] = useState<string>("")
   const [batchEditProperty, setBatchEditProperty] = useState<string>("")
   const [batchEditValue, setBatchEditValue] = useState<string>("")
   const [newDevice, setNewDevice] = useState<DeviceType>({
+    address: "",
     sn: "",
     customer: "",
-    locked: false,
+    locked: 1,
+    metadata: "QmNPyntq8DLiV1M6ru9CVixpEvuhmwTbJytPARoEjMqDPN/35eaffe809a27639951d8e36c57a1c3f784cbe3855b309ebe3708c532b4bda46.json"
   })
 
-  const handleAddDevice = () => {console.log(newDevice)}
+  const handleAddDevice = () => {
+    console.log(newDevice)
+    addDevice(newDevice.sn, newDevice.customer, newDevice.metadata);
+  }
+
   const handleBatchImport = () => {}
   const handleBatchEdit = () => {}
   

@@ -118,3 +118,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+a, .router-link, a[href] {
+  transition: all 0.5s ease;
+}
+
+a:hover, .router-link:hover, a[href]:hover {
+  color: #1e40af;
+  text-decoration: underline;
+  cursor: pointer;
+}

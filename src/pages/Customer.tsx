@@ -6,12 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CustomerType } from "@/context/BlockchainContext";
 import { useBlockchain } from "@/hooks/useBlockchain";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { truncateMiddle } from "@/utils";
 import { Copy, Edit, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
-import { toast } from "sonner";
+
 
 const Customer = () => {
   const {customerName} = useParams();
@@ -21,6 +22,7 @@ const Customer = () => {
   const [editing, setEditing] = useState(false)
   const [editedCustomer, setEditedCustomer] = useState<CustomerType | null>(null)
   const [newAdmin, setNewAdmin] = useState<string>("")
+  const handleCopyAddress = useCopyToClipboard();
 
   const handleSaveChanges = () => {
     if (editedCustomer) {
@@ -34,14 +36,6 @@ const Customer = () => {
   const handleAddAddress = () => {
     console.log("New admin: "+newAdmin)
     // In a real app, you would make an API call here
-  }
-
-  const handleCopyAddress = (address: string) => {
-    navigator.clipboard.writeText(address)
-    toast("Address copied", {
-      description: `${address} " has been copied to your clipboard`,
-      duration: 3000,
-    })
   }
 
   useEffect(() => {

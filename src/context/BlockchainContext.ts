@@ -1,9 +1,11 @@
 import { createContext } from "react";
 
 export interface DeviceType {
+  address: string,
   sn: string,
   customer: string,
-  locked: boolean,
+  locked: number,
+  metadata: string,
 }
 
 export interface CustomerType {
@@ -18,6 +20,7 @@ export interface CustomerType {
 type BlockchainContextType = { // The context is an array of providers
   fetchedDevices: Array<DeviceType>;
   refetchDevices: () => void;
+  addDevice: (_sn:string, _customer:string, _metadata:string) => void;
   fetchedCustomers: Array<CustomerType>;
   refetchCustomers: () => void;
   createCustomer: (_parentAddress:string, _name:string) => void;
@@ -28,6 +31,7 @@ const BlockchainContext = createContext<BlockchainContextType>({
     // Default context
     fetchedDevices: [],
     refetchDevices: () => {},
+    addDevice: () => {},
     fetchedCustomers: [],
     refetchCustomers: () => {},
     createCustomer: () => {}

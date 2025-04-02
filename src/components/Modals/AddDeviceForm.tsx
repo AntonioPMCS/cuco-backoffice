@@ -1,6 +1,7 @@
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { DeviceType } from "@/context/BlockchainContext";
+import { useBlockchain } from "@/hooks/useBlockchain";
 
 interface AddDeviceFormProps {
   newDevice: DeviceType;
@@ -9,6 +10,10 @@ interface AddDeviceFormProps {
 
 
 const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) => {
+  const {fetchedCustomers} = useBlockchain();
+
+  console.log(fetchedCustomers)
+  
   return (
     <>
       <div className="grid gap-2 py-4">
@@ -34,23 +39,44 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) 
         />
       </div>
       <div>
-        <Label htmlFor="locked">State</Label>
+        <Label htmlFor="customerAddress">Customer</Label>
         <Select
-          value={newDevice.locked? "locked" : "unlocked"}
+          value={newDevice.customer}
           onValueChange={ (value) => setNewDevice({
             ...newDevice,
-            locked: value == "Locked" ? true: false
+            customer: value
+          })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select customer"/>
+          </SelectTrigger>
+          <SelectContent>
+            { fetchedCustomers.map((customer) => {
+              return <SelectItem value={customer.address}>{customer.name}</SelectItem>
+            })
+            }
+          </SelectContent>
+        </Select>
+      </div>
+      {/*<div>
+        <Label htmlFor="locked">State</Label>
+        <Select
+          value={(newDevice?.locked ?? newDevice.locked).toString()}
+          onValueChange={ (value) => setNewDevice({
+            ...newDevice,
+            locked: Number(value)
           })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select state"/>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="locked">Locked</SelectItem>
-            <SelectItem value="unlocked">Unlocked</SelectItem>
+          <SelectItem value="1">Unlocked</SelectItem>
+            <SelectItem value="2">Locked</SelectItem>
+            <SelectItem value="0">Free</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </div>*/}
     </>
     
   )
