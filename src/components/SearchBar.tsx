@@ -41,7 +41,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ placeholder = "Serial Number...",
         )}
         <button type="submit" className="search-btn">🔍</button>
       </form>
-      <SearchFilter />  
+      {false && <SearchFilter /> }
     </div>
     
   );

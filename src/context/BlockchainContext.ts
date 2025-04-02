@@ -21,6 +21,7 @@ type BlockchainContextType = { // The context is an array of providers
   fetchedDevices: Array<DeviceType>;
   refetchDevices: () => void;
   addDevice: (_sn:string, _customer:string, _metadata:string) => void;
+  setDeviceState: (_state:number, _address:string) => void;
   fetchedCustomers: Array<CustomerType>;
   refetchCustomers: () => void;
   createCustomer: (_parentAddress:string, _name:string) => void;
@@ -32,6 +33,7 @@ const BlockchainContext = createContext<BlockchainContextType>({
     fetchedDevices: [],
     refetchDevices: () => {},
     addDevice: () => {},
+    setDeviceState: () => {},
     fetchedCustomers: [],
     refetchCustomers: () => {},
     createCustomer: () => {}

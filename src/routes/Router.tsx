@@ -6,6 +6,8 @@ import Customers from "@/pages/Customers";
 import Customer from "@/pages/Customer";
 import CustomerManager from "@/components/CustomerManager";
 import { Navigate } from "react-router-dom";
+import DeviceManager from "@/components/DeviceManager";
+import Device from "@/pages/Device";
 
 const router = createBrowserRouter([
   {
@@ -14,7 +16,14 @@ const router = createBrowserRouter([
     errorElement: <NotFoundPage />, 
     children: [
       { path: "/", element: <Navigate to="/devices" replace /> },
-      { path: "/devices", element: <Devices /> },
+      { 
+        path: "/devices", 
+        element: <Devices />,
+        children: [
+          { index: true, element: <DeviceManager />},
+          { path: ":deviceSN", element: <Device />}  // dynamic segment for customer name
+        ]
+      },
       { 
         path: "/customers", 
         element: <Customers />, 

@@ -7,7 +7,7 @@ import { useCustomers } from "@/hooks/useCustomers";
 
 const BlockchainProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   const { ethersProvider } = useWalletProviders();
-  const { devices, fetchDevices, addDevice } = useDevices();
+  const { devices, fetchDevices, addDevice, setDeviceState } = useDevices();
   const { customers, fetchCustomers, createCustomer } = useCustomers();
 
   // Fetch data once on mount or when provider changes.
@@ -23,6 +23,7 @@ const BlockchainProvider: React.FC<{children: React.ReactNode}> = ({children}) =
         fetchedDevices: devices,
         refetchDevices: fetchDevices, 
         addDevice,
+        setDeviceState,
         fetchedCustomers: customers,
         refetchCustomers: fetchCustomers,
         createCustomer

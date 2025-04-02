@@ -67,6 +67,37 @@ export const useDevices = () => {
 
   // More device actions (create, update, etc.) can be added here.
 
+  const setDeviceState = useCallback(async (_newState:number, _address:string) => {
+    if (!ethersProvider) return;
+    try {
+      console.log("Editing device state...");
+      const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
+      const contract:Contract = new Contract(_address, Device.abi, signer);
+      const tx:TransactionResponse = await contract.setState(_newState);
+      console.log("Transaction sent:", tx.hash);
+      const receipt = await tx.wait();
+      if (receipt) {
+        console.log("Transaction confirmed:", receipt);
+        const logs = receipt.logs;
+        const deviceInterface = new Interface(Device.abi);
+        const parsedLog = deviceInterface.parseLog(logs[logs.length-1]); //last log is event emitted
+        console.log(parsedLog);
+        //const newDeviceState:string = parsedLog?.args.newDeviceState;
+        /*setDevices(devices.map((device) => {
+          if (device.address == _address) {
+            device.locked = newDeviceState;
+          }
+        }));*/
+      } else {
+        throw Error("Transaction receipt differs from expected");
+      }
+      
+    } catch (error) {
+      console.error("Unable to create device", error);
+      return;
+    }
+  }, [ethersProvider, chainId])
+
   const addDevice = useCallback(async (_sn:string, _customer: string, _metadata:string) => {
     if (!ethersProvider) return;
     let contractAddress;
@@ -104,5 +135,5 @@ export const useDevices = () => {
     }
   }, [ethersProvider, chainId])
 
-  return { devices, fetchDevices, addDevice };
+  return { devices, fetchDevices, addDevice, setDeviceState };
 };

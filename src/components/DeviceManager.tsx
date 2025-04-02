@@ -88,7 +88,13 @@ const DeviceManager = () => {
                           onCheckedChange={() => toggleDeviceSelection(device.sn)}
                         />
                       </TableCell>
-                      <TableCell>{device.sn}</TableCell>
+                      
+                      <Link to={`/devices/${encodeURIComponent(device.sn)}`} >
+                        <TableCell>           
+                          {device.sn}
+                        </TableCell>
+                      </Link>
+
                       <TableCell>
                         {truncateMiddle(device.address)}
                         <Button
@@ -107,13 +113,13 @@ const DeviceManager = () => {
                         </TableCell>
                       </Link>
                       <TableCell>
-                        <Badge variant={device.locked ? "secondary" : "outline"}>
-                          {device.locked ? (
-                            <Lock className="mr-1 h-3 w-3" />
-                          ) : (
+                        <Badge variant={device.locked < 2 ? "secondary" : "outline"}>
+                          {device.locked < 2 ? (
                             <Unlock className="mr-1 h-3 w-3" />
+                          ) : (
+                            <Lock className="mr-1 h-3 w-3" />
                           )}
-                          {device.locked}
+                          {device.locked == 0 ? "Free" : device.locked == 1 ? "Unlocked" : "Locked"}
                         </Badge>
                       </TableCell>
                       <TableCell>

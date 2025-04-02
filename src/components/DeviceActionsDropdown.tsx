@@ -71,7 +71,7 @@ const DeviceActionsDropdown:React.FC<DeviceActionsDropdownProps> = ({editDevice,
                 <div className="grid gap-2">
                   <Label htmlFor="edit-state">State</Label>
                   <Select
-                    value={(editDevice?.locked || device.locked) ? "2" : "1"}
+                    value={(editDevice?.locked ?? device.locked).toString()}
                     onValueChange={(value) =>
                       setEditDevice({
                         ...(editDevice || device),
@@ -89,6 +89,20 @@ const DeviceActionsDropdown:React.FC<DeviceActionsDropdownProps> = ({editDevice,
                       <SelectItem value="0">Free</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-serialNumber">Metadata IPFS URI</Label>
+                  <Input
+                    id="edit-metadata_uri"
+                    value={editDevice?.metadata || device.metadata}
+                    onChange={(e) =>
+                      setEditDevice({
+                        ...(editDevice || device),
+                        metadata: e.target.value,
+                      })
+                    }
+                    onClick={() => setEditDevice(device)}
+                  />
                 </div>
               </div>
               <DialogFooter>

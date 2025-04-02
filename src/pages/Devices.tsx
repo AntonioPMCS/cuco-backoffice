@@ -1,5 +1,5 @@
 import SearchBar from "../components/SearchBar"
-import DeviceManager from "../components/DeviceManager"
+import { Outlet } from "react-router-dom"
 
 const Devices = () => {
 
@@ -9,7 +9,7 @@ const Devices = () => {
   return (
     <div className="flex flex-col justify-between items-center gap-5">
       <SearchBar handleSearch={handleSearch} />
-      <DeviceManager />
+      <Outlet />
     </div>
   ) 
 }
