@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CustomerType } from "@/context/BlockchainContext";
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
+import { useWalletProviders } from "@/hooks/useWalletProviders";
 import { truncateMiddle } from "@/utils";
 import { Copy, Edit, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -16,7 +17,8 @@ import { useParams } from 'react-router-dom';
 
 const Customer = () => {
   const {customerName} = useParams();
-  const {fetchedCustomers} = useBlockchain();
+  const {fetchedCustomers, addAdmin} = useBlockchain();
+  const {selectedWallet} = useWalletProviders();
   const [customer, setCustomer] = useState<CustomerType | undefined>();
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -34,8 +36,11 @@ const Customer = () => {
   } 
 
   const handleAddAddress = () => {
+    if (!customer)
+      return;
     console.log("New admin: "+newAdmin)
     // In a real app, you would make an API call here
+    addAdmin(customer?.address, newAdmin)
   }
 
   useEffect(() => {
@@ -176,9 +181,12 @@ const Customer = () => {
                   <Button variant="outline">Cancel</Button>
                 </DialogClose>
                 <DialogClose asChild>
-                  <Button onClick={handleAddAddress}>Add Address</Button>
+                  <Button onClick={handleAddAddress} disabled={selectedWallet ? false : true}>Add Address</Button>
                 </DialogClose>
               </DialogFooter>
+              {!selectedWallet && 
+                <span className="text-red-500 text-sm text-right block">You must connect your wallet to transact with the blockchain</span>
+              }
             </DialogContent>
           </Dialog>
         </CardHeader>
@@ -221,7 +229,7 @@ const Customer = () => {
       </Card>
 
 
-      <Link to="/">Home</Link>
+      <Link to="/">{`<<< Home`}</Link>
     </div>
   )
 }

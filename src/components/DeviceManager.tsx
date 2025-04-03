@@ -100,7 +100,7 @@ const DeviceManager = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleCopyAddress(device.customer)}
+                          onClick={() => handleCopyAddress(device.address)}
                           title="Copy address"
                         >
                           <Copy className="h-4 w-4" />
@@ -113,13 +113,13 @@ const DeviceManager = () => {
                         </TableCell>
                       </Link>
                       <TableCell>
-                        <Badge variant={device.locked < 2 ? "secondary" : "outline"}>
-                          {device.locked < 2 ? (
+                        <Badge variant={device.deviceState < 2 ? "outline" : "secondary"}>
+                          {device.deviceState < 2 ? (
                             <Unlock className="mr-1 h-3 w-3" />
                           ) : (
                             <Lock className="mr-1 h-3 w-3" />
                           )}
-                          {device.locked == 0 ? "Free" : device.locked == 1 ? "Unlocked" : "Locked"}
+                          {device.deviceState == 0 ? "Free" : device.deviceState == 1 ? "Unlocked" : "Locked"}
                         </Badge>
                       </TableCell>
                       <TableCell>

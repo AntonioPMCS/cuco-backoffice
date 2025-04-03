@@ -60,7 +60,7 @@ export const useDevices = () => {
       address: await deviceContract.getAddress(),
       sn: await deviceContract.sn(),
       customer: await deviceContract.customer(),
-      locked: await deviceContract.locked(),
+      deviceState: await deviceContract.deviceState(),
       metadata: await deviceContract.metadata(),
     };
   };
@@ -69,11 +69,22 @@ export const useDevices = () => {
 
   const setDeviceState = useCallback(async (_newState:number, _address:string) => {
     if (!ethersProvider) return;
+    let cucoAddress;
+    const network = (await ethersProvider.getNetwork()).name;
+    switch (network) {
+      case "sepolia":
+        cucoAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
+        break;
+      default:
+        cucoAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
+        break;
+    }
     try {
+      
       console.log("Editing device state...");
       const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
-      const contract:Contract = new Contract(_address, Device.abi, signer);
-      const tx:TransactionResponse = await contract.setState(_newState);
+      const contract:Contract = new Contract(cucoAddress, CuCoBlockchain.abi, signer);
+      const tx:TransactionResponse = await contract.setDeviceState(_newState, _address);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
       if (receipt) {

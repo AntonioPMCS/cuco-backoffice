@@ -71,11 +71,11 @@ const DeviceActionsDropdown:React.FC<DeviceActionsDropdownProps> = ({editDevice,
                 <div className="grid gap-2">
                   <Label htmlFor="edit-state">State</Label>
                   <Select
-                    value={(editDevice?.locked ?? device.locked).toString()}
+                    value={(editDevice?.deviceState ?? device.deviceState).toString()}
                     onValueChange={(value) =>
                       setEditDevice({
                         ...(editDevice || device),
-                        locked: Number(value),
+                        deviceState: Number(value),
                       })
                     }
                     onOpenChange={() => !editDevice && setEditDevice(device)}

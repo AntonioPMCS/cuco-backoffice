@@ -5,12 +5,20 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Button } from "./ui/button";
 import { Menu } from "lucide-react";
+import { useWalletProviders } from "@/hooks/useWalletProviders";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const {selectedWallet} = useWalletProviders();
+
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 mb-5">
+        {!selectedWallet && 
+          <span className="text-sm italic text-center">
+            Using fallback provider @ Sepolia testnet for read-only operations. Connect your wallet to transact with the blockchain.
+          </span>
+        }
         <div className="container flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">

@@ -27,19 +27,8 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) 
         })}
       />
       </div>
-      <div className="grid gap-2">
-        <Label htmlFor="customerAddress">Customer Address</Label>
-        <input
-          id="customerAddress"
-          value={newDevice.customer}
-          onChange={ (e) => setNewDevice({
-            ...newDevice,
-            customer: e.target.value
-          })}
-        />
-      </div>
       <div>
-        <Label htmlFor="customerAddress">Customer</Label>
+        <Label htmlFor="customerAddress" className="mb-2">Customer</Label>
         <Select
           value={newDevice.customer}
           onValueChange={ (value) => setNewDevice({
@@ -57,6 +46,17 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) 
             }
           </SelectContent>
         </Select>
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="customerAddress">Customer Address</Label>
+        <input
+          id="customerAddress"
+          value={newDevice.customer}
+          onChange={ (e) => setNewDevice({
+            ...newDevice,
+            customer: e.target.value
+          })}
+        />
       </div>
       {/*<div>
         <Label htmlFor="locked">State</Label>

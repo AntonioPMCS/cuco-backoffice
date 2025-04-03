@@ -3,8 +3,8 @@ import { DiscoverWalletProviders } from '../components/DiscoverWalletProviders';
 import { useEffect } from "react";
 import { truncateMiddle, formatChainAsString } from "../utils";
 import { useWalletProviders } from "../hooks/useWalletProviders";
-import { Dialog, DialogContent, DialogClose, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "./ui/dialog";
-import { KeyRound } from "lucide-react";
+import { Dialog, DialogContent, DialogClose, DialogTitle, DialogTrigger, DialogDescription } from "./ui/dialog";
+import { KeyRound, X } from "lucide-react";
 import { Button } from "./ui/button";
 
 const ConnectionBar = () => {
@@ -34,31 +34,26 @@ const ConnectionBar = () => {
   return (
     <div className="connection-bar">
       { !selectedAccount &&
-        <>
           <Dialog>
             <DialogTrigger asChild>
-              <Button>
-                <KeyRound className="mr-2 h-4 w-4" />CONNECT
-              </Button>
+              <Button><KeyRound className="mr-2 h-4 w-4" />CONNECT</Button>
             </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  Connect your wallet
-                </DialogTitle>
-                <DialogDescription>Choose a provider to connect to the blockchain.</DialogDescription>
-              </DialogHeader>  
-              <div className="grid gap-4 py-4">
+            <DialogContent className="p-0 border border-gray-200 bg-white text-gray-800 max-w-md shadow-md">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <DialogTitle className="text-lg font-medium text-gray-900">
+                  Connect a Wallet
+              </DialogTitle>
+              <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none">
+                <span className="sr-only">Close</span>
+              </DialogClose>
+            </div>
+            <div className="p-4">
+              <div className="space-y-3">
                 <DiscoverWalletProviders handleClick={handleConnect}/>
               </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent> 
-          </Dialog>
-        </>
+            </div>
+          </DialogContent> 
+        </Dialog>
       }
       { selectedAccount && chainId &&
         <>

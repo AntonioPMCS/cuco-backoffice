@@ -4,7 +4,7 @@ export interface DeviceType {
   address: string,
   sn: string,
   customer: string,
-  locked: number,
+  deviceState: number,
   metadata: string,
 }
 
@@ -25,6 +25,7 @@ type BlockchainContextType = { // The context is an array of providers
   fetchedCustomers: Array<CustomerType>;
   refetchCustomers: () => void;
   createCustomer: (_parentAddress:string, _name:string) => void;
+  addAdmin: (_customerAddress:string, _newAdmin:string) => void;
 };
 
 
@@ -36,7 +37,8 @@ const BlockchainContext = createContext<BlockchainContextType>({
     setDeviceState: () => {},
     fetchedCustomers: [],
     refetchCustomers: () => {},
-    createCustomer: () => {}
+    createCustomer: () => {},
+    addAdmin: () => {},
 });
 
 export default BlockchainContext;

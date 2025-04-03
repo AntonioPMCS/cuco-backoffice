@@ -20,7 +20,7 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
     address: "",
     sn: "",
     customer: "",
-    locked: 1,
+    deviceState: 1,
     metadata: "QmNPyntq8DLiV1M6ru9CVixpEvuhmwTbJytPARoEjMqDPN/35eaffe809a27639951d8e36c57a1c3f784cbe3855b309ebe3708c532b4bda46.json"
   })
 

@@ -1,6 +1,9 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { DeviceType } from "@/context/BlockchainContext";
 import { useBlockchain } from "@/hooks/useBlockchain";
+import { Check, Edit, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
@@ -8,23 +11,49 @@ import { useParams } from 'react-router-dom';
 
 const Device = () => {
   const {deviceSN} = useParams();
-  const {fetchedDevices} = useBlockchain();
+  const {fetchedDevices, setDeviceState, fetchedCustomers} = useBlockchain();
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true)
   // Add state for inline editing
-  // const [editingField, setEditingField] = useState<string | null>(null);
-  // const [tempValue, setTempValue] = useState("");
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [tempValue, setTempValue] = useState("");
 
-  // // Handle edit button click
-  // const handleEdit = (field: string, value: string) => {
-  //   setEditingField(field)
-  //   setTempValue(value)
-  // }
+    
+  const getCustomerName = (address:string) => {
+    console.log("Getting name for customer: "+address)
+    console.log(fetchedCustomers);
+    const customer = fetchedCustomers.find((customer) => {
+      console.log("Customer address: "+ customer.address); 
+      return customer.address === address
+    });
+    console.log(customer)
+    return customer ? customer.name : "unknown";
+  };
 
-  // // Handle save button click
-  // const handleSave = async () => {
-  //   if (!device || !editingField) return
+  // Handle edit button click
+  const handleEdit = (field: string, value: string) => {
+     setEditingField(field)
+     setTempValue(value)
+  }
 
+  // Handle cancel button click
+  const handleCancel = () => {
+    setEditingField(null)
+  }
+
+  // Handle save button click
+  const handleSave = async () => {
+    if (!device || !editingField) return
+
+    switch (editingField) {
+      case "state": 
+        setDeviceState(Number(tempValue), device.address);
+        setEditingField(null);
+        break;
+    
+      default:
+        break;
+    }
   //   // Create updated device object
   //   const updatedDevice = {
   //     ...device,
@@ -34,12 +63,7 @@ const Device = () => {
   //   // Update device in blockchain context
   //   // Note: You'll need to implement updateDevice in your blockchain context
   //   switch (editingField) {
-  //     case state:
-        
-  //       break;
-    
-  //     default:
-  //       break;
+
   //   }
   //   if (typeof updateDevice === "function") {
   //     try {
@@ -56,7 +80,7 @@ const Device = () => {
 
   //   // Reset editing state
   //   setEditingField(null)
-  // }
+  }
 
   useEffect(() => {
     if (!fetchedDevices) return;
@@ -65,6 +89,41 @@ const Device = () => {
   }, [fetchedDevices, deviceSN]);
 
 
+  // Render a field with inline edit functionality
+  const renderEditableField = (label: string, field: string, value: string) => {
+    const isEditing = editingField === field
+
+    return (
+      <div>
+        <h3 className="text-sm font-medium text-muted-foreground mb-1">{label}</h3>
+        <div className="flex items-center gap-2 group">
+          {isEditing ? (
+            <>
+              <Input value={tempValue} onChange={(e) => setTempValue(e.target.value)} className="flex-1" autoFocus />
+              <Button size="icon" variant="ghost" onClick={handleSave} className="h-8 w-8">
+                <Check className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="ghost" onClick={handleCancel} className="h-8 w-8">
+                <X className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className="text-base flex-1">{value}</p>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => handleEdit(field, value)}
+                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
@@ -97,27 +156,18 @@ const Device = () => {
         <CardContent className="pt-6">
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Name</h3>
-                <p className="text-base">{device.sn}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Customer</h3>
-                <p className="text-base">{device.customer || "N/A"}</p>
-              </div>
+              {renderEditableField("Serial Number", "sn", device.sn)}
+              {renderEditableField("State", "state", device.deviceState.toString())}
+              {renderEditableField("Belongs to customer", "customer", getCustomerName(device.customer) || "N/A")}
               <div className="md:col-span-1">
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Address</h3>
+                <h3 className="text-sm font-medium text-muted-foreground mb-1">Device Contract (immutable)</h3>
                 <p className="text-base">{device.address}</p>
-              </div>
-              <div className="md:col-span-1">
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">State</h3>
-                <p className="text-base">{device.locked}</p>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
-      <Link to="/">Home</Link>
+      <Link to="/">{`<<< Home`}</Link>
     </div>
   )
 }

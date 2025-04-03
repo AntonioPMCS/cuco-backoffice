@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Contract, Signer, TransactionResponse, Interface } from "ethers";
+import { Contract, Signer, TransactionResponse, Interface, FallbackProvider } from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Customer from "../../abi/Customer.json";
 import { CustomerType } from "../context/BlockchainContext";
@@ -51,15 +51,20 @@ export const useCustomers = () => {
   const fetchCustomerInstance = async (address: string): Promise<CustomerType> => {
     const customerContract = new Contract(address, Customer.abi, ethersProvider);
     try { 
-      const parentAddress = await customerContract.parent()
-      const parentContract = new Contract(address, Customer.abi, ethersProvider);
-      
+      const parentAddress = await customerContract.parent();
+      let parentName:string;
+      if (parentAddress == "0x0000000000000000000000000000000000000000") {
+        parentName = ""
+      } else {
+        const parentContract = new Contract(parentAddress, Customer.abi, ethersProvider);
+        parentName = await parentContract.name()
+      }
+    
       const authorizedUsers:string[] = await customerContract.getAuthorizedUsers();
-
       return {
         name: await customerContract.name(),
         parent: parentAddress,
-        parentName: await parentContract.name(),
+        parentName: parentName,
         address,
         authorizedUsers: authorizedUsers
       };
@@ -71,6 +76,47 @@ export const useCustomers = () => {
   };
 
   // Additional customer actions (edit, create, etc.) can be added here.
+  const addAdmin = useCallback(async (_customerAddress: string, _newAdmin:string) => {
+    try {
+      if (!ethersProvider) return;
+      if (ethersProvider instanceof FallbackProvider) {
+        throw Error("Connect to your wallet")
+      }
+      let contractAddress;
+      const network = (await ethersProvider.getNetwork()).name;
+      switch (network) {
+        case "sepolia":
+          contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
+          break;
+        default:
+          contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
+          break;
+      }
+      // TODO: Abstract getting and checking signer and providers
+      const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
+      const contract:Contract = new Contract(contractAddress, CuCoBlockchain.abi, signer);
+      const tx:TransactionResponse = await contract.authorizeUser(_customerAddress, _newAdmin);
+      console.log("Transaction sent:", tx.hash);
+      const receipt = await tx.wait();
+      if (receipt) {
+        console.log("Transaction confirmed:", receipt);
+        // Buscar o customer
+        // modificar o authorized users
+        // Array.map ( (ele) => address = address )
+        setCustomers(customers.map( (customer) => {
+          if (customer.address == _customerAddress) {
+            return {...customer, authorizedUsers: [...customer.authorizedUsers, _newAdmin] }
+          }
+          return customer;
+        }));
+      } else {
+        throw Error("Transaction receipt differs from expected");
+      }
+    } catch (error) {
+      console.error("Unable to create customers", error);
+      return;
+    }
+  }, [ethersProvider, chainId, customers])
 
   const createCustomer = useCallback(async (_parentAddress: string, _name:string) => {
     if (!ethersProvider) return;
@@ -110,5 +156,5 @@ export const useCustomers = () => {
     }
   }, [ethersProvider, chainId])
 
-  return { customers, fetchCustomers, createCustomer };
+  return { customers, fetchCustomers, createCustomer, addAdmin };
 };
