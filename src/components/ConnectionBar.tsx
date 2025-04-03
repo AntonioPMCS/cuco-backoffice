@@ -3,8 +3,8 @@ import { DiscoverWalletProviders } from '../components/DiscoverWalletProviders';
 import { useEffect } from "react";
 import { truncateMiddle, formatChainAsString } from "../utils";
 import { useWalletProviders } from "../hooks/useWalletProviders";
-import { Dialog, DialogContent, DialogClose, DialogTitle, DialogTrigger, DialogDescription } from "./ui/dialog";
-import { KeyRound, X } from "lucide-react";
+import { Dialog, DialogContent, DialogClose, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { KeyRound} from "lucide-react";
 import { Button } from "./ui/button";
 
 const ConnectionBar = () => {
