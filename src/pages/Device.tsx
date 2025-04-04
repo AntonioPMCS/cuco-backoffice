@@ -1,9 +1,8 @@
-import { Button } from "@/components/ui/button";
+
+import { RenderEditableDropdown, RenderEditableText } from "@/components/FormFields";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { DeviceType } from "@/context/BlockchainContext";
 import { useBlockchain } from "@/hooks/useBlockchain";
-import { Check, Edit, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
@@ -14,11 +13,13 @@ const Device = () => {
   const {fetchedDevices, setDeviceState, fetchedCustomers} = useBlockchain();
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true)
-  // Add state for inline editing
-  const [editingField, setEditingField] = useState<string | null>(null);
-  const [tempValue, setTempValue] = useState("");
 
-    
+  const options = [ 
+                    { label: "Free", value:"0"},
+                    { label: "Unlocked", value: "1"},
+                    { label: "Locked", value: "2"}
+                  ]
+ 
   const getCustomerName = (address:string) => {
     console.log("Getting name for customer: "+address)
     console.log(fetchedCustomers);
@@ -30,56 +31,28 @@ const Device = () => {
     return customer ? customer.name : "unknown";
   };
 
-  // Handle edit button click
-  const handleEdit = (field: string, value: string) => {
-     setEditingField(field)
-     setTempValue(value)
-  }
-
-  // Handle cancel button click
-  const handleCancel = () => {
-    setEditingField(null)
-  }
-
   // Handle save button click
-  const handleSave = async () => {
-    if (!device || !editingField) return
+  const handleSave = async (field:string, newValue:string) => {
+    if (!device) return
+    setLoading(true);
 
-    switch (editingField) {
-      case "state": 
-        setDeviceState(Number(tempValue), device.address);
-        setEditingField(null);
-        break;
-    
-      default:
-        break;
+    try {
+      switch (field) {
+        case "deviceState": 
+          await setDeviceState(Number(newValue), device.address);
+          break;
+        default:
+          break;
+      } 
+      // Update the device state locally after successful blockchain update
+      setDevice((prevDevice) =>
+        prevDevice ? { ...prevDevice, [field]: newValue } : prevDevice
+      );
+    } catch(error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
-  //   // Create updated device object
-  //   const updatedDevice = {
-  //     ...device,
-  //     [editingField]: tempValue,
-  //   }
-
-  //   // Update device in blockchain context
-  //   // Note: You'll need to implement updateDevice in your blockchain context
-  //   switch (editingField) {
-
-  //   }
-  //   if (typeof updateDevice === "function") {
-  //     try {
-  //       await updateDevice(updatedDevice)
-  //       // Update local state
-  //       setDevice(updatedDevice)
-  //     } catch (error) {
-  //       console.error("Failed to update device:", error)
-  //     }
-  //   } else {
-  //     // If updateDevice is not available, just update local state
-  //     setDevice(updatedDevice)
-  //   }
-
-  //   // Reset editing state
-  //   setEditingField(null)
   }
 
   useEffect(() => {
@@ -88,42 +61,6 @@ const Device = () => {
     setDevice(fetchedDevices.find((_device) => _device.sn == deviceSN ));
   }, [fetchedDevices, deviceSN]);
 
-
-  // Render a field with inline edit functionality
-  const renderEditableField = (label: string, field: string, value: string) => {
-    const isEditing = editingField === field
-
-    return (
-      <div>
-        <h3 className="text-sm font-medium text-muted-foreground mb-1">{label}</h3>
-        <div className="flex items-center gap-2 group">
-          {isEditing ? (
-            <>
-              <Input value={tempValue} onChange={(e) => setTempValue(e.target.value)} className="flex-1" autoFocus />
-              <Button size="icon" variant="ghost" onClick={handleSave} className="h-8 w-8">
-                <Check className="h-4 w-4" />
-              </Button>
-              <Button size="icon" variant="ghost" onClick={handleCancel} className="h-8 w-8">
-                <X className="h-4 w-4" />
-              </Button>
-            </>
-          ) : (
-            <>
-              <p className="text-base flex-1">{value}</p>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => handleEdit(field, value)}
-                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
-    )
-  }
 
   if (loading) {
     return (
@@ -156,9 +93,16 @@ const Device = () => {
         <CardContent className="pt-6">
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {renderEditableField("Serial Number", "sn", device.sn)}
-              {renderEditableField("State", "state", device.deviceState.toString())}
-              {renderEditableField("Belongs to customer", "customer", getCustomerName(device.customer) || "N/A")}
+              <RenderEditableText 
+                label="Serial Number" field="sn" value={device.sn} handleSave={handleSave}
+              />
+              <RenderEditableDropdown
+                label="State" field="deviceState" value={device.deviceState.toString()}
+                handleSave={handleSave} options={options}
+              />
+              <RenderEditableText
+                label="Belongs to customer" field="customer" value={getCustomerName(device.customer)} handleSave={handleSave}
+              />
               <div className="md:col-span-1">
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Device Contract (immutable)</h3>
                 <p className="text-base">{device.address}</p>

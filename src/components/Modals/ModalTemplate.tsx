@@ -41,7 +41,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({children, trigger, title, 
             </DialogClose>
           </DialogFooter>
           {!selectedWallet && 
-            <span className="text-red-500 text-sm text-right block">You must connect your wallet to transact with the blockchain</span>
+            <span className="text-red-500 text-sm text-right block">Connect a wallet to transact with the blockchain</span>
           }
         </DialogContent> 
       </Dialog>
