@@ -5,7 +5,7 @@ import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { Input } from "./ui/input";
-import { Edit, MoreVertical, Trash2 } from "lucide-react";
+import { Edit, EyeOff, MoreVertical } from "lucide-react";
 import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
 import { DeviceType } from "@/context/BlockchainContext";
 
@@ -14,10 +14,11 @@ interface DeviceActionsDropdownProps {
   setEditDevice: (device:DeviceType) => void;
   device: DeviceType;
   handleEditDevice: (arg0?:any) => void;
-  handleDeleteDevice: (arg0?:any) => void;
+  handleHideDevice: (address:string) => void;
 }
 
-const DeviceActionsDropdown:React.FC<DeviceActionsDropdownProps> = ({editDevice, setEditDevice, device, handleEditDevice, handleDeleteDevice}) => {
+const DeviceActionsDropdown:React.FC<DeviceActionsDropdownProps> = ({editDevice, setEditDevice, device, handleEditDevice, handleHideDevice}) => {
+  
   return (
     <>
       <DropdownMenu>
@@ -117,10 +118,10 @@ const DeviceActionsDropdown:React.FC<DeviceActionsDropdownProps> = ({editDevice,
           </Dialog>
           <DropdownMenuItem
             className="text-destructive focus:text-destructive"
-            onClick={() => handleDeleteDevice(device.sn)}
+            onClick={() => handleHideDevice(device.address)}
           >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            <EyeOff className="mr-2 h-4 w-4" />
+            Hide
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

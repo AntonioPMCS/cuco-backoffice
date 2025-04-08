@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Contract, Signer, TransactionResponse, Interface } from "ethers";
+import { Contract, Signer, TransactionResponse, Interface, Provider } from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Device from "../../abi/Device.json";
 import { DeviceType } from "../context/BlockchainContext";
@@ -9,27 +9,34 @@ export const useDevices = () => {
   const [devices, setDevices] = useState<DeviceType[]>([]);
   const {chainId, ethersProvider} = useWalletProviders()
 
-    // A helper function that returns a promise that rejects after a timeout.
-    const timeoutPromise = (ms: number) => new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Request timed out')), ms)
-    );
+  // A helper function that returns a promise that rejects after a timeout.
+  const timeoutPromise = (ms: number) => new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('Request timed out')), ms)
+  );
 
-  const fetchDevices = useCallback(async () => {
-    if (!ethersProvider) return;
-    let contractAddress;
+  // A helper to return the CUCo contract on current network
+  const getCuco = async (ethersProvider:Provider) => {
+
+    let cucoAddress;
     const network = (await ethersProvider.getNetwork()).name;
     switch (network) {
       case "sepolia":
-        contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
+        cucoAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
         break;
       default:
-        contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
+        cucoAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
         break;
     }
+    return cucoAddress;
+  }
+
+  const fetchDevices = useCallback(async () => {
+    if (!ethersProvider) return;
+    const cucoAddress = await getCuco(ethersProvider);
     let contract: Contract, rootCustomer: string;
     try {
       console.log("Fetching devices...");
-      contract = new Contract(contractAddress, CuCoBlockchain.abi, ethersProvider);
+      contract = new Contract(cucoAddress, CuCoBlockchain.abi, ethersProvider);
       rootCustomer = (await Promise.race([
         contract.getCustomers().then((customers: any[]) => customers[0]),
         timeoutPromise(10000),
@@ -62,6 +69,7 @@ export const useDevices = () => {
       customer: await deviceContract.customer(),
       deviceState: await deviceContract.deviceState(),
       metadata: await deviceContract.metadata(),
+      visible: await deviceContract.visible()
     };
   };
 
@@ -69,16 +77,7 @@ export const useDevices = () => {
 
   const setDeviceState = useCallback(async (_newState:number, _address:string) => {
     if (!ethersProvider) return;
-    let cucoAddress;
-    const network = (await ethersProvider.getNetwork()).name;
-    switch (network) {
-      case "sepolia":
-        cucoAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
-        break;
-      default:
-        cucoAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
-        break;
-    }
+    const cucoAddress = await getCuco(ethersProvider);
     try {
       
       console.log("Editing device state...");
@@ -93,12 +92,13 @@ export const useDevices = () => {
         const deviceInterface = new Interface(Device.abi);
         const parsedLog = deviceInterface.parseLog(logs[logs.length-1]); //last log is event emitted
         console.log(parsedLog);
-        //const newDeviceState:string = parsedLog?.args.newDeviceState;
-        /*setDevices(devices.map((device) => {
+        const newDeviceState:number = parsedLog?.args.newDeviceState;
+        setDevices(devices.map((device) => {
           if (device.address == _address) {
-            device.locked = newDeviceState;
+            return { ...device, deviceState: newDeviceState};
           }
-        }));*/
+          return device;
+        }));
       } else {
         throw Error("Transaction receipt differs from expected");
       }
@@ -111,20 +111,11 @@ export const useDevices = () => {
 
   const addDevice = useCallback(async (_sn:string, _customer: string, _metadata:string) => {
     if (!ethersProvider) return;
-    let contractAddress;
-    const network = (await ethersProvider.getNetwork()).name;
-    switch (network) {
-      case "sepolia":
-        contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
-        break;
-      default:
-        contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
-        break;
-    }
+    const cucoAddress = await getCuco(ethersProvider);
     try {
       console.log("Adding new device...");
       const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
-      const contract:Contract = new Contract(contractAddress, CuCoBlockchain.abi, signer);
+      const contract:Contract = new Contract(cucoAddress, CuCoBlockchain.abi, signer);
       const tx:TransactionResponse = await contract.createDevice(_customer, _sn, _metadata);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
@@ -146,5 +137,38 @@ export const useDevices = () => {
     }
   }, [ethersProvider, chainId])
 
-  return { devices, fetchDevices, addDevice, setDeviceState };
+  const toggleDeviceVisible = useCallback(async (_deviceAddress: string) => {
+    if (!ethersProvider) return;
+    const cucoAddress = await getCuco(ethersProvider);
+    try {
+      console.log("Setting Device Visible to false...");
+      const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
+      const contract:Contract = new Contract(cucoAddress, CuCoBlockchain.abi, signer);
+      const tx:TransactionResponse = await contract.toggleDeviceVisible(_deviceAddress);
+      console.log("Transaction sent:", tx.hash);
+      const receipt = await tx.wait();
+      if (receipt) {
+        console.log("Transaction confirmed:", receipt);
+        const logs = receipt.logs;
+        const cucoInterface = new Interface(CuCoBlockchain.abi);
+        const parsedLog = cucoInterface.parseLog(logs[logs.length-1]); //last log is event emitted
+        console.log(parsedLog);
+        const newDeviceVisibility:boolean = parsedLog?.args.newDeviceState;
+        setDevices(devices.map((device) => {
+          if (device.address == _deviceAddress) {
+            return { ...device, visible: newDeviceVisibility};
+          }
+          return device;
+        }));
+      } else {
+        throw Error("Transaction receipt differs from expected");
+      }
+      
+    } catch (error) {
+      console.error("Unable to create device", error);
+      return;
+    }
+  }, [ethersProvider, chainId])
+
+  return { devices, fetchDevices, addDevice, setDeviceState, toggleDeviceVisible };
 };

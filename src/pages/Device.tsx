@@ -14,7 +14,7 @@ const Device = () => {
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true)
 
-  const options = [ 
+  const stateOptions = [ 
                     { label: "Free", value:"0"},
                     { label: "Unlocked", value: "1"},
                     { label: "Locked", value: "2"}
@@ -98,7 +98,14 @@ const Device = () => {
               />
               <RenderEditableDropdown
                 label="State" field="deviceState" value={device.deviceState.toString()}
-                handleSave={handleSave} options={options}
+                handleSave={handleSave} options={stateOptions}
+              />
+              <RenderEditableDropdown
+                label="Visible" field="visible" value={device.visible.toString()}
+                handleSave={handleSave} options={[
+                                                  {label: "True", value: "1"},
+                                                  {label: "false", value: "0"}
+                                                ]}
               />
               <RenderEditableText
                 label="Belongs to customer" field="customer" value={getCustomerName(device.customer)} handleSave={handleSave}

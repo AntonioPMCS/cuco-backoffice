@@ -6,6 +6,7 @@ export interface DeviceType {
   customer: string,
   deviceState: number,
   metadata: string,
+  visible: boolean
 }
 
 export interface CustomerType {
@@ -22,6 +23,7 @@ type BlockchainContextType = { // The context is an array of providers
   refetchDevices: () => void;
   addDevice: (_sn:string, _customer:string, _metadata:string) => void;
   setDeviceState: (_state:number, _address:string) => void;
+  toggleDeviceVisible: (_address:string) => void;
   fetchedCustomers: Array<CustomerType>;
   refetchCustomers: () => void;
   createCustomer: (_parentAddress:string, _name:string) => void;
@@ -35,6 +37,7 @@ const BlockchainContext = createContext<BlockchainContextType>({
     refetchDevices: () => {},
     addDevice: () => {},
     setDeviceState: () => {},
+    toggleDeviceVisible: () => {},
     fetchedCustomers: [],
     refetchCustomers: () => {},
     createCustomer: () => {},

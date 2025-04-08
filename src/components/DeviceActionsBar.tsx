@@ -5,14 +5,18 @@ import AddDeviceForm from "./Modals/AddDeviceForm";
 import { DeviceType } from "@/context/BlockchainContext";
 import BatchDeviceImportForm from "./Modals/BatchDeviceImportForm";
 import BatchEditForm from "./Modals/BatchEditForm";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 
 
 interface DeviceActionsBarProps {
   selectedDevices: string[];
   addDevice: (sn:string, _customer:string, _metadata:string ) => void;
+  showHidden: boolean;
+  setShowHidden: (hidden: boolean) => void;
 }
 
-const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addDevice}) => {
+const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addDevice, showHidden, setShowHidden}) => {
   const [batchDevices, setBatchDevices] = useState<string>("")
   const [batchEditProperty, setBatchEditProperty] = useState<string>("")
   const [batchEditValue, setBatchEditValue] = useState<string>("")
@@ -21,7 +25,8 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
     sn: "",
     customer: "",
     deviceState: 1,
-    metadata: "QmNPyntq8DLiV1M6ru9CVixpEvuhmwTbJytPARoEjMqDPN/35eaffe809a27639951d8e36c57a1c3f784cbe3855b309ebe3708c532b4bda46.json"
+    metadata: "QmNPyntq8DLiV1M6ru9CVixpEvuhmwTbJytPARoEjMqDPN/35eaffe809a27639951d8e36c57a1c3f784cbe3855b309ebe3708c532b4bda46.json",
+    visible: true
   })
 
   const handleAddDevice = () => {
@@ -33,35 +38,41 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
   const handleBatchEdit = () => {}
   
   return (
-    <div className="flex items-center gap-2">
-      <ModalTemplate 
-        trigger={<><Plus className="mr-2 h-4 w-4" />Add Device</>}
-        title="Add New Device"
-        handler={handleAddDevice}
-      >
-        <AddDeviceForm newDevice = {newDevice} setNewDevice = {setNewDevice} />
-      </ModalTemplate>
-
-      <ModalTemplate
-        trigger={<><Upload className="mr-2 h-4 w-4" />BatchImport</>}
-        title="Batch Import Devices"
-        handler={handleBatchImport}
-      >
-        <BatchDeviceImportForm batchDevices={batchDevices} setBatchDevices={setBatchDevices} />
-      </ModalTemplate>
-
-      {selectedDevices.length > 0 && (
-        <ModalTemplate
-          trigger={<><Edit className="mr-2 h-4 w-4" />Batch Edit {selectedDevices.length}</>}
-          title="Batch Edit Devices"
-          handler={handleBatchEdit}
+    <div className="flex items-center justify-between w-full px-8">
+      <div className="flex items-center space-x-2">
+        <ModalTemplate 
+          trigger={<><Plus className="mr-2 h-4 w-4" />Add Device</>}
+          title="Add New Device"
+          handler={handleAddDevice}
         >
-          <BatchEditForm 
-            batchEditProperty={batchEditProperty} setBatchEditProperty={setBatchEditProperty}
-            batchEditValue={batchEditValue} setBatchEditValue={setBatchEditValue} 
-          />
+          <AddDeviceForm newDevice = {newDevice} setNewDevice = {setNewDevice} />
         </ModalTemplate>
-      )}
+
+        <ModalTemplate
+          trigger={<><Upload className="mr-2 h-4 w-4" />BatchImport</>}
+          title="Batch Import Devices"
+          handler={handleBatchImport}
+        >
+          <BatchDeviceImportForm batchDevices={batchDevices} setBatchDevices={setBatchDevices} />
+        </ModalTemplate>
+
+        {selectedDevices.length > 0 && (
+          <ModalTemplate
+            trigger={<><Edit className="mr-2 h-4 w-4" />Batch Edit {selectedDevices.length}</>}
+            title="Batch Edit Devices"
+            handler={handleBatchEdit}
+          >
+            <BatchEditForm 
+              batchEditProperty={batchEditProperty} setBatchEditProperty={setBatchEditProperty}
+              batchEditValue={batchEditValue} setBatchEditValue={setBatchEditValue} 
+            />
+          </ModalTemplate>
+        )}
+      </div>
+      <div className="flex items-center space-x-2 ">
+        <Switch id="show-hidden" checked={showHidden} onCheckedChange={setShowHidden} />
+        <Label htmlFor="show-hidden">Show Hidden</Label>
+      </div>
     </div>
   )
 }

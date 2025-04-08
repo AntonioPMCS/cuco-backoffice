@@ -13,15 +13,27 @@ import { useBlockchain } from "@/hooks/useBlockchain";
 import { Button } from "./ui/button";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { Link } from "react-router-dom";
+import { useWalletProviders } from "@/hooks/useWalletProviders";
 
 const DeviceManager = () => {
-  const { fetchedDevices, addDevice, fetchedCustomers } = useBlockchain();
+  const { fetchedDevices, addDevice, fetchedCustomers, toggleDeviceVisible } = useBlockchain();
+  const {selectedWallet} = useWalletProviders();
   const [selectedDevices, setSelectedDevices] = useState<string[]>([])
   const [editDevice, setEditDevice] = useState<DeviceType | null>(null)
+  const [showHidden, setShowHidden] = useState(false)
   const handleCopyAddress = useCopyToClipboard();
 
   const handleEditDevice = () => {}
-  const handleDeleteDevice = (deviceSN:string) => {console.log(deviceSN)}
+  const handleHideDevice = async (deviceAddress:string) => {
+    console.log(deviceAddress)
+    try {
+      await toggleDeviceVisible(deviceAddress);
+      // Update the device state locally after successful blockchain update
+    } catch(error) {
+      console.log(error);
+    } finally {
+    }
+  }
 
   
   const getCustomerName = (address:string) => {
@@ -54,7 +66,12 @@ const DeviceManager = () => {
     <>
     <div className="space-y-6 w-full">
       <div className="flex flex-col justify-between items-center gap-4">
-        <DeviceActionsBar selectedDevices={selectedDevices} addDevice={addDevice}/>
+        <DeviceActionsBar 
+          selectedDevices={selectedDevices} 
+          addDevice={addDevice}
+          showHidden={showHidden}
+          setShowHidden={setShowHidden}
+        />
         <div className="border rounded-md w-full">
           <Table>
             <TableHeader>
@@ -69,7 +86,8 @@ const DeviceManager = () => {
                 <TableHead>Contract</TableHead>
                 <TableHead>Assigned to</TableHead>
                 <TableHead>State</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
+                {selectedWallet && 
+                  <TableHead className="w-[100px]">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -80,8 +98,9 @@ const DeviceManager = () => {
                   </TableCell>
                 </TableRow>
                 ) : (
-                  fetchedDevices.map((device) => (
-                    <TableRow key={device.sn}>
+                  fetchedDevices.map((device:DeviceType) => {
+                    if (!showHidden && !device.visible) return;
+                    return (<TableRow key={device.sn}>
                       <TableCell>
                         <Checkbox
                           checked={selectedDevices.includes(device.sn)}
@@ -122,16 +141,16 @@ const DeviceManager = () => {
                           {device.deviceState == 0 ? "Free" : device.deviceState == 1 ? "Unlocked" : "Locked"}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      {selectedWallet && <TableCell>
                         <ActionsDropdown 
                           editDevice={editDevice} setEditDevice={setEditDevice}
                           device={device}
                           handleEditDevice={handleEditDevice}
-                          handleDeleteDevice={handleDeleteDevice}
+                          handleHideDevice={handleHideDevice}
                         />
-                      </TableCell>
+                      </TableCell>}
                     </TableRow>
-                  )
+                  )}
                 ))}
               </TableBody>
             </Table>
