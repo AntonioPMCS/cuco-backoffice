@@ -71,7 +71,7 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
       </div>
       <div className="flex items-center space-x-2 ">
         <Switch id="show-hidden" checked={showHidden} onCheckedChange={setShowHidden} />
-        <Label htmlFor="show-hidden">Show Hidden</Label>
+        <Label htmlFor="show-hidden">Show Removed</Label>
       </div>
     </div>
   )

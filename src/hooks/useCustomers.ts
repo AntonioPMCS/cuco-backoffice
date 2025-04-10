@@ -100,9 +100,7 @@ export const useCustomers = () => {
       const receipt = await tx.wait();
       if (receipt) {
         console.log("Transaction confirmed:", receipt);
-        // Buscar o customer
-        // modificar o authorized users
-        // Array.map ( (ele) => address = address )
+        // Get the customer and append new user to its authorizedUsers array
         setCustomers(customers.map( (customer) => {
           if (customer.address == _customerAddress) {
             return {...customer, authorizedUsers: [...customer.authorizedUsers, _newAdmin] }

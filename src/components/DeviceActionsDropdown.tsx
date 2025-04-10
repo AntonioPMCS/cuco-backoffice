@@ -5,7 +5,7 @@ import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { Input } from "./ui/input";
-import { Edit, EyeOff, MoreVertical } from "lucide-react";
+import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
 import { DeviceType } from "@/context/BlockchainContext";
 
@@ -120,8 +120,8 @@ const DeviceActionsDropdown:React.FC<DeviceActionsDropdownProps> = ({editDevice,
             className="text-destructive focus:text-destructive"
             onClick={() => handleHideDevice(device.address)}
           >
-            <EyeOff className="mr-2 h-4 w-4" />
-            Hide
+            <Trash2 className="mr-2 h-4 w-4" />
+            {device.visible ? "Remove" : "Undo remove"}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
