@@ -109,14 +109,14 @@ export const useDevices = () => {
     }
   }, [ethersProvider, chainId])
 
-  const addDevice = useCallback(async (_sn:string, _customer: string, _metadata:string) => {
+  const addDevice = useCallback(async (customer: string, sn:string, metadata:string) => {
     if (!ethersProvider) return;
     const cucoAddress = await getCuco(ethersProvider);
     try {
       console.log("Adding new device...");
       const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
       const contract:Contract = new Contract(cucoAddress, CuCoBlockchain.abi, signer);
-      const tx:TransactionResponse = await contract.createDevice(_customer, _sn, _metadata);
+      const tx:TransactionResponse = await contract.createDevice(customer, sn, metadata);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
       if (receipt) {

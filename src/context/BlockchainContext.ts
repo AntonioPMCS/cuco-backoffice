@@ -21,7 +21,7 @@ export interface CustomerType {
 type BlockchainContextType = { // The context is an array of providers
   fetchedDevices: Array<DeviceType>;
   refetchDevices: () => void;
-  addDevice: (_sn:string, _customer:string, _metadata:string) => void;
+  addDevice: (_customer:string, _sn:string, _metadata:string) => void;
   setDeviceState: (_state:number, _address:string) => void;
   toggleDeviceVisible: (_address:string) => void;
   fetchedCustomers: Array<CustomerType>;

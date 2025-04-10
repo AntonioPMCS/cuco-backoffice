@@ -37,13 +37,9 @@ const DeviceManager = () => {
 
   
   const getCustomerName = (address:string) => {
-    console.log("Getting name for customer: "+address)
-    console.log(fetchedCustomers);
     const customer = fetchedCustomers.find((customer) => {
-      console.log("Customer address: "+ customer.address); 
       return customer.address === address
     });
-    console.log(customer)
     return customer ? customer.name : "unknown";
   };
 

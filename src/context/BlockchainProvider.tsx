@@ -9,7 +9,6 @@ const BlockchainProvider: React.FC<{children: React.ReactNode}> = ({children}) =
   const { ethersProvider } = useWalletProviders();
   const { devices, fetchDevices, addDevice, setDeviceState, toggleDeviceVisible } = useDevices();
   const { customers, fetchCustomers, createCustomer, addAdmin } = useCustomers();
-
   // Fetch data once on mount or when provider changes.
   useEffect(() => {
     fetchDevices();

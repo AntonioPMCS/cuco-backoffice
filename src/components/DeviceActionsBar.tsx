@@ -11,7 +11,7 @@ import { Label } from "./ui/label";
 
 interface DeviceActionsBarProps {
   selectedDevices: string[];
-  addDevice: (sn:string, _customer:string, _metadata:string ) => void;
+  addDevice: (_customer:string, sn:string, _metadata:string ) => void;
   showHidden: boolean;
   setShowHidden: (hidden: boolean) => void;
 }
@@ -31,7 +31,7 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
 
   const handleAddDevice = () => {
     console.log(newDevice)
-    addDevice(newDevice.sn, newDevice.customer, newDevice.metadata);
+    addDevice(newDevice.customer, newDevice.sn, newDevice.metadata);
   }
 
   const handleBatchImport = () => {}
