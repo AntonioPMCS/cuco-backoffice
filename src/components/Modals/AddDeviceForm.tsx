@@ -11,8 +11,6 @@ interface AddDeviceFormProps {
 
 const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) => {
   const {fetchedCustomers} = useBlockchain();
-
-  console.log(fetchedCustomers)
   
   return (
     <>
@@ -41,7 +39,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) 
           </SelectTrigger>
           <SelectContent>
             { fetchedCustomers.map((customer) => {
-              return <SelectItem value={customer.address}>{customer.name}</SelectItem>
+              return <SelectItem key={customer.address} value={customer.address}>{customer.name}</SelectItem>
             })
             }
           </SelectContent>

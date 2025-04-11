@@ -30,7 +30,6 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
   })
 
   const handleAddDevice = () => {
-    console.log(newDevice)
     addDevice(newDevice.customer, newDevice.sn, newDevice.metadata);
   }
 
@@ -44,6 +43,7 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
           trigger={<><Plus className="mr-2 h-4 w-4" />Add Device</>}
           title="Add New Device"
           handler={handleAddDevice}
+          description={"Fill device SN and customer to add a new device"}
         >
           <AddDeviceForm newDevice = {newDevice} setNewDevice = {setNewDevice} />
         </ModalTemplate>

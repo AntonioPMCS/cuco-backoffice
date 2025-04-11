@@ -103,12 +103,12 @@ const DeviceManager = () => {
                           onCheckedChange={() => toggleDeviceSelection(device.sn)}
                         />
                       </TableCell>
-                      
-                      <Link to={`/devices/${encodeURIComponent(device.sn)}`} >
-                        <TableCell>           
+
+                      <TableCell>  
+                        <Link to={`/devices/${encodeURIComponent(device.sn)}`} >         
                           {device.sn}
-                        </TableCell>
-                      </Link>
+                        </Link>
+                      </TableCell>
 
                       <TableCell>
                         {truncateMiddle(device.address)}
@@ -122,11 +122,13 @@ const DeviceManager = () => {
                           <span className="sr-only">Copy address</span>
                         </Button>
                       </TableCell>
-                      <Link to={`/customers/${encodeURIComponent(getCustomerName(device.customer))}`} >
-                        <TableCell>                        
+                      
+                      <TableCell>   
+                        <Link to={`/customers/${encodeURIComponent(getCustomerName(device.customer))}`} >                     
                           {getCustomerName(device.customer)}
-                        </TableCell>
-                      </Link>
+                        </Link>
+                      </TableCell>
+                      
                       <TableCell>
                         <Badge variant={device.deviceState < 2 ? "outline" : "secondary"}>
                           {device.deviceState < 2 ? (

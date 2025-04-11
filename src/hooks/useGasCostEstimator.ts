@@ -4,37 +4,51 @@ export const useGasCostEstimator = () => {
     methodName: string,
     args: any[],
     overrides: any = {}
-  ): Promise<string> => {
+  ): Promise<{ethereum: string, polygon: string}> => {
     try {
       // Estimate gas
-      console.log("Estimating gas for:", methodName, args);
       const gasEstimate:bigint = await contract[methodName].estimateGas(...args, overrides);
 
-      // Get current gas price in GWEI
+      // ETHEREUM 
+      // Get current ETH gas price in GWEI
       const feeData = await contract.runner.getFeeData();
       const gasPrice:bigint = feeData.maxFeePerGas;
 
       if (!gasPrice) throw new Error("Gas price unavailable");
 
       // Cost in ETH
-      console.log(gasEstimate)
-      console.log(gasPrice)
       const costInWei = gasEstimate * gasPrice; // BigNumber
       const costInEth = Number(costInWei.toString()) / 1e18;
-      console.log("Cost in Eth: " + costInEth)
 
       // Fetch ETH price
-      const res = await fetch(
+      let res = await fetch(
         "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
       );
-      const data = await res.json();
+      let data = await res.json();
       const ethToUsd = data.ethereum.usd;
-      console.log("Cost in $: "+(costInEth * ethToUsd).toFixed(5))
+      const ethereumCost = (costInEth * ethToUsd).toFixed(5)
 
-      return `$${(costInEth * ethToUsd).toFixed(2)}`;
+      // POLYGON 
+      res = await fetch(
+        "https://api.polygonscan.com/api?module=gastracker&action=gasoracle&apikey=YourApiKeyToken"
+      )
+      data = await res.json()
+      const polygonGasPrice:number = Number(data.result.ProposeGasPrice);
+
+      const polygonCostInGwei = Number(gasEstimate) * polygonGasPrice;
+      const polygonCostInPol = polygonCostInGwei / 1e9
+
+      // Fetch Polygon price
+      res = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd"
+      );
+      data = await res.json();
+      const polToUsd = data["matic-network"].usd;
+      const polygonCost = (Number(polygonCostInPol) * polToUsd).toFixed(5)
+
+      return {ethereum: ethereumCost.toString(), polygon: polygonCost.toString()};
     } catch (error) {
-      console.error("Gas estimation failed:", error);
-      return "Unable to estimate cost";
+      throw Error("Gas estimation failed");
     }
   };
 

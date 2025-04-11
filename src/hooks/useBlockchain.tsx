@@ -35,10 +35,10 @@ export const useBlockchain = () => {
     ...context,
     addDevice: async (...args: Parameters<typeof context.addDevice>) => {
       try {
+        console.log("! Adding new device !")
         // Get the original function
         const originalFn = context.addDevice;
         const contract = await getCuco(); // assuming you have this in context
-        console.log(contract);
         const estimation = await estimateTransactionCost(
           contract,
           "createDevice",
@@ -46,16 +46,12 @@ export const useBlockchain = () => {
           {from: selectedAccount}
         );
 
-        console.log("Estimated cost of addDevice:", estimation);
-
+        console.log("Estimated cost of addDevice on Ethereum: $" + estimation.ethereum);
+        console.log("Estimated cost of addDevice on Polygon: $" + estimation.polygon);
         
         // Call the original function
         await originalFn(...args);
         
-        // Note: This is a simplified implementation. In a real implementation,
-        // you would prepare the transaction without sending it, estimate its cost,
-        // then send the actual transaction.
-        console.log("Transaction would cost approximately: [estimation skipped in this simplified implementation]");
       } catch (error) {
         console.error("Error in wrapped addDevice:", error);
         throw error;

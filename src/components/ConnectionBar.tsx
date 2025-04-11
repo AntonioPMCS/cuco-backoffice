@@ -3,7 +3,7 @@ import { DiscoverWalletProviders } from '../components/DiscoverWalletProviders';
 import { useEffect } from "react";
 import { truncateMiddle, formatChainAsString } from "../utils";
 import { useWalletProviders } from "../hooks/useWalletProviders";
-import { Dialog, DialogContent, DialogClose, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogClose, DialogTitle, DialogTrigger, DialogDescription} from "./ui/dialog";
 import { KeyRound} from "lucide-react";
 import { Button } from "./ui/button";
 
@@ -34,15 +34,16 @@ const ConnectionBar = () => {
   return (
     <div className="connection-bar">
       { !selectedAccount &&
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button><KeyRound className="mr-2 h-4 w-4" />CONNECT</Button>
-            </DialogTrigger>
-            <DialogContent className="p-0 border border-gray-200 bg-white text-gray-800 max-w-md shadow-md">
+        <Dialog>  
+          <DialogTrigger asChild>
+            <Button><KeyRound className="mr-2 h-4 w-4" />CONNECT</Button>
+          </DialogTrigger>
+          <DialogContent className="p-0 border border-gray-200 bg-white text-gray-800 max-w-md shadow-md">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <DialogTitle className="text-lg font-medium text-gray-900">
                   Connect a Wallet
               </DialogTitle>
+              <DialogDescription>Choose from your browser wallets</DialogDescription>
               <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none">
                 <span className="sr-only">Close</span>
               </DialogClose>
@@ -60,7 +61,6 @@ const ConnectionBar = () => {
           <p>🟢 {truncateMiddle(selectedAccount)} @ {formatChainAsString(chainId)}</p>
         </>
       }
-
     </div>
   )
 }

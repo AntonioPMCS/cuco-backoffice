@@ -113,7 +113,6 @@ export const useDevices = () => {
     if (!ethersProvider) return;
     const cucoAddress = await getCuco(ethersProvider);
     try {
-      console.log("Adding new device...");
       const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
       const contract:Contract = new Contract(cucoAddress, CuCoBlockchain.abi, signer);
       const tx:TransactionResponse = await contract.createDevice(customer, sn, metadata);
