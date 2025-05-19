@@ -52,7 +52,7 @@ export const RenderEditableText = ({ label, field, value, handleSave }:
               size="icon"
               variant="ghost"
               onClick={handleEdit}
-              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 opacity-100"
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -121,7 +121,7 @@ export const RenderEditableDropdown = ({ label, field, value, handleSave, option
               size="icon"
               variant="ghost"
               onClick={handleEdit}
-              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 opacity-100"
             >
               <Edit className="h-4 w-4" />
             </Button>

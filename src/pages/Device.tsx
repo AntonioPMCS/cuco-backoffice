@@ -32,22 +32,26 @@ const Device = () => {
   };
 
   // Handle save button click
-  const handleSave = async (field:string, newValue:string) => {
+  const handleSave = async (field:string, _newValue:string) => {
+    const newValue = Number(_newValue);
     if (!device) return
     setLoading(true);
 
     try {
       switch (field) {
         case "deviceState": 
-          await setDeviceState(Number(newValue), device.address);
+          await setDeviceState(newValue, device.address);
           break;
         default:
           break;
       } 
       // Update the device state locally after successful blockchain update
-      setDevice((prevDevice) =>
-        prevDevice ? { ...prevDevice, [field]: newValue } : prevDevice
-      );
+      // setDevice((prevDevice) => {
+      //   if (!prevDevice) {
+      //     throw new Error("Trying to update device, but it's undefined.");
+      //   }
+      //   return { ...prevDevice, [field]: newValue };
+      // });
     } catch(error) {
       console.log(error);
     } finally {
@@ -97,11 +101,11 @@ const Device = () => {
                 label="Serial Number" field="sn" value={device.sn} handleSave={handleSave}
               />
               <RenderEditableDropdown
-                label="State" field="deviceState" value={device.deviceState.toString()}
+                label="State" field="deviceState" value={device.deviceState?.toString() ?? "0"}
                 handleSave={handleSave} options={stateOptions}
               />
               <RenderEditableDropdown
-                label="Visible" field="visible" value={device.visible.toString()}
+                label="Visible" field="visible" value={device.visible?.toString() ?? "0"}
                 handleSave={handleSave} options={[
                                                   {label: "True", value: "1"},
                                                   {label: "false", value: "0"}

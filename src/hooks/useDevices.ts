@@ -91,14 +91,20 @@ export const useDevices = () => {
         const logs = receipt.logs;
         const deviceInterface = new Interface(Device.abi);
         const parsedLog = deviceInterface.parseLog(logs[logs.length-1]); //last log is event emitted
+        if (!parsedLog || parsedLog.args.newDeviceState === undefined) {
+          throw Error("Could not parse newDeviceState from log");
+        }
         console.log(parsedLog);
         const newDeviceState:number = parsedLog?.args.newDeviceState;
-        setDevices(devices.map((device) => {
-          if (device.address == _address) {
-            return { ...device, deviceState: newDeviceState};
-          }
-          return device;
-        }));
+        setDevices((prevDevices) =>
+          prevDevices.map((device) => {
+            if (device.address === _address) {
+              return { ...device, deviceState: newDeviceState };
+            }
+            return device;
+          })
+        );
+
       } else {
         throw Error("Transaction receipt differs from expected");
       }
@@ -140,7 +146,6 @@ export const useDevices = () => {
     if (!ethersProvider) return;
     const cucoAddress = await getCuco(ethersProvider);
     try {
-      console.log("Setting Device Visible to false...");
       const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
       const contract:Contract = new Contract(cucoAddress, CuCoBlockchain.abi, signer);
       const tx:TransactionResponse = await contract.toggleDeviceVisible(_deviceAddress);
