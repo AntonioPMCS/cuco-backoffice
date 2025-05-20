@@ -4,7 +4,6 @@ import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Customer from "../../abi/Customer.json";
 import { CustomerType } from "../context/BlockchainContext";
 import { useWalletProviders } from "./useWalletProviders";
-import { Provider as EthCallprovider, Contract as EthCallContract} from "ethcall";
 import { batchCalls } from "./useBatchCalls";
 
 export const useCustomers = () => {
@@ -73,30 +72,6 @@ export const useCustomers = () => {
         const parentCustomer = customers.find(customer => customer.address == parentAddress);
         return parentCustomer? parentCustomer.name : "";
       }
-  }
-
-  const fetchCustomerInstanceMC = async (_address: string): Promise<CustomerType> => {
-    const ethCallProvider = new EthCallprovider(1, ethersProvider!);
-    const customerContract = new EthCallContract(_address, Customer.abi);
-    const calls = [
-      customerContract.parent(),
-      customerContract.name(),
-      customerContract.getAuthorizedUsers(),
-    ]
-    const [parentAddress, name, authorizedUsers] = await ethCallProvider.all(calls);
-    let parentName = "";
-    if (parentAddress != ZEROADDRESS) {
-      const parentContract = new Contract(parentAddress as string, Customer.abi, ethersProvider);
-      parentName = await parentContract.name()
-     }
-
-     return {
-      name: name as string,
-      parent: parentAddress as string,
-      parentName: parentName,
-      address: _address,
-      authorizedUsers: authorizedUsers as string[]
-     }
   }
 
 
