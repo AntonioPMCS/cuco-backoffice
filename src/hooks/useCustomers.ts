@@ -46,13 +46,34 @@ export const useCustomers = () => {
       //setCustomers(customerObjects);
       const fnNames = ["parent", "name", "getAuthorizedUsers"];
       const results = await batchCalls(ethersProvider, customerAddresses, fnNames, "Customer");
-      console.log(results);
-      setCustomers([]);
+      const customerObjects: Array<CustomerType> = customerAddresses.map((address, index) => ({
+        address,
+        name: results[index * fnNames.length + 1] as string,
+        parent: results[index * fnNames.length] as string,
+        parentName: "",
+        authorizedUsers: results[index * fnNames.length + 2] as string[]
+      }));
+
+      const customerObjectsWithParentNames = customerObjects.map(customer => ({
+        ...customer,
+        parentName: fetchParentName(customer.parent, customerObjects)
+      }));
+      
+      setCustomers(customerObjectsWithParentNames);
     } catch (error) {
       console.error(error);
       setCustomers([]);
     }
   }, [ethersProvider, chainId]);
+
+
+  const fetchParentName = (parentAddress: string, customers: Array<CustomerType>): string => {
+    if (parentAddress == ZEROADDRESS) return "";
+    else {
+        const parentCustomer = customers.find(customer => customer.address == parentAddress);
+        return parentCustomer? parentCustomer.name : "";
+      }
+  }
 
   const fetchCustomerInstanceMC = async (_address: string): Promise<CustomerType> => {
     const ethCallProvider = new EthCallprovider(1, ethersProvider!);

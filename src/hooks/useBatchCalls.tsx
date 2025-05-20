@@ -33,16 +33,3 @@ export const batchCalls = async (
       return [];
   }
 };
-
-//   for (let i = 0; i < _addresses.length; i++) {
-//     const contract = new EthCallContract(_addresses[i], abi!);
-//     _functionNames.forEach((method) => {
-//       calls.push(contract[method]());
-//     });
-//   }
-
-//   results = await ethCallProvider.all(calls);
-
-
-//   return results;
-// }

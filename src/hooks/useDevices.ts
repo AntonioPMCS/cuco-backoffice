@@ -61,37 +61,19 @@ export const useDevices = () => {
 
 
   const _fetchDeviceInstances = async(deviceAddresses: string[]): Promise<DeviceType[]> => {
-    // Fetch all device instances using ethcall
-    // const deviceObjects =  await Promise.all(deviceAddresses.map((address) => 
-    //   fetchDeviceInstanceMC(address)
-    // ));
-    // return deviceObjects;
+    // Batch calls to fetch device instances
     const fnNames = ["sn", "customer", "deviceState", "metadata", "visible"];
     const results = await batchCalls(ethersProvider, deviceAddresses, fnNames, "Device");
-    console.log(results);
-    return [];
+    const deviceObjects: Array<DeviceType> = deviceAddresses.map((address, index) => ({
+      address,
+      sn: results[index * fnNames.length] as string,
+      customer: results[index * fnNames.length + 1] as string,
+      deviceState: results[index * fnNames.length + 2] as number,
+      metadata: results[index * fnNames.length + 3] as string,
+      visible: results[index * fnNames.length + 4] as boolean
+    }));
+    return deviceObjects;
   }
-
-  /*const fetchDeviceInstanceMC = async (_address: string): Promise<DeviceType> => {
-    const ethCallProvider = new EthCallprovider(1, ethersProvider!);
-    const deviceContract = new EthCallContract(_address, Device.abi);
-    const calls = [
-      deviceContract.sn(),
-      deviceContract.customer(),
-      deviceContract.deviceState(),
-      deviceContract.metadata(),
-      deviceContract.visible()
-    ]
-    const [sn, customer, deviceState, metadata, visible] = await ethCallProvider.all(calls);
-    return {
-      address: _address,
-      sn:sn as string,
-      customer: customer as string,
-      deviceState: deviceState as number,
-      metadata: metadata as string,
-      visible: visible as boolean
-    }
-  }*/
 
   const fetchDeviceInstance = async (address: string): Promise<DeviceType> => {
     const deviceContract = new Contract(address, Device.abi, ethersProvider);
@@ -123,11 +105,13 @@ export const useDevices = () => {
         const logs = receipt.logs;
         const deviceInterface = new Interface(Device.abi);
         const parsedLog = deviceInterface.parseLog(logs[logs.length-1]); //last log is event emitted
-        if (!parsedLog || parsedLog.args.newDeviceState === undefined) {
+        console.log(parsedLog);
+        if (!parsedLog || parsedLog.args['1'] === undefined) {
           throw Error("Could not parse newDeviceState from log");
         }
-        console.log(parsedLog);
-        const newDeviceState:number = parsedLog?.args.newDeviceState;
+        const newDeviceState:number = parsedLog?.args['1'];
+        console.log("New device state: ", newDeviceState);
+        // Update the device state locally after successful blockchain update
         setDevices((prevDevices) =>
           prevDevices.map((device) => {
             if (device.address === _address) {
@@ -136,6 +120,7 @@ export const useDevices = () => {
             return device;
           })
         );
+        console.log("Updated device state locally");
 
       } else {
         throw Error("Transaction receipt differs from expected");
