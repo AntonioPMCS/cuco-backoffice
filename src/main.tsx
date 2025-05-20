@@ -7,11 +7,11 @@ import WalletProvider from './context/WalletProvider.tsx'
 import BlockchainProvider from './context/BlockchainProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  //<StrictMode>
     <WalletProvider>
       <BlockchainProvider>
         <RouterProvider router={router} />
       </BlockchainProvider>
     </WalletProvider>
-  </StrictMode>,
+  //</StrictMode>,
 )

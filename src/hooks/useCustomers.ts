@@ -1,9 +1,11 @@
 import { useState, useCallback } from "react";
-import { Contract, Signer, TransactionResponse, Interface, FallbackProvider } from "ethers";
+import { Contract, Signer, TransactionResponse, Interface, FallbackProvider, ZeroAddress as ZEROADDRESS} from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Customer from "../../abi/Customer.json";
 import { CustomerType } from "../context/BlockchainContext";
 import { useWalletProviders } from "./useWalletProviders";
+import { Provider as EthCallprovider, Contract as EthCallContract} from "ethcall";
+import { batchCalls } from "./useBatchCalls";
 
 export const useCustomers = () => {
   const [customers, setCustomers] = useState<CustomerType[]>([]);
@@ -38,15 +40,44 @@ export const useCustomers = () => {
       return;
     }
     try {
-      const customerObjects: Array<CustomerType> = await Promise.all(
-        customerAddresses.map((address) => fetchCustomerInstance(address))
-      );
-      setCustomers(customerObjects);
+      // const customerObjects: Array<CustomerType> = await Promise.all(
+      //   customerAddresses.map((address) => fetchCustomerInstanceMC(address))
+      // );
+      //setCustomers(customerObjects);
+      const fnNames = ["parent", "name", "getAuthorizedUsers"];
+      const results = await batchCalls(ethersProvider, customerAddresses, fnNames, "Customer");
+      console.log(results);
+      setCustomers([]);
     } catch (error) {
       console.error(error);
       setCustomers([]);
     }
   }, [ethersProvider, chainId]);
+
+  const fetchCustomerInstanceMC = async (_address: string): Promise<CustomerType> => {
+    const ethCallProvider = new EthCallprovider(1, ethersProvider!);
+    const customerContract = new EthCallContract(_address, Customer.abi);
+    const calls = [
+      customerContract.parent(),
+      customerContract.name(),
+      customerContract.getAuthorizedUsers(),
+    ]
+    const [parentAddress, name, authorizedUsers] = await ethCallProvider.all(calls);
+    let parentName = "";
+    if (parentAddress != ZEROADDRESS) {
+      const parentContract = new Contract(parentAddress as string, Customer.abi, ethersProvider);
+      parentName = await parentContract.name()
+     }
+
+     return {
+      name: name as string,
+      parent: parentAddress as string,
+      parentName: parentName,
+      address: _address,
+      authorizedUsers: authorizedUsers as string[]
+     }
+  }
+
 
   const fetchCustomerInstance = async (address: string): Promise<CustomerType> => {
     const customerContract = new Contract(address, Customer.abi, ethersProvider);

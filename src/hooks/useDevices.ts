@@ -4,10 +4,11 @@ import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Device from "../../abi/Device.json";
 import { DeviceType } from "../context/BlockchainContext";
 import { useWalletProviders } from "./useWalletProviders";
+import { batchCalls } from "./useBatchCalls";
 
 export const useDevices = () => {
   const [devices, setDevices] = useState<DeviceType[]>([]);
-  const {chainId, ethersProvider} = useWalletProviders()
+  const {chainId, ethersProvider} = useWalletProviders();
 
   // A helper function that returns a promise that rejects after a timeout.
   const timeoutPromise = (ms: number) => new Promise((_, reject) => 
@@ -49,17 +50,48 @@ export const useDevices = () => {
     }
 
     try {
-      // Fetch all device instances concurrently
       const deviceAddresses: string[] = await contract.getDevicesUnderCustomer(rootCustomer);
-      const deviceObjects: Array<DeviceType> = await Promise.all(
-        deviceAddresses.map((address) => fetchDeviceInstance(address))
-      );
+      const deviceObjects: Array<DeviceType> = await _fetchDeviceInstances(deviceAddresses);
       setDevices(deviceObjects);
     } catch (error) {
       console.error(error);
       setDevices([]);
     }
   }, [ethersProvider, chainId]);
+
+
+  const _fetchDeviceInstances = async(deviceAddresses: string[]): Promise<DeviceType[]> => {
+    // Fetch all device instances using ethcall
+    // const deviceObjects =  await Promise.all(deviceAddresses.map((address) => 
+    //   fetchDeviceInstanceMC(address)
+    // ));
+    // return deviceObjects;
+    const fnNames = ["sn", "customer", "deviceState", "metadata", "visible"];
+    const results = await batchCalls(ethersProvider, deviceAddresses, fnNames, "Device");
+    console.log(results);
+    return [];
+  }
+
+  /*const fetchDeviceInstanceMC = async (_address: string): Promise<DeviceType> => {
+    const ethCallProvider = new EthCallprovider(1, ethersProvider!);
+    const deviceContract = new EthCallContract(_address, Device.abi);
+    const calls = [
+      deviceContract.sn(),
+      deviceContract.customer(),
+      deviceContract.deviceState(),
+      deviceContract.metadata(),
+      deviceContract.visible()
+    ]
+    const [sn, customer, deviceState, metadata, visible] = await ethCallProvider.all(calls);
+    return {
+      address: _address,
+      sn:sn as string,
+      customer: customer as string,
+      deviceState: deviceState as number,
+      metadata: metadata as string,
+      visible: visible as boolean
+    }
+  }*/
 
   const fetchDeviceInstance = async (address: string): Promise<DeviceType> => {
     const deviceContract = new Contract(address, Device.abi, ethersProvider);

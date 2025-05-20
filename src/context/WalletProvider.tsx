@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState} from "react";
 import WalletContext from "./WalletContext";
-import { ethers } from "ethers";
-import { BrowserProvider } from "ethers";
+import { BrowserProvider, ethers } from "ethers";
 
 declare global {
   interface WindowEventMap {
@@ -39,7 +38,13 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   useEffect(() => {
     if (!selectedWallet) {
       console.log("MetaMask not installed; using read-only default Provider")
-      setEthersProvider(ethers.getDefaultProvider("sepolia") as BrowserProvider);
+      setEthersProvider(ethers.getDefaultProvider(
+                            "sepolia",
+                            {
+                              infura: import.meta.env.VITE_INFURA_API_KEY,
+                              exclusive:["infura"]
+                            }
+                          ) as BrowserProvider);
       return;
     }
     console.log("Initializing Ethers")
