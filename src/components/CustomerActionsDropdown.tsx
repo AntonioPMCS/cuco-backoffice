@@ -5,7 +5,7 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
-import { CustomerType } from "@/context/BlockchainContext";
+import { CustomerType } from "@/context/CucoContext";
 
 interface CustomerActionsDropdownProps {
   editCustomer: CustomerType | null;

@@ -1,36 +1,28 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useContext } from "react";
 import { Contract, Signer, TransactionResponse, Interface, FallbackProvider, ZeroAddress as ZEROADDRESS} from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Customer from "../../abi/Customer.json";
-import { CustomerType } from "../context/BlockchainContext";
+import { CustomerType } from "../context/CucoContext";
 import { useWalletProviders } from "./useWalletProviders";
 import { batchCalls } from "./useBatchCalls";
+import BlockchainContext from "@/context/BlockchainContext";
 
 export const useCustomers = () => {
   const [customers, setCustomers] = useState<CustomerType[]>([]);
-  const {chainId, ethersProvider} = useWalletProviders()
+  const {chainId, ethersProvider} = useWalletProviders();
+  const { cucoContract } = useContext(BlockchainContext);
 
   const timeoutPromise = (ms: number) =>
     new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), ms));
 
   const fetchCustomers = useCallback(async () => {
     if (!ethersProvider) return;
-    let contractAddress;
-    const network = (await ethersProvider.getNetwork()).name;
-    switch (network) {
-      case "sepolia":
-        contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
-        break;
-      default:
-        contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
-        break;
-    }
-    let contract: Contract, customerAddresses: string[];
+    if (!cucoContract) return;
+    let customerAddresses: string[];
     try {
       console.log("Fetching customers...");
-      contract = new Contract(contractAddress, CuCoBlockchain.abi, ethersProvider);
       customerAddresses = (await Promise.race([
-        contract.getCustomers(),
+        cucoContract.getCustomers(),
         timeoutPromise(10000),
       ])) as string[];
     } catch (error) {
@@ -39,10 +31,6 @@ export const useCustomers = () => {
       return;
     }
     try {
-      // const customerObjects: Array<CustomerType> = await Promise.all(
-      //   customerAddresses.map((address) => fetchCustomerInstanceMC(address))
-      // );
-      //setCustomers(customerObjects);
       const fnNames = ["parent", "name", "getAuthorizedUsers"];
       const results = await batchCalls(ethersProvider, customerAddresses, fnNames, "Customer");
       const customerObjects: Array<CustomerType> = customerAddresses.map((address, index) => ({
@@ -63,7 +51,7 @@ export const useCustomers = () => {
       console.error(error);
       setCustomers([]);
     }
-  }, [ethersProvider, chainId]);
+  }, [ethersProvider, chainId, cucoContract]);
 
 
   const fetchParentName = (parentAddress: string, customers: Array<CustomerType>): string => {

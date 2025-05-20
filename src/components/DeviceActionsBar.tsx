@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Edit, Plus, Upload } from "lucide-react"
 import ModalTemplate from "./Modals/ModalTemplate"
 import AddDeviceForm from "./Modals/AddDeviceForm";
-import { DeviceType } from "@/context/BlockchainContext";
+import { DeviceType } from "@/context/CucoContext";
 import BatchDeviceImportForm from "./Modals/BatchDeviceImportForm";
 import BatchEditForm from "./Modals/BatchEditForm";
 import { Switch } from "./ui/switch";

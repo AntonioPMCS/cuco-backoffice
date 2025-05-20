@@ -1,0 +1,22 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36" version="27.0.5">
+  <diagram name="Page-1" id="DuVm4UdYL3HALoVWy8cT">
+    <mxGraphModel dx="983" dy="521" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="UAy0BjJXKNZdqDins2-7-1" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Wallet Context&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=16;labelPosition=center;verticalLabelPosition=middle;align=center;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="260" width="260" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="UAy0BjJXKNZdqDins2-7-3" value="- providers[]&lt;div&gt;- selectedWallet&lt;/div&gt;&lt;div&gt;- ethersProvider&lt;/div&gt;&lt;div&gt;- selectedAccount&lt;/div&gt;&lt;div&gt;- chainId&lt;/div&gt;&lt;div&gt;- connectWallet()&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="125" y="290" width="210" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="UAy0BjJXKNZdqDins2-7-4" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Wallet Context&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=16;labelPosition=center;verticalLabelPosition=middle;align=center;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="470" y="260" width="260" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="UAy0BjJXKNZdqDins2-7-5" value="- providers[]&lt;div&gt;- selectedWallet&lt;/div&gt;&lt;div&gt;- ethersProvider&lt;/div&gt;&lt;div&gt;- selectedAccount&lt;/div&gt;&lt;div&gt;- chainId&lt;/div&gt;&lt;div&gt;- connectWallet()&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="495" y="290" width="210" height="150" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

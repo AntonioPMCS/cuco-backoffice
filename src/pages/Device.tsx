@@ -1,8 +1,8 @@
 
 import { RenderEditableDropdown, RenderEditableText } from "@/components/FormFields";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DeviceType } from "@/context/BlockchainContext";
-import { useBlockchain } from "@/hooks/useBlockchain";
+import { DeviceType } from "@/context/CucoContext";
+import { useCuco } from "@/hooks/useCuco";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 
 const Device = () => {
   const {deviceSN} = useParams();
-  const {fetchedDevices, setDeviceState, fetchedCustomers} = useBlockchain();
+  const {fetchedDevices, setDeviceState, fetchedCustomers} = useCuco();
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true)
 

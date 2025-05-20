@@ -4,8 +4,8 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogT
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CustomerType } from "@/context/BlockchainContext";
-import { useBlockchain } from "@/hooks/useBlockchain";
+import { CustomerType } from "@/context/CucoContext";
+import { useCuco } from "@/hooks/useCuco";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
 import { truncateMiddle } from "@/utils";
@@ -17,7 +17,7 @@ import { useParams } from 'react-router-dom';
 
 const Customer = () => {
   const {customerName} = useParams();
-  const {fetchedCustomers, addAdmin} = useBlockchain();
+  const {fetchedCustomers, addAdmin} = useCuco();
   const {selectedWallet} = useWalletProviders();
   const [customer, setCustomer] = useState<CustomerType | undefined>();
   const [loading, setLoading] = useState(true)

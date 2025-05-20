@@ -1,5 +1,5 @@
 import { Label } from "../ui/label";
-import { CustomerType } from "@/context/BlockchainContext";
+import { CustomerType } from "@/context/CucoContext";
 
 interface AddCustomerFormProps {
   newCustomer: CustomerType;

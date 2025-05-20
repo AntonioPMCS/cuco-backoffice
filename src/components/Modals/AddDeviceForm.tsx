@@ -1,7 +1,7 @@
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { DeviceType } from "@/context/BlockchainContext";
-import { useBlockchain } from "@/hooks/useBlockchain";
+import { DeviceType } from "@/context/CucoContext";
+import { useCuco } from "@/hooks/useCuco";
 
 interface AddDeviceFormProps {
   newDevice: DeviceType;
@@ -10,7 +10,7 @@ interface AddDeviceFormProps {
 
 
 const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) => {
-  const {fetchedCustomers} = useBlockchain();
+  const {fetchedCustomers} = useCuco();
   
   return (
     <>

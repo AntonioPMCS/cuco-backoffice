@@ -7,7 +7,7 @@ import { SelectValue } from "@radix-ui/react-select";
 import { Input } from "./ui/input";
 import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
-import { DeviceType } from "@/context/BlockchainContext";
+import { DeviceType } from "@/context/CucoContext";
 
 interface DeviceActionsDropdownProps {
   editDevice: DeviceType | null;

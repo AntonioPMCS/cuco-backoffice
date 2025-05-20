@@ -1,34 +1,20 @@
+import CucoContext from "@/context/CucoContext";
 import BlockchainContext from "@/context/BlockchainContext";
 import { useContext } from "react";
 import { useGasCostEstimator} from "./useGasCostEstimator";
 import { useWalletProviders } from "./useWalletProviders";
-import { Contract } from "ethers";
+import { Block, Contract } from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 
-export const useBlockchain = () => {
-  const {ethersProvider, selectedAccount} = useWalletProviders();
-  const context = useContext(BlockchainContext);  
+export const useCuco = () => {
+  const {selectedAccount} = useWalletProviders();
+  const context = useContext(CucoContext);  
   if (!context) {
-    throw new Error("useBlockchain must be used within a BlockchainProvider");
+    throw new Error("useCuco must be used within a BlockchainProvider");
   }
+  const cucoContract = useContext(BlockchainContext).cucoContract;
 
   const { estimateTransactionCost } = useGasCostEstimator();
-
-  // A helper to return the CUCo contract on current network
-  const getCuco = async () => {
-    if(!ethersProvider) return "";
-    let cucoAddress;
-    const network = (await ethersProvider.getNetwork()).name;
-    switch (network) {
-      case "sepolia":
-        cucoAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
-        break;
-      default:
-        cucoAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
-        break;
-    }
-    return new Contract(cucoAddress, CuCoBlockchain.abi, ethersProvider);
-  }
   
   // Wrap each blockchain method to include cost estimation
   const wrappedContext = {
@@ -38,9 +24,8 @@ export const useBlockchain = () => {
         console.log("! Adding new device !")
         // Get the original function
         const originalFn = context.addDevice;
-        const contract = await getCuco(); // assuming you have this in context
         const estimation = await estimateTransactionCost(
-          contract,
+          cucoContract,
           "createDevice",
           args,
           {from: selectedAccount}

@@ -2,17 +2,17 @@ import { useState } from "react";
 import { truncateMiddle } from "../utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Checkbox } from "./ui/checkbox";
-import { CustomerType } from "@/context/BlockchainContext";
+import { CustomerType } from "@/context/CucoContext";
 import CustomerActionsBar from "./CustomerActionsBar";
 import CustomerActionsDropdown from "./CustomerActionsDropdown";
-import { useBlockchain } from "@/hooks/useBlockchain";
+import { useCuco } from "@/hooks/useCuco";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Copy } from "lucide-react";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 const CustomerManager = () => {
-  const { fetchedCustomers, createCustomer } = useBlockchain();
+  const { fetchedCustomers, createCustomer } = useCuco();
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([])
   const [editCustomer, setEditCustomer] = useState<CustomerType | null>(null)
   const handleCopyAddress = useCopyToClipboard();

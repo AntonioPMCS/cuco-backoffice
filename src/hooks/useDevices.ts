@@ -1,45 +1,33 @@
-import { useState, useCallback } from "react";
-import { Contract, Signer, TransactionResponse, Interface, Provider } from "ethers";
+import { useState, useCallback, useContext } from "react";
+import { Contract, Signer, TransactionResponse, Interface, Provider, Block } from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Device from "../../abi/Device.json";
-import { DeviceType } from "../context/BlockchainContext";
+import { DeviceType } from "../context/CucoContext";
 import { useWalletProviders } from "./useWalletProviders";
 import { batchCalls } from "./useBatchCalls";
+import BlockchainContext from "@/context/BlockchainContext";
 
 export const useDevices = () => {
   const [devices, setDevices] = useState<DeviceType[]>([]);
   const {chainId, ethersProvider} = useWalletProviders();
+  const { cucoContract } = useContext(BlockchainContext);
 
   // A helper function that returns a promise that rejects after a timeout.
   const timeoutPromise = (ms: number) => new Promise((_, reject) => 
     setTimeout(() => reject(new Error('Request timed out')), ms)
   );
 
-  // A helper to return the CUCo contract on current network
-  const getCuco = async (ethersProvider:Provider) => {
-
-    let cucoAddress;
-    const network = (await ethersProvider.getNetwork()).name;
-    switch (network) {
-      case "sepolia":
-        cucoAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
-        break;
-      default:
-        cucoAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
-        break;
-    }
-    return cucoAddress;
-  }
-
   const fetchDevices = useCallback(async () => {
     if (!ethersProvider) return;
-    const cucoAddress = await getCuco(ethersProvider);
-    let contract: Contract, rootCustomer: string;
+    if (!cucoContract) {
+      console.log("CucoContract is null at fetchDevices"); 
+      return;
+    }
+    let rootCustomer: string;
     try {
       console.log("Fetching devices...");
-      contract = new Contract(cucoAddress, CuCoBlockchain.abi, ethersProvider);
       rootCustomer = (await Promise.race([
-        contract.getCustomers().then((customers: any[]) => customers[0]),
+        cucoContract.getCustomers().then((customers: any[]) => customers[0]),
         timeoutPromise(10000),
       ])) as string;
       console.log("Root Customer: ", rootCustomer);
@@ -50,14 +38,14 @@ export const useDevices = () => {
     }
 
     try {
-      const deviceAddresses: string[] = await contract.getDevicesUnderCustomer(rootCustomer);
+      const deviceAddresses: string[] = await cucoContract.getDevicesUnderCustomer(rootCustomer);
       const deviceObjects: Array<DeviceType> = await _fetchDeviceInstances(deviceAddresses);
       setDevices(deviceObjects);
     } catch (error) {
       console.error(error);
       setDevices([]);
     }
-  }, [ethersProvider, chainId]);
+  }, [ethersProvider, chainId, cucoContract]);
 
 
   const _fetchDeviceInstances = async(deviceAddresses: string[]): Promise<DeviceType[]> => {
@@ -90,14 +78,15 @@ export const useDevices = () => {
   // More device actions (create, update, etc.) can be added here.
 
   const setDeviceState = useCallback(async (_newState:number, _address:string) => {
-    if (!ethersProvider) return;
-    const cucoAddress = await getCuco(ethersProvider);
+    if (!ethersProvider || !cucoContract) {
+      console.log("CucoContract or ethersProvider is null at setDeviceState");
+      return;
+    } 
     try {
       
       console.log("Editing device state...");
       const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
-      const contract:Contract = new Contract(cucoAddress, CuCoBlockchain.abi, signer);
-      const tx:TransactionResponse = await contract.setDeviceState(_newState, _address);
+      const tx:TransactionResponse = await cucoContract.setDeviceState(_newState, _address);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
       if (receipt) {
@@ -127,18 +116,18 @@ export const useDevices = () => {
       }
       
     } catch (error) {
-      console.error("Unable to create device", error);
+      console.error("Unable to change device state", error);
       return;
     }
-  }, [ethersProvider, chainId])
+  }, [ethersProvider, chainId, cucoContract])
 
   const addDevice = useCallback(async (customer: string, sn:string, metadata:string) => {
-    if (!ethersProvider) return;
-    const cucoAddress = await getCuco(ethersProvider);
+    if (!ethersProvider || !cucoContract) {
+      console.log("CucoContract or ethersProvider is null at toggleDeviceVisible");
+      return;
+    }
     try {
-      const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
-      const contract:Contract = new Contract(cucoAddress, CuCoBlockchain.abi, signer);
-      const tx:TransactionResponse = await contract.createDevice(customer, sn, metadata);
+      const tx:TransactionResponse = await cucoContract.createDevice(customer, sn, metadata);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
       if (receipt) {
@@ -157,15 +146,15 @@ export const useDevices = () => {
       console.error("Unable to create device", error);
       return;
     }
-  }, [ethersProvider, chainId])
+  }, [ethersProvider, chainId, cucoContract])
 
   const toggleDeviceVisible = useCallback(async (_deviceAddress: string) => {
-    if (!ethersProvider) return;
-    const cucoAddress = await getCuco(ethersProvider);
+    if (!ethersProvider || !cucoContract) {
+      console.log("CucoContract or ethersProvider is null at toggleDeviceVisible");
+      return;
+    }
     try {
-      const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
-      const contract:Contract = new Contract(cucoAddress, CuCoBlockchain.abi, signer);
-      const tx:TransactionResponse = await contract.toggleDeviceVisible(_deviceAddress);
+      const tx:TransactionResponse = await cucoContract.toggleDeviceVisible(_deviceAddress);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
       if (receipt) {
@@ -189,7 +178,7 @@ export const useDevices = () => {
       console.error("Unable to create device", error);
       return;
     }
-  }, [ethersProvider, chainId])
+  }, [ethersProvider, chainId, cucoContract])
 
   return { devices, fetchDevices, addDevice, setDeviceState, toggleDeviceVisible };
 };

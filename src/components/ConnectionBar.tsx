@@ -9,7 +9,7 @@ import { Button } from "./ui/button";
 
 const ConnectionBar = () => {
   const {selectedAccount, chainId, connectWallet, ethersProvider} = useWalletProviders()
-  //const { getBalance } = useBlockchain();
+  //const { getBalance } = useCuco();
   // Connect to the selected provider using eth_requestAccounts.
   const handleConnect = async (providerWithInfo: EIP6963ProviderDetail) => {
     connectWallet(providerWithInfo);

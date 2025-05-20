@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Edit, Plus, Upload } from "lucide-react"
 import ModalTemplate from "./Modals/ModalTemplate"
 import AddCustomerForm from "./Modals/AddCustomerForm";
-import { CustomerType } from "@/context/BlockchainContext";
+import { CustomerType } from "@/context/CucoContext";
 import BatchCustomerImportForm from "./Modals/BatchCustomerImportForm";
 import BatchEditForm from "./Modals/BatchEditForm";
 

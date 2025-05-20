@@ -1,5 +1,5 @@
 import "../styles/DeviceManager.css"
-import { DeviceType } from "@/context/BlockchainContext";
+import { DeviceType } from "@/context/CucoContext";
 import { useState } from "react";
 import { truncateMiddle } from "../utils";
 import { Copy, Lock, Unlock } from "lucide-react";
@@ -9,14 +9,14 @@ import { Badge } from "./ui/badge";
 
 import DeviceActionsBar from "./DeviceActionsBar";
 import ActionsDropdown from "./DeviceActionsDropdown";
-import { useBlockchain } from "@/hooks/useBlockchain";
+import { useCuco } from "@/hooks/useCuco";
 import { Button } from "./ui/button";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { Link } from "react-router-dom";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
 
 const DeviceManager = () => {
-  const { fetchedDevices, addDevice, fetchedCustomers, toggleDeviceVisible } = useBlockchain();
+  const { fetchedDevices, addDevice, fetchedCustomers, toggleDeviceVisible } = useCuco();
   const {selectedWallet} = useWalletProviders();
   const [selectedDevices, setSelectedDevices] = useState<string[]>([])
   const [editDevice, setEditDevice] = useState<DeviceType | null>(null)
