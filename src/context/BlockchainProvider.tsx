@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
-import { Contract, ethers, Signer } from "ethers";
+import { Contract, Signer } from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import BlockchainContext from "./BlockchainContext";
 

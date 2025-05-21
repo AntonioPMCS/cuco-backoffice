@@ -1,5 +1,5 @@
 import { useState, useCallback, useContext } from "react";
-import { Contract, Signer, TransactionResponse, Interface, Provider, Block } from "ethers";
+import { Contract, TransactionResponse, Interface } from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Device from "../../abi/Device.json";
 import { DeviceType } from "../context/CucoContext";
@@ -85,7 +85,6 @@ export const useDevices = () => {
     try {
       
       console.log("Editing device state...");
-      const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
       const tx:TransactionResponse = await cucoContract.setDeviceState(_newState, _address);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();

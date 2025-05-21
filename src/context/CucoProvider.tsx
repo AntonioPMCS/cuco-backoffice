@@ -3,8 +3,6 @@ import CucoContext from "./CucoContext";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
 import { useDevices } from "@/hooks/useDevices";
 import { useCustomers } from "@/hooks/useCustomers";
-import { Contract } from "ethers";
-import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 
 
 const CucoProvider: React.FC<{children: React.ReactNode}> = ({children}) => {

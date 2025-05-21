@@ -3,8 +3,6 @@ import BlockchainContext from "@/context/BlockchainContext";
 import { useContext } from "react";
 import { useGasCostEstimator} from "./useGasCostEstimator";
 import { useWalletProviders } from "./useWalletProviders";
-import { Block, Contract } from "ethers";
-import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 
 export const useCuco = () => {
   const {selectedAccount} = useWalletProviders();
