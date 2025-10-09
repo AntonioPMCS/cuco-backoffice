@@ -22,16 +22,18 @@ export const useCuco = () => {
         console.log("! Adding new device !")
         // Get the original function
         const originalFn = context.addDevice;
-        const estimation = await estimateTransactionCost(
-          cucoContract,
-          "createDevice",
-          args,
-          {from: selectedAccount}
-        );
-
-        console.log("Estimated cost of addDevice on Ethereum: $" + estimation.ethereum);
-        console.log("Estimated cost of addDevice on Polygon: $" + estimation.polygon);
-        
+        try {
+          const estimation = await estimateTransactionCost(
+            cucoContract,
+            "createDevice",
+            args,
+            {from: selectedAccount}
+          );
+          console.log("Estimated cost of addDevice on Ethereum: $" + estimation.ethereum);
+          console.log("Estimated cost of addDevice on Polygon: $" + estimation.polygon);
+        } catch (error) {
+          console.error("Error estimating cost for addDevice:", error);
+        }
         // Call the original function
         await originalFn(...args);
         
