@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import { Contract } from "ethers";
 
 export interface DeviceType {
   address: string,
@@ -6,7 +7,11 @@ export interface DeviceType {
   customer: string,
   deviceState: number,
   metadata: string,
-  visible: boolean
+  visible: boolean,
+  installationText?: string,
+  blockText?: string,
+  blockWarning?: string,
+  toleranceWindow?: number
 }
 
 export interface CustomerType {
@@ -19,6 +24,8 @@ export interface CustomerType {
 
 
 type CucoContextType = { // The context is an array of providers
+  cucoContract: Contract | null;
+  fetchCuco: () => void;
   fetchedDevices: Array<DeviceType>;
   refetchDevices: () => void;
   addDevice: (_customer:string, _sn:string, _metadata:string) => void;
@@ -33,6 +40,7 @@ type CucoContextType = { // The context is an array of providers
 
 const CucoContext = createContext<CucoContextType>({
     // Default context
+    cucoContract: null,
     fetchedDevices: [],
     refetchDevices: () => {},
     addDevice: () => {},

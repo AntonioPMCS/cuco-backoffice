@@ -5,12 +5,10 @@ import Device from "../../abi/Device.json";
 import { DeviceType } from "../context/CucoContext";
 import { useWalletProviders } from "./useWalletProviders";
 import { batchCalls } from "./useBatchCalls";
-import BlockchainContext from "@/context/BlockchainContext";
 
-export const useDevices = () => {
+export const useDevices = (cucoContract?: Contract | null) => {
   const [devices, setDevices] = useState<DeviceType[]>([]);
   const {chainId, ethersProvider} = useWalletProviders();
-  const { cucoContract } = useContext(BlockchainContext);
 
   // A helper function that returns a promise that rejects after a timeout.
   const timeoutPromise = (ms: number) => new Promise((_, reject) => 

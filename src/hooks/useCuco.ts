@@ -1,16 +1,17 @@
-import CucoContext from "@/context/CucoContext";
-import BlockchainContext from "@/context/BlockchainContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useGasCostEstimator} from "./useGasCostEstimator";
 import { useWalletProviders } from "./useWalletProviders";
 
+import CucoContext from "@/context/CucoContext";
+
 export const useCuco = () => {
   const {selectedAccount} = useWalletProviders();
-  const context = useContext(CucoContext);  
-  if (!context) {
-    throw new Error("useCuco must be used within a BlockchainProvider");
-  }
-  const cucoContract = useContext(BlockchainContext).cucoContract;
+  const context = useContext(CucoContext);
+
+  // Log when cucoContract actually changes
+  useEffect(() => {
+    console.log("CucoContract updated: ", context.cucoContract);
+  }, [context.cucoContract]);
 
   const { estimateTransactionCost } = useGasCostEstimator();
   
@@ -24,7 +25,7 @@ export const useCuco = () => {
         const originalFn = context.addDevice;
         try {
           const estimation = await estimateTransactionCost(
-            cucoContract,
+            context.cucoContract,
             "createDevice",
             args,
             {from: selectedAccount}
@@ -79,7 +80,7 @@ export const useCuco = () => {
     addAdmin: async (...args: Parameters<typeof context.addAdmin>) => {
       try {
         console.log("Estimating cost for addAdmin transaction...");
-        await context.addAdmin(...args);
+        context.addAdmin(...args);
         console.log("Transaction would cost approximately: [estimation skipped in this simplified implementation]");
       } catch (error) {
         console.error("Error in wrapped addAdmin:", error);

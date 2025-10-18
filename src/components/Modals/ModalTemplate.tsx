@@ -22,17 +22,17 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({children, trigger, title, 
             {trigger}
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="max-h-[calc(100vh-4rem)] sm:max-w-4xl top-[2rem] translate-y-0 overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {title}
             </DialogTitle>
             {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>  
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-8">
             {children}
           </div>
-          <DialogFooter>
+          <DialogFooter className="pt-8">
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
@@ -41,7 +41,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({children, trigger, title, 
             </DialogClose>
           </DialogFooter>
           {!selectedWallet && 
-            <span className="text-red-500 text-sm text-right block">Connect a wallet to transact with the blockchain</span>
+            <span className="mb-8 text-red-500 text-sm text-right block">Connect a wallet to transact with the blockchain</span>
           }
         </DialogContent> 
       </Dialog>

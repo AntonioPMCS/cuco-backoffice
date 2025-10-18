@@ -26,7 +26,11 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
     customer: "",
     deviceState: 1,
     metadata: "QmNPyntq8DLiV1M6ru9CVixpEvuhmwTbJytPARoEjMqDPN/35eaffe809a27639951d8e36c57a1c3f784cbe3855b309ebe3708c532b4bda46.json",
-    visible: true
+    visible: true,
+    installationText: "Instalacao do CUCo\n\n(esta mensagem repete-se na desativacao...)",
+    blockText: "Your computer is locked by CUCo Firmware security\nPlease contact your seller or the CUCo Firmware Support Team at support@cuco-firmware.com",
+    blockWarning: "This is a test warning message This is a test warning message :GNV: :FI:60",
+    toleranceWindow: 2
   })
 
   const handleAddDevice = () => {

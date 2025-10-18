@@ -3,6 +3,7 @@ import { RenderEditableDropdown, RenderEditableText } from "@/components/FormFie
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeviceType } from "@/context/CucoContext";
 import { useCuco } from "@/hooks/useCuco";
+import { useIpfs } from "@/hooks/useIpfs";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
@@ -11,6 +12,7 @@ import { useParams } from 'react-router-dom';
 const Device = () => {
   const {deviceSN} = useParams();
   const {fetchedDevices, setDeviceState, fetchedCustomers} = useCuco();
+  const {data, loading: ipfsLoading, error: ipfsError, loadData} = useIpfs();
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true)
 
@@ -19,6 +21,22 @@ const Device = () => {
                     { label: "Unlocked", value: "1"},
                     { label: "Locked", value: "2"}
                   ]
+
+  useEffect(() => {
+    if (device?.metadata) {
+      console.log("Loading IPFS data for device:", device.sn, "with metadata hash:", device.metadata);
+      loadData(device.metadata);
+    }
+  }, [device?.metadata, device?.sn, loadData]);
+
+  // Log IPFS data when it's loaded
+  useEffect(() => {
+    if (data) {
+      console.log("IPFS data loaded successfully for device:", device?.sn);
+      console.log("IPFS data content:", data);
+    }
+  }, [data, device?.sn]);
+
  
   const getCustomerName = (address:string) => {
     console.log("Getting name for customer: "+address)
@@ -119,6 +137,36 @@ const Device = () => {
                 <p className="text-base">{device.address}</p>
               </div>
             </div>
+            
+            {/* IPFS Data Section */}
+            {device.metadata && (
+              <div className="mt-6 pt-6 border-t">
+                <h3 className="text-lg font-semibold mb-4">Device Metadata (IPFS)</h3>
+                
+                {ipfsLoading && (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                    <span className="text-sm text-muted-foreground">Loading metadata...</span>
+                  </div>
+                )}
+
+                {ipfsError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h4 className="text-red-800 font-medium mb-2">Error loading metadata</h4>
+                    <p className="text-red-600 text-sm">{ipfsError}</p>
+                  </div>
+                )}
+
+                {data && (
+                  <div className="bg-muted p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">Metadata Content:</h4>
+                    <pre className="text-sm overflow-auto max-h-64 whitespace-pre-wrap">
+                      {JSON.stringify(data, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

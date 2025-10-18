@@ -5,12 +5,10 @@ import Customer from "../../abi/Customer.json";
 import { CustomerType } from "../context/CucoContext";
 import { useWalletProviders } from "./useWalletProviders";
 import { batchCalls } from "./useBatchCalls";
-import BlockchainContext from "@/context/BlockchainContext";
 
-export const useCustomers = () => {
+export const useCustomers = (cucoContract?: Contract | null) => {
   const [customers, setCustomers] = useState<CustomerType[]>([]);
   const {chainId, ethersProvider} = useWalletProviders();
-  const { cucoContract } = useContext(BlockchainContext);
 
   const timeoutPromise = (ms: number) =>
     new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), ms));
