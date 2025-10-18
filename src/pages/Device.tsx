@@ -1,6 +1,7 @@
 
 import { RenderEditableDropdown, RenderEditableText } from "@/components/FormFields";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { DeviceType } from "@/context/CucoContext";
 import { useCuco } from "@/hooks/useCuco";
 import { useIpfs } from "@/hooks/useIpfs";
@@ -14,7 +15,8 @@ const Device = () => {
   const {fetchedDevices, setDeviceState, fetchedCustomers} = useCuco();
   const {data, loading: ipfsLoading, error: ipfsError, loadData} = useIpfs();
   const [device, setDevice] = useState<DeviceType | undefined>();
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'main' | 'metadata'>('main');
 
   const stateOptions = [ 
                     { label: "Free", value:"0"},
@@ -112,62 +114,111 @@ const Device = () => {
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <RenderEditableText 
-                label="Serial Number" field="sn" value={device.sn} handleSave={handleSave}
-              />
-              <RenderEditableDropdown
-                label="State" field="deviceState" value={device.deviceState?.toString() ?? "0"}
-                handleSave={handleSave} options={stateOptions}
-              />
-              <RenderEditableDropdown
-                label="Visible" field="visible" value={device.visible?.toString() ?? "0"}
-                handleSave={handleSave} options={[
-                                                  {label: "True", value: "1"},
-                                                  {label: "false", value: "0"}
-                                                ]}
-              />
-              <RenderEditableText
-                label="Belongs to customer" field="customer" value={getCustomerName(device.customer)} handleSave={handleSave}
-              />
-              <div className="md:col-span-1">
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Device Contract (immutable)</h3>
-                <p className="text-base">{device.address}</p>
-              </div>
-            </div>
-            
-            {/* IPFS Data Section */}
-            {device.metadata && (
-              <div className="mt-6 pt-6 border-t">
-                <h3 className="text-lg font-semibold mb-4">Device Metadata (IPFS)</h3>
-                
-                {ipfsLoading && (
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                    <span className="text-sm text-muted-foreground">Loading metadata...</span>
-                  </div>
-                )}
-
-                {ipfsError && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <h4 className="text-red-800 font-medium mb-2">Error loading metadata</h4>
-                    <p className="text-red-600 text-sm">{ipfsError}</p>
-                  </div>
-                )}
-
-                {data && (
-                  <div className="bg-muted p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">Metadata Content:</h4>
-                    <pre className="text-sm overflow-auto max-h-64 whitespace-pre-wrap">
-                      {JSON.stringify(data, null, 2)}
-                    </pre>
-                  </div>
-                )}
-              </div>
-            )}
+        <CardContent>
+          {/* Tab Navigation */}
+          <div className="flex space-x-1 mb-6 border-b">
+            <Button
+              variant={activeTab === 'main' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('main')}
+              className="rounded-none border-b-2 border-transparent"
+              style={activeTab === 'main' ? { 
+                borderBottomColor: 'black', 
+                color: 'black',
+                backgroundColor: 'transparent'
+              } : {}}
+            >
+              Device Info
+            </Button>
+            <Button
+              variant={activeTab === 'metadata' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('metadata')}
+              className="rounded-none border-b-2 border-transparent"
+              style={activeTab === 'metadata' ? { 
+                borderBottomColor: 'black', 
+                color: 'black',
+                backgroundColor: 'transparent'
+              } : {}}
+            >
+              CUCo Params
+            </Button>
           </div>
+
+          {/* Tab Content */}
+          {activeTab === 'main' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <RenderEditableText 
+                  label="Serial Number" field="sn" value={device.sn} handleSave={handleSave}
+                />
+                <RenderEditableDropdown
+                  label="State" field="deviceState" value={device.deviceState?.toString() ?? "0"}
+                  handleSave={handleSave} options={stateOptions}
+                />
+                <RenderEditableDropdown
+                  label="Visible" field="visible" value={device.visible?.toString() ?? "0"}
+                  handleSave={handleSave} options={[
+                                                    {label: "True", value: "1"},
+                                                    {label: "false", value: "0"}
+                                                  ]}
+                />
+                <RenderEditableText
+                  label="Belongs to customer" field="customer" value={getCustomerName(device.customer)} handleSave={handleSave}
+                />
+                <div className="md:col-span-1">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Device Contract (immutable)</h3>
+                  <p className="text-base">{device.address}</p>
+                </div>
+              </div>
+              
+              {/* Metadata URL in Main tab for quick access */}
+              {device.metadata && (
+                <div className="mt-6 pt-6 border-t">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Metadata URI</h3>
+                  <p className="text-base">{device.metadata}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'metadata' && (
+            <div className="space-y-4">
+              {device.metadata ? (
+                <>
+                  {ipfsLoading && (
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                      <span className="text-sm text-muted-foreground">Loading metadata...</span>
+                    </div>
+                  )}
+
+                  {ipfsError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <h4 className="text-red-800 font-medium mb-2">Error loading metadata</h4>
+                      <p className="text-red-600 text-sm">{ipfsError}</p>
+                    </div>
+                  )}
+
+                  {data && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {Object.entries(data).map(([key, value]) => (
+                        <RenderEditableText
+                          key={key}
+                          label={key}
+                          field={`metadata.${key}`}
+                          value={typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                          handleSave={handleSave}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No metadata available for this device.</p>
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
       <Link to="/">{`<<< Home`}</Link>

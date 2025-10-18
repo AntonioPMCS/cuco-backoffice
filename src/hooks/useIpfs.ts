@@ -27,7 +27,11 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
 
     try {
       // You can customize the IPFS gateway URL here
-      const ipfsUrl = `https://ipfs.io/${hash}`;
+      // hash example: ipfs://bafkreihccimod2m7y7txvnm34kocealmr7u2yurqohwgleaslloh2fokzi
+      // remove the ipfs:// prefix
+      const cid = hash.replace('ipfs://', '');
+      // add #x-ipfs-companion-no-redirect to the end of the url 
+      const ipfsUrl = `https://ipfs.io/ipfs/${cid}#x-ipfs-companion-no-redirect`;
       const response = await fetch(ipfsUrl);
       
       if (!response.ok) {
