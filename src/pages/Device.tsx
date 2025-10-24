@@ -1,7 +1,7 @@
 
-import { RenderEditableDropdown, RenderEditableText } from "@/components/FormFields";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/FormField";
 import { DeviceType } from "@/context/CucoContext";
 import { useCuco } from "@/hooks/useCuco";
 import { useIpfs } from "@/hooks/useIpfs";
@@ -17,12 +17,29 @@ const Device = () => {
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'main' | 'metadata'>('main');
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState<Partial<DeviceType>>({});
 
   const stateOptions = [ 
                     { label: "Free", value:"0"},
                     { label: "Unlocked", value: "1"},
                     { label: "Locked", value: "2"}
                   ]
+
+  // Initialize form data when device loads
+  useEffect(() => {
+    if (device) {
+      setFormData(device);
+    }
+  }, [device]);
+
+  // Handle field changes
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   useEffect(() => {
     if (device?.metadata) {
@@ -51,32 +68,39 @@ const Device = () => {
     return customer ? customer.name : "unknown";
   };
 
-  // Handle save button click
-  const handleSave = async (field:string, _newValue:string) => {
-    const newValue = Number(_newValue);
-    if (!device) return
+  // Handle save all changes
+  const handleSaveAll = async () => {
+    console.log("Hello from Save button!");
+    console.log("Form data:", formData);
+    console.log("Original device data:", device);
+    
+    if (!device) return;
     setLoading(true);
 
     try {
-      switch (field) {
-        case "deviceState": 
-          await setDeviceState(newValue, device.address);
-          break;
-        default:
-          break;
-      } 
-      // Update the device state locally after successful blockchain update
-      // setDevice((prevDevice) => {
-      //   if (!prevDevice) {
-      //     throw new Error("Trying to update device, but it's undefined.");
-      //   }
-      //   return { ...prevDevice, [field]: newValue };
-      // });
+      // TODO: Implement actual save logic here
+      // For now, just log the changes
+      console.log("Changes to be saved:");
+      Object.entries(formData).forEach(([key, value]) => {
+        if (device[key as keyof DeviceType] !== value) {
+          console.log(`${key}: ${device[key as keyof DeviceType]} → ${value}`);
+        }
+      });
+      
+      // Simulate save delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setIsEditing(false);
     } catch(error) {
-      console.log(error);
+      console.log("Save error:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Legacy handleSave function (kept for compatibility)
+  const handleSave = async (field:string, _newValue:string) => {
+    console.log("Legacy handleSave called - this should not be used in edit mode");
   }
 
   useEffect(() => {
@@ -113,6 +137,22 @@ const Device = () => {
               {device.customer ? `Customer: ${device.customer}` : "Device's customer not found"}
             </CardDescription>
           </div>
+          <div className="flex gap-2">
+            {!isEditing ? (
+              <Button onClick={() => setIsEditing(true)} variant="outline">
+                Edit
+              </Button>
+            ) : (
+              <>
+                <Button onClick={handleSaveAll} disabled={loading}>
+                  {loading ? "Saving..." : "Save"}
+                </Button>
+                <Button onClick={() => setIsEditing(false)} variant="outline">
+                  Cancel
+                </Button>
+              </>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {/* Tab Navigation */}
@@ -147,22 +187,40 @@ const Device = () => {
           {activeTab === 'main' && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <RenderEditableText 
-                  label="Serial Number" field="sn" value={device.sn} handleSave={handleSave}
+                <FormField 
+                  label="Serial Number" 
+                  field="sn" 
+                  value={formData.sn || device.sn}
+                  isEditing={isEditing}
+                  onFieldChange={handleFieldChange}
                 />
-                <RenderEditableDropdown
-                  label="State" field="deviceState" value={device.deviceState?.toString() ?? "0"}
-                  handleSave={handleSave} options={stateOptions}
+                <FormField
+                  label="State" 
+                  field="deviceState" 
+                  value={formData.deviceState?.toString() ?? device.deviceState?.toString() ?? "0"}
+                  type="select"
+                  options={stateOptions}
+                  isEditing={isEditing}
+                  onFieldChange={handleFieldChange}
                 />
-                <RenderEditableDropdown
-                  label="Visible" field="visible" value={device.visible?.toString() ?? "0"}
-                  handleSave={handleSave} options={[
-                                                    {label: "True", value: "1"},
-                                                    {label: "false", value: "0"}
-                                                  ]}
+                <FormField
+                  label="Visible" 
+                  field="visible" 
+                  value={formData.visible?.toString() ?? device.visible?.toString() ?? "0"}
+                  type="select"
+                  options={[
+                    {label: "True", value: "1"},
+                    {label: "False", value: "0"}
+                  ]}
+                  isEditing={isEditing}
+                  onFieldChange={handleFieldChange}
                 />
-                <RenderEditableText
-                  label="Belongs to customer" field="customer" value={getCustomerName(device.customer)} handleSave={handleSave}
+                <FormField
+                  label="Belongs to customer" 
+                  field="customer" 
+                  value={getCustomerName(device.customer)}
+                  isEditing={isEditing}
+                  onFieldChange={handleFieldChange}
                 />
                 <div className="md:col-span-1">
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Device Contract (immutable)</h3>
@@ -201,12 +259,13 @@ const Device = () => {
                   {data && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {Object.entries(data).map(([key, value]) => (
-                        <RenderEditableText
+                        <FormField
                           key={key}
                           label={key}
                           field={`metadata.${key}`}
                           value={typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                          handleSave={handleSave}
+                          isEditing={isEditing}
+                          onFieldChange={handleFieldChange}
                         />
                       ))}
                     </div>
