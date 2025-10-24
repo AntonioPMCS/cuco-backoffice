@@ -41,6 +41,7 @@ type CucoContextType = { // The context is an array of providers
 const CucoContext = createContext<CucoContextType>({
     // Default context
     cucoContract: null,
+    fetchCuco: () => {},
     fetchedDevices: [],
     refetchDevices: () => {},
     addDevice: () => {},
