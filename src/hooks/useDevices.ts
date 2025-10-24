@@ -1,4 +1,4 @@
-import { useState, useCallback, useContext } from "react";
+import { useState, useCallback } from "react";
 import { Contract, TransactionResponse, Interface } from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Device from "../../abi/Device.json";

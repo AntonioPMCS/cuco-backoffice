@@ -1,4 +1,4 @@
-import { useState, useCallback, useContext } from "react";
+import { useState, useCallback } from "react";
 import { Contract, Signer, TransactionResponse, Interface, FallbackProvider, ZeroAddress as ZEROADDRESS} from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Customer from "../../abi/Customer.json";
