@@ -8,12 +8,15 @@ import { useIpfs } from "@/hooks/useIpfs";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
+import { useWalletProviders } from "@/hooks/useWalletProviders";
+
 
 
 const Device = () => {
   const {deviceSN} = useParams();
-  const {fetchedDevices, setDeviceState, fetchedCustomers} = useCuco();
+  const {fetchedDevices, setDeviceState, toggleDeviceVisible, fetchedCustomers} = useCuco();
   const {data, loading: ipfsLoading, error: ipfsError, loadData} = useIpfs();
+  const {selectedWallet} = useWalletProviders();
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'main' | 'metadata'>('main');
@@ -41,22 +44,38 @@ const Device = () => {
     }));
   };
 
+  // Find device and load IPFS data, then set complete device
   useEffect(() => {
-    if (device?.metadata) {
-      console.log("Loading IPFS data for device:", device.sn, "with metadata hash:", device.metadata);
-      loadData(device.metadata);
-    }
-  }, [device?.metadata, device?.sn, loadData]);
+    if (!fetchedDevices) return;
+    
+    const foundDevice = fetchedDevices.find((_device) => _device.sn == deviceSN);
+    if (!foundDevice) return;
 
-  // Log IPFS data when it's loaded
-  useEffect(() => {
+    
+    // If device has metadata but no IPFS data yet, load it
+    if (foundDevice.metadata && !data) {
+      console.log("Loading IPFS data for device:", foundDevice.sn, "with metadata hash:", foundDevice.metadata);
+      loadData(foundDevice.metadata);
+      setDevice(foundDevice);
+      setLoading(false);
+      return; // Don't set device yet, wait for IPFS data
+    }
+    
+    // Set device with complete data (including IPFS data if available)
+    const completeDevice = {
+      ...foundDevice,
+      ...(data && data)
+    };
+    
+    setDevice(completeDevice);
+    setLoading(false);
+    
     if (data) {
-      console.log("IPFS data loaded successfully for device:", device?.sn);
+      console.log("IPFS data loaded successfully for device:", foundDevice.sn);
       console.log("IPFS data content:", data);
     }
-  }, [data, device?.sn]);
+  }, [fetchedDevices, deviceSN, data, loadData]);
 
- 
   const getCustomerName = (address:string) => {
     console.log("Getting name for customer: "+address)
     console.log(fetchedCustomers);
@@ -78,21 +97,48 @@ const Device = () => {
     setLoading(true);
 
     try {
-      // TODO: Implement actual save logic here
-      // For now, just log the changes
-      console.log("Changes to be saved:");
+      const tasks: Promise<any>[] = [];
+
+      // 1) deviceState (string in formData → number on chain)
+      if (formData.deviceState !== undefined) {
+        const newState = Number(formData.deviceState);
+        if (newState != device.deviceState) {
+          tasks.push(setDeviceState(newState, device.address));
+        }
+      }
+      // 2) visible (string "1"/"0" or boolean → toggle if different)
+      if (formData.visible !== undefined) {
+        if (formData.visible != device.visible) {
+          tasks.push(toggleDeviceVisible(device.address));
+        }
+      }
+
+      // 3) Unsupported fields for now:
+      // - sn, customer, metadata or any metadata.* keys
+      //   You can log or collect them for a future flow
+      const unsupportedChanges: Record<string, unknown> = {};
       Object.entries(formData).forEach(([key, value]) => {
-        if (device[key as keyof DeviceType] !== value) {
-          console.log(`${key}: ${device[key as keyof DeviceType]} → ${value}`);
+        if (!["deviceState", "visible"].includes(key)) {
+          unsupportedChanges[key] = value;
         }
       });
-      
-      // Simulate save delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      if (Object.keys(unsupportedChanges).length > 0) {
+        console.log("Unsupported changes (not saved yet):", unsupportedChanges);
+      }
+
+        // 4) Run all supported actions
+      const results = await Promise.allSettled(tasks);
+      const failed = results.filter(r => r.status === "rejected");
+      if (failed.length) {
+        console.error("Some actions failed:", failed);
+      }
+
+      // 5) Refresh data for accuracy
+      // TODO: is this really needed?
+
       setIsEditing(false);
-    } catch(error) {
-      console.log("Save error:", error);
+    } catch (err) {
+      console.error("Save error:", err);
     } finally {
       setLoading(false);
     }
@@ -102,12 +148,6 @@ const Device = () => {
   const handleSave = async (field:string, _newValue:string) => {
     console.log("Legacy handleSave called - this should not be used in edit mode");
   }
-
-  useEffect(() => {
-    if (!fetchedDevices) return;
-    setLoading(false);
-    setDevice(fetchedDevices.find((_device) => _device.sn == deviceSN ));
-  }, [fetchedDevices, deviceSN]);
 
 
   if (loading) {
@@ -129,7 +169,7 @@ const Device = () => {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="w-[800px]">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
             <CardTitle className="text-2xl">{device.sn}</CardTitle>
@@ -143,14 +183,21 @@ const Device = () => {
                 Edit
               </Button>
             ) : (
-              <>
-                <Button onClick={handleSaveAll} disabled={loading}>
-                  {loading ? "Saving..." : "Save"}
-                </Button>
-                <Button onClick={() => setIsEditing(false)} variant="outline">
-                  Cancel
-                </Button>
-              </>
+              <div className="flex flex-col items-end">
+                <div className="flex gap-2">
+                  <Button onClick={handleSaveAll} disabled={loading || selectedWallet ? false : true}>
+                    {loading ? "Saving..." : "Save"}
+                  </Button>
+                  <Button onClick={() => setIsEditing(false)} variant="outline">
+                    Cancel
+                  </Button>
+                </div>
+                {!selectedWallet && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Connect a wallet to transact with the blockchain
+                  </p>
+                )}
+              </div>
             )}
           </div>
         </CardHeader>
@@ -262,7 +309,7 @@ const Device = () => {
                         <FormField
                           key={key}
                           label={key}
-                          field={`metadata.${key}`}
+                          field={key}
                           value={typeof value === 'object' ? JSON.stringify(value) : String(value)}
                           isEditing={isEditing}
                           onFieldChange={handleFieldChange}

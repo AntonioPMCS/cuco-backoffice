@@ -56,20 +56,29 @@ export const useDevices = (cucoContract?: Contract | null) => {
       customer: results[index * fnNames.length + 1] as string,
       deviceState: results[index * fnNames.length + 2] as number,
       metadata: results[index * fnNames.length + 3] as string,
-      visible: results[index * fnNames.length + 4] as boolean
+      visible: results[index * fnNames.length + 4] as boolean,
+      installationText: "",
+      blockText: "",
+      blockWarning: "",
+      toleranceWindow: 0
     }));
     return deviceObjects;
   }
 
   const fetchDeviceInstance = async (address: string): Promise<DeviceType> => {
     const deviceContract = new Contract(address, Device.abi, ethersProvider);
+    // We defer IPFS fetching to the Device page to speed up loading.
     return {
       address: await deviceContract.getAddress(),
       sn: await deviceContract.sn(),
       customer: await deviceContract.customer(),
       deviceState: await deviceContract.deviceState(),
       metadata: await deviceContract.metadata(),
-      visible: await deviceContract.visible()
+      visible: await deviceContract.visible(),
+      installationText: "",
+      blockText: "",
+      blockWarning: "",
+      toleranceWindow: 0
     };
   };
 

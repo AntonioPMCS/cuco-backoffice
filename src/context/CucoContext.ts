@@ -8,10 +8,10 @@ export interface DeviceType {
   deviceState: number,
   metadata: string,
   visible: boolean,
-  installationText?: string,
-  blockText?: string,
-  blockWarning?: string,
-  toleranceWindow?: number
+  installationText: string,
+  blockText: string,
+  blockWarning: string,
+  toleranceWindow: number
 }
 
 export interface CustomerType {

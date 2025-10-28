@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEffect, useState } from "react";
 
 interface FormFieldProps {
   label: string;
@@ -20,13 +21,26 @@ export const FormField = ({
   isEditing, 
   onFieldChange 
 }: FormFieldProps) => {
+  const [internalValue, setInternalValue] = useState(value);
+
+  // Sync internal value with prop value when it changes
+  useEffect(() => {
+    setInternalValue(value);
+  }, [value]);
+
   // Get the display value for select fields
   const getDisplayValue = () => {
     if (type === "select" && options) {
-      const option = options.find(opt => opt.value === value);
-      return option ? option.label : value;
+      const option = options.find(opt => opt.value === internalValue);
+      return option ? option.label : internalValue;
     }
-    return value;
+    return internalValue;
+  };
+
+  // Handle input changes
+  const handleInputChange = (newValue: string) => {
+    setInternalValue(newValue);
+    onFieldChange(field, newValue);
   };
 
   return (
@@ -34,7 +48,7 @@ export const FormField = ({
       <h3 className="text-sm font-medium text-muted-foreground mb-1">{label}</h3>
       {isEditing ? (
         type === "select" && options ? (
-          <Select value={value} onValueChange={(newValue) => onFieldChange(field, newValue)}>
+          <Select value={internalValue} onValueChange={handleInputChange}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -48,8 +62,8 @@ export const FormField = ({
           </Select>
         ) : (
           <Input 
-            value={value} 
-            onChange={(e) => onFieldChange(field, e.target.value)}
+            value={internalValue} 
+            onChange={(e) => handleInputChange(e.target.value)}
           />
         )
       ) : (
