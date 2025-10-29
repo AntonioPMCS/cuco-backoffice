@@ -129,7 +129,7 @@ export const useDevices = (cucoContract?: Contract | null) => {
 
   const addDevice = useCallback(async (customer: string, sn:string, metadata:string) => {
     if (!ethersProvider || !cucoContract) {
-      console.log("CucoContract or ethersProvider is null at toggleDeviceVisible");
+      console.log("CucoContract or ethersProvider is null at addDevice");
       return;
     }
     try {

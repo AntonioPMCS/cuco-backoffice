@@ -8,6 +8,7 @@ interface IpfsState {
 
 interface UseIpfsReturn extends IpfsState {
   loadData: (hash: string) => Promise<void>;
+  uploadToIpfs: (data: any) => Promise<string | null>;
   clearData: () => void;
 }
 
@@ -51,6 +52,12 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
     }
   }, []);
 
+  const uploadToIpfs = useCallback(async (data: any): Promise<string | null> => {
+    console.log('Uploading to IPFS:', data);
+    // TODO: Implement IPFS upload logic
+    return null;
+  }, []);
+
   const clearData = useCallback(() => {
     setData(null);
     setError(null);
@@ -69,6 +76,7 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
     loading,
     error,
     loadData,
+    uploadToIpfs,
     clearData
   };
 };

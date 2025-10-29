@@ -23,10 +23,10 @@ export const FormField = ({
 }: FormFieldProps) => {
   const [internalValue, setInternalValue] = useState(value);
 
-  // Sync internal value with prop value when it changes
+  // Sync internal value with prop value when it changes or when exiting edit mode
   useEffect(() => {
     setInternalValue(value);
-  }, [value]);
+  }, [value, isEditing]); // Reset when exiting edit mode (isEditing becomes false)
 
   // Get the display value for select fields
   const getDisplayValue = () => {
@@ -50,7 +50,7 @@ export const FormField = ({
         type === "select" && options ? (
           <Select value={internalValue} onValueChange={handleInputChange}>
             <SelectTrigger>
-              <SelectValue />
+              <SelectValue placeholder={getDisplayValue()} />
             </SelectTrigger>
             <SelectContent>
               {options.map((option) => (

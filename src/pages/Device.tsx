@@ -5,7 +5,7 @@ import { FormField } from "@/components/FormField";
 import { DeviceType } from "@/context/CucoContext";
 import { useCuco } from "@/hooks/useCuco";
 import { useIpfs } from "@/hooks/useIpfs";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
 import { useWalletProviders } from "@/hooks/useWalletProviders";
@@ -21,7 +21,8 @@ const Device = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'main' | 'metadata'>('main');
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<Partial<DeviceType>>({});
+  // Store form changes in ref (no re-renders during editing)
+  const formChangesRef = useRef<Record<string, string>>({});
 
   const stateOptions = [ 
                     { label: "Free", value:"0"},
@@ -29,19 +30,9 @@ const Device = () => {
                     { label: "Locked", value: "2"}
                   ]
 
-  // Initialize form data when device loads
-  useEffect(() => {
-    if (device) {
-      setFormData(device);
-    }
-  }, [device]);
-
-  // Handle field changes
+  // Handle field changes - store in ref only (no re-render)
   const handleFieldChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    formChangesRef.current[field] = value;
   };
 
   // Find device and load IPFS data, then set complete device
@@ -76,21 +67,17 @@ const Device = () => {
     }
   }, [fetchedDevices, deviceSN, data, loadData]);
 
-  const getCustomerName = (address:string) => {
-    console.log("Getting name for customer: "+address)
-    console.log(fetchedCustomers);
-    const customer = fetchedCustomers.find((customer) => {
-      console.log("Customer address: "+ customer.address); 
-      return customer.address === address
-    });
-    console.log(customer)
+  // Memoize customer name - only recalculates when device.customer or fetchedCustomers changes
+  const customerName = useMemo(() => {
+    if (!device?.customer) return "unknown";
+    const customer = fetchedCustomers.find((c) => c.address === device.customer);
     return customer ? customer.name : "unknown";
-  };
+  }, [device?.customer, fetchedCustomers]);
 
   // Handle save all changes
   const handleSaveAll = async () => {
     console.log("Hello from Save button!");
-    console.log("Form data:", formData);
+    console.log("Form changes:", formChangesRef.current);
     console.log("Original device data:", device);
     
     if (!device) return;
@@ -98,26 +85,28 @@ const Device = () => {
 
     try {
       const tasks: Promise<any>[] = [];
+      const changes = formChangesRef.current; // Read all changes from ref
 
-      // 1) deviceState (string in formData → number on chain)
-      if (formData.deviceState !== undefined) {
-        const newState = Number(formData.deviceState);
+      // 1) deviceState (string in changes → number on chain)
+      if (changes.deviceState !== undefined) {
+        const newState = Number(changes.deviceState);
         if (newState != device.deviceState) {
           tasks.push(setDeviceState(newState, device.address));
         }
       }
-      // 2) visible (string "1"/"0" or boolean → toggle if different)
-      if (formData.visible !== undefined) {
-        if (formData.visible != device.visible) {
+      
+      // 2) visible (string "true"/"false" → boolean → toggle if different)
+      if (changes.visible !== undefined) {
+        const newVisible = changes.visible === "true";
+        if (newVisible !== device.visible) {
           tasks.push(toggleDeviceVisible(device.address));
         }
       }
 
       // 3) Unsupported fields for now:
       // - sn, customer, metadata or any metadata.* keys
-      //   You can log or collect them for a future flow
       const unsupportedChanges: Record<string, unknown> = {};
-      Object.entries(formData).forEach(([key, value]) => {
+      Object.entries(changes).forEach(([key, value]) => {
         if (!["deviceState", "visible"].includes(key)) {
           unsupportedChanges[key] = value;
         }
@@ -126,16 +115,15 @@ const Device = () => {
         console.log("Unsupported changes (not saved yet):", unsupportedChanges);
       }
 
-        // 4) Run all supported actions
+      // 4) Run all supported actions
       const results = await Promise.allSettled(tasks);
       const failed = results.filter(r => r.status === "rejected");
       if (failed.length) {
         console.error("Some actions failed:", failed);
       }
 
-      // 5) Refresh data for accuracy
-      // TODO: is this really needed?
-
+      // 5) Clear form changes after successful save
+      formChangesRef.current = {};
       setIsEditing(false);
     } catch (err) {
       console.error("Save error:", err);
@@ -179,7 +167,10 @@ const Device = () => {
           </div>
           <div className="flex gap-2">
             {!isEditing ? (
-              <Button onClick={() => setIsEditing(true)} variant="outline">
+              <Button onClick={() => {
+                setIsEditing(true);
+                formChangesRef.current = {}; // Initialize empty ref when entering edit mode
+              }} variant="outline">
                 Edit
               </Button>
             ) : (
@@ -188,9 +179,12 @@ const Device = () => {
                   <Button onClick={handleSaveAll} disabled={loading || selectedWallet ? false : true}>
                     {loading ? "Saving..." : "Save"}
                   </Button>
-                  <Button onClick={() => setIsEditing(false)} variant="outline">
-                    Cancel
-                  </Button>
+                <Button onClick={() => {
+                  setIsEditing(false);
+                  formChangesRef.current = {}; // Clear unsaved changes
+                }} variant="outline">
+                  Cancel
+                </Button>
                 </div>
                 {!selectedWallet && (
                   <p className="text-xs text-red-500 mt-1">
@@ -237,14 +231,14 @@ const Device = () => {
                 <FormField 
                   label="Serial Number" 
                   field="sn" 
-                  value={formData.sn || device.sn}
+                  value={device.sn}
                   isEditing={isEditing}
                   onFieldChange={handleFieldChange}
                 />
                 <FormField
                   label="State" 
                   field="deviceState" 
-                  value={formData.deviceState?.toString() ?? device.deviceState?.toString() ?? "0"}
+                  value={device.deviceState?.toString() ?? "0"}
                   type="select"
                   options={stateOptions}
                   isEditing={isEditing}
@@ -253,11 +247,11 @@ const Device = () => {
                 <FormField
                   label="Visible" 
                   field="visible" 
-                  value={formData.visible?.toString() ?? device.visible?.toString() ?? "0"}
+                  value={device.visible?.toString() ?? "false"}
                   type="select"
                   options={[
-                    {label: "True", value: "1"},
-                    {label: "False", value: "0"}
+                    {label: "True", value: "true"},
+                    {label: "False", value: "false"}
                   ]}
                   isEditing={isEditing}
                   onFieldChange={handleFieldChange}
@@ -265,7 +259,7 @@ const Device = () => {
                 <FormField
                   label="Belongs to customer" 
                   field="customer" 
-                  value={getCustomerName(device.customer)}
+                  value={customerName}
                   isEditing={isEditing}
                   onFieldChange={handleFieldChange}
                 />
