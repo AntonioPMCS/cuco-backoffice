@@ -215,7 +215,7 @@ export const useDevices = (cucoContract?: Contract | null) => {
         setDevices((prevDevices) =>
           prevDevices.map((device) => {
             if (device.address === _address) {
-              return { ...device, deviceState: parsedLog.args['1'] };
+              return { ...device, metadataURI: parsedLog.args['1'] };
             }
             return device;
           }))
