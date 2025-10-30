@@ -115,12 +115,12 @@ const Device = () => {
       if (Object.keys(unsupportedChanges).length > 0) {
         // Rebuild the metadata object with fields "IT", "BT", "BW","TW", "MaxUC" and "ticketlifetime"
         const metadata = {
-          IT: changes.IT? changes.IT : device.installationText,
-          BT: changes.BT? changes.BT : device.blockText,
-          BW: changes.BW? changes.BW : device.blockWarning,
-          TW: changes.TW? changes.TW : device.toleranceWindow,
-          MaxUC: changes.MaxUC? changes.MaxUC : device.maxUC,
-          ticketlifetime: changes.ticketlifetime? changes.ticketlifetime : device.ticketLifetime
+          IT: changes.IT?? device.IT,
+          BT: changes.BT?? device.BT,
+          BW: changes.BW?? device.BW,
+          TW: changes.TW?? device.TW,
+          MaxUC: changes.MaxUC?? device.MaxUC,
+          ticketlifetime: changes.ticketlifetime?? device.ticketlifetime
         };
        
         uploadToIpfs(metadata);

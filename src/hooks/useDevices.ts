@@ -57,12 +57,12 @@ export const useDevices = (cucoContract?: Contract | null) => {
       deviceState: results[index * fnNames.length + 2] as number,
       metadataURI: results[index * fnNames.length + 3] as string,
       visible: results[index * fnNames.length + 4] as boolean,
-      installationText: "",
-      blockText: "",
-      blockWarning: "",
-      toleranceWindow: 0,
-      maxUC: 0,
-      ticketLifetime: 0
+      IT: "", //installationText
+      BT: "", //blockText
+      BW: "", //blockWarning
+      TW: 0, //toleranceWindow
+      MaxUC: 0,
+      ticketlifetime: 0
     }));
     return deviceObjects;
   }
@@ -77,12 +77,12 @@ export const useDevices = (cucoContract?: Contract | null) => {
       deviceState: await deviceContract.deviceState(),
       metadataURI: await deviceContract.metadata(),
       visible: await deviceContract.visible(),
-      installationText: "",
-      blockText: "",
-      blockWarning: "",
-      toleranceWindow: 0,
-      maxUC: 0,
-      ticketLifetime: 0
+      IT: "",
+      BT: "",
+      BW: "",
+      TW: 0,
+      MaxUC: 0,
+      ticketlifetime: 0
     };
   };
 

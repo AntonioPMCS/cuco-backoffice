@@ -27,12 +27,12 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
     deviceState: 1,
     metadataURI: "bafkreihccimod2m7y7txvnm34kocealmr7u2yurqohwgleaslloh2fokzi",
     visible: true,
-    installationText: "Instalacao do CUCo\n\n(esta mensagem repete-se na desativacao...)",
-    blockText: "Your computer is locked by CUCo Firmware security\nPlease contact your seller or the CUCo Firmware Support Team at support@cuco-firmware.com",
-    blockWarning: "This is a test warning message This is a test warning message :GNV: :FI:60",
-    toleranceWindow: 2,
-    maxUC: 64,
-    ticketLifetime: 0
+    IT: "Instalacao do CUCo\n\n(esta mensagem repete-se na desativacao...)",
+    BT: "Your computer is locked by CUCo Firmware security\nPlease contact your seller or the CUCo Firmware Support Team at support@cuco-firmware.com",
+    BW: "This is a test warning message This is a test warning message :GNV: :FI:60",
+    TW: 2,
+    MaxUC: 64,
+    ticketlifetime: 0
   })
 
   const handleAddDevice = () => {

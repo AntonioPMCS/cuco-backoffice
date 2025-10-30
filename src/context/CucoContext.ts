@@ -8,12 +8,12 @@ export interface DeviceType {
   deviceState: number,
   metadataURI: string,
   visible: boolean,
-  installationText: string,
-  blockText: string,
-  blockWarning: string,
-  toleranceWindow: number,
-  maxUC: number,
-  ticketLifetime: number
+  IT: string, //installationText
+  BT: string, //blockText
+  BW: string, //blockWarning
+  TW: number, //toleranceWindow
+  MaxUC: number, 
+  ticketlifetime: number
 }
 
 export interface CustomerType {

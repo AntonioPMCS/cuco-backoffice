@@ -64,10 +64,10 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) 
         <Label htmlFor="installationText">Installation Text</Label>
         <Textarea
           id="installationText"
-          value={newDevice.installationText || ''}
+          value={newDevice.IT || ''}
           onChange={(e) => setNewDevice({
             ...newDevice,
-            installationText: e.target.value
+            IT: e.target.value
           })}
           placeholder="Enter installation text..."
           rows={2}
@@ -77,10 +77,10 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) 
         <Label htmlFor="blockText">Block Text</Label>
         <Textarea
           id="blockText"
-          value={newDevice.blockText || ''}
+          value={newDevice.BT || ''}
           onChange={(e) => setNewDevice({
             ...newDevice,
-            blockText: e.target.value
+            BT: e.target.value
           })}
           placeholder="Enter block text..."
           rows={2}
@@ -90,10 +90,10 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) 
         <Label htmlFor="blockWarning">Block Warning</Label>
         <Textarea
           id="blockWarning"
-          value={newDevice.blockWarning || ''}
+          value={newDevice.BW || ''}
           onChange={(e) => setNewDevice({
             ...newDevice,
-            blockWarning: e.target.value
+            BW: e.target.value
           })}
           placeholder="Enter block warning..."
           rows={2}
@@ -107,15 +107,15 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({newDevice, setNewDevice}) 
             id="toleranceWindow"
             min="0"
             max="30"
-            value={newDevice.toleranceWindow || 0}
+            value={newDevice.TW || 0}
             onChange={(e) => setNewDevice({
               ...newDevice,
-              toleranceWindow: parseInt(e.target.value)
+              TW: parseInt(e.target.value)
             })}
             className="flex-1"
           />
           <span className="text-sm text-gray-600 min-w-[2rem]">
-            {newDevice.toleranceWindow || 0}
+            {newDevice.TW || 0}
           </span>
         </div>
       </div>
