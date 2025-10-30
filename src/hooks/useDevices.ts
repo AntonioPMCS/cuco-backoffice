@@ -205,8 +205,8 @@ export const useDevices = (cucoContract?: Contract | null) => {
       if (receipt) {
         console.log("Transaction confirmed:", receipt);
         const logs = receipt.logs;
-        const cucoInterface = new Interface(CuCoBlockchain.abi);
-        const parsedLog = cucoInterface.parseLog(logs[logs.length-1]); //last log is event emitted
+        const deviceInterface = new Interface(Device.abi);
+        const parsedLog = deviceInterface.parseLog(logs[logs.length-1]); //last log is event emitted
         if (!parsedLog || parsedLog.args['1'] === undefined) {
           throw Error("Could not parse new metadata URI from log");
         }
