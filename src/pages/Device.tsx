@@ -15,7 +15,7 @@ import { useWalletProviders } from "@/hooks/useWalletProviders";
 const Device = () => {
   const {deviceSN} = useParams();
   const {fetchedDevices, setDeviceState, toggleDeviceVisible, fetchedCustomers} = useCuco();
-  const {data, loading: ipfsLoading, error: ipfsError, loadData} = useIpfs();
+  const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs} = useIpfs();
   const {selectedWallet} = useWalletProviders();
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true);
@@ -43,10 +43,10 @@ const Device = () => {
     if (!foundDevice) return;
 
     
-    // If device has metadata but no IPFS data yet, load it
-    if (foundDevice.metadata && !data) {
-      console.log("Loading IPFS data for device:", foundDevice.sn, "with metadata hash:", foundDevice.metadata);
-      loadData(foundDevice.metadata);
+    // If device has metadaURI but no IPFS data yet, load it
+    if (foundDevice.metadataURI && !data) {
+      console.log("Loading IPFS data for device:", foundDevice.sn, "with metadata hash:", foundDevice.metadataURI);
+      loadData(foundDevice.metadataURI);
       setDevice(foundDevice);
       setLoading(false);
       return; // Don't set device yet, wait for IPFS data
@@ -112,7 +112,17 @@ const Device = () => {
         }
       });
       if (Object.keys(unsupportedChanges).length > 0) {
-        console.log("Unsupported changes (not saved yet):", unsupportedChanges);
+        // Rebuild the metadata object with fields "IT", "BT", "BW","TW", "MaxUC" and "ticketlifetime"
+        const metadata = {
+          IT: changes.installationText,
+          BT: changes.blockText,
+          BW: changes.blockWarning,
+          TW: changes.toleranceWindow,
+          MaxUC: changes.maxUC,
+          ticketlifetime: changes.ticketLifetime
+        };
+       
+        uploadToIpfs(metadata);
       }
 
       // 4) Run all supported actions
@@ -131,12 +141,6 @@ const Device = () => {
       setLoading(false);
     }
   };
-
-  // Legacy handleSave function (kept for compatibility)
-  const handleSave = async (field:string, _newValue:string) => {
-    console.log("Legacy handleSave called - this should not be used in edit mode");
-  }
-
 
   if (loading) {
     return (
@@ -270,10 +274,10 @@ const Device = () => {
               </div>
               
               {/* Metadata URL in Main tab for quick access */}
-              {device.metadata && (
+              {device.metadataURI && (
                 <div className="mt-6 pt-6 border-t">
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Metadata URI</h3>
-                  <p className="text-base">{device.metadata}</p>
+                  <p className="text-base">{device.metadataURI}</p>
                 </div>
               )}
             </div>
@@ -281,7 +285,7 @@ const Device = () => {
 
           {activeTab === 'metadata' && (
             <div className="space-y-4">
-              {device.metadata ? (
+              {device.metadataURI ? (
                 <>
                   {ipfsLoading && (
                     <div className="flex items-center space-x-2">

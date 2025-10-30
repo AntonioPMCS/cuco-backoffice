@@ -35,7 +35,7 @@ const devices = await _fetchDeviceInstances(deviceAddresses);
 
 **Implementation Details**:
 - Uses `batchCalls` for efficient blockchain queries
-- Fetches: `sn`, `customer`, `deviceState`, `metadata`, `visible`
+- Fetches: `sn`, `customer`, `deviceState`, `metadata` (mapped to `metadaURI`), `visible`
 - Returns devices with basic blockchain data only
 - IPFS metadata fetching is deferred to individual device pages
 
@@ -66,7 +66,7 @@ const device = await fetchDeviceInstance(deviceAddress);
 //   sn: "DEV001",
 //   customer: "0xabc...",
 //   deviceState: 1,
-//   metadata: "QmHash...",
+//   metadaURI: "QmHash...",
 //   visible: true,
 //   installationText: "",
 //   blockText: "",

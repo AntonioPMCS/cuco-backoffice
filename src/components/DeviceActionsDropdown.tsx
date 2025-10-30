@@ -95,11 +95,11 @@ const DeviceActionsDropdown:React.FC<DeviceActionsDropdownProps> = ({editDevice,
                   <Label htmlFor="edit-serialNumber">Metadata IPFS URI</Label>
                   <Input
                     id="edit-metadata_uri"
-                    value={editDevice?.metadata || device.metadata}
+                    value={editDevice?.metadataURI || device.metadataURI}
                     onChange={(e) =>
                       setEditDevice({
                         ...(editDevice || device),
-                        metadata: e.target.value,
+                        metadataURI: e.target.value,
                       })
                     }
                     onClick={() => setEditDevice(device)}

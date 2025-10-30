@@ -6,12 +6,14 @@ export interface DeviceType {
   sn: string,
   customer: string,
   deviceState: number,
-  metadata: string,
+  metadataURI: string,
   visible: boolean,
   installationText: string,
   blockText: string,
   blockWarning: string,
-  toleranceWindow: number
+  toleranceWindow: number,
+  maxUC: number,
+  ticketLifetime: number
 }
 
 export interface CustomerType {
