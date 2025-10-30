@@ -197,7 +197,7 @@ export const useDevices = (cucoContract?: Contract | null) => {
       return;
     }
     try {
-      const tx:TransactionResponse = await cucoContract.setDeviceMetadataURI(_metadataURI, _address);
+      const tx:TransactionResponse = await cucoContract.setDeviceMetadataUri(_metadataURI, _address);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
       if (receipt) {
