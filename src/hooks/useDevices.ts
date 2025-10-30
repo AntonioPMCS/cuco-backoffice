@@ -172,11 +172,13 @@ export const useDevices = (cucoContract?: Contract | null) => {
         const logs = receipt.logs;
         const cucoInterface = new Interface(CuCoBlockchain.abi);
         const parsedLog = cucoInterface.parseLog(logs[logs.length-1]); //last log is event emitted
+        if (!parsedLog || parsedLog.args['0'] === undefined) {
+          throw Error("Could not parse new device visibility from log");
+        }
         console.log(parsedLog);
-        const newDeviceVisibility:boolean = parsedLog?.args.newDeviceState;
         setDevices(devices.map((device) => {
           if (device.address == _deviceAddress) {
-            return { ...device, visible: newDeviceVisibility};
+            return { ...device, visible: parsedLog?.args['0']};
           }
           return device;
         }));
@@ -205,11 +207,13 @@ export const useDevices = (cucoContract?: Contract | null) => {
         const logs = receipt.logs;
         const cucoInterface = new Interface(CuCoBlockchain.abi);
         const parsedLog = cucoInterface.parseLog(logs[logs.length-1]); //last log is event emitted
+        if (!parsedLog || parsedLog.args['1'] === undefined) {
+          throw Error("Could not parse new metadata URI from log");
+        }
         console.log(parsedLog);
-        const newMetadataURI:string = parsedLog?.args.newUri;
         setDevices(devices.map((device) => {
           if (device.address == _address) {
-            return { ...device, metadataURI: newMetadataURI};
+            return { ...device, metadataURI: parsedLog?.args['1']};
           }
           return device;
         }));
