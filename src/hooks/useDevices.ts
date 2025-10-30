@@ -176,12 +176,13 @@ export const useDevices = (cucoContract?: Contract | null) => {
           throw Error("Could not parse new device visibility from log");
         }
         console.log(parsedLog);
-        setDevices(devices.map((device) => {
-          if (device.address == _deviceAddress) {
-            return { ...device, visible: parsedLog?.args['0']};
-          }
-          return device;
-        }));
+        setDevices((prevDevices) =>
+          prevDevices.map((device) => {
+            if (device.address === _deviceAddress) {
+              return { ...device, deviceState: parsedLog.args['0'] };
+            }
+            return device;
+          }));
       } else {
         throw Error("Transaction receipt differs from expected");
       }
@@ -211,12 +212,13 @@ export const useDevices = (cucoContract?: Contract | null) => {
           throw Error("Could not parse new metadata URI from log");
         }
         console.log(parsedLog);
-        setDevices(devices.map((device) => {
-          if (device.address == _address) {
-            return { ...device, metadataURI: parsedLog?.args['1']};
-          }
-          return device;
-        }));
+        setDevices((prevDevices) =>
+          prevDevices.map((device) => {
+            if (device.address === _address) {
+              return { ...device, deviceState: parsedLog.args['1'] };
+            }
+            return device;
+          }))
       } else {
         throw Error("Transaction receipt differs from expected");
       }
