@@ -33,6 +33,7 @@ type CucoContextType = { // The context is an array of providers
   addDevice: (_customer:string, _sn:string, _metadata:string) => void;
   setDeviceState: (_state:number, _address:string) => void;
   toggleDeviceVisible: (_address:string) => void;
+  setDeviceMetadataURI: (_address:string, _metadataURI:string) => void;
   fetchedCustomers: Array<CustomerType>;
   refetchCustomers: () => void;
   createCustomer: (_parentAddress:string, _name:string) => void;
@@ -49,6 +50,7 @@ const CucoContext = createContext<CucoContextType>({
     addDevice: () => {},
     setDeviceState: () => {},
     toggleDeviceVisible: () => {},
+    setDeviceMetadataURI: () => {},
     fetchedCustomers: [],
     refetchCustomers: () => {},
     createCustomer: () => {},

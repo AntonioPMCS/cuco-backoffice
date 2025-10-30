@@ -190,5 +190,37 @@ export const useDevices = (cucoContract?: Contract | null) => {
     }
   }, [ethersProvider, chainId, cucoContract])
 
-  return { devices, fetchDevices, addDevice, setDeviceState, toggleDeviceVisible };
+  // Skeleton: set device metadata URI (no implementation yet)
+  const setDeviceMetadataURI = useCallback(async (_address: string, _metadataURI: string) => {
+    if (!ethersProvider || !cucoContract) {
+      console.log("CucoContract or ethersProvider is null at toggleDeviceVisible");
+      return;
+    }
+    try {
+      const tx:TransactionResponse = await cucoContract.setDeviceMetadataURI(_metadataURI, _address);
+      console.log("Transaction sent:", tx.hash);
+      const receipt = await tx.wait();
+      if (receipt) {
+        console.log("Transaction confirmed:", receipt);
+        const logs = receipt.logs;
+        const cucoInterface = new Interface(CuCoBlockchain.abi);
+        const parsedLog = cucoInterface.parseLog(logs[logs.length-1]); //last log is event emitted
+        console.log(parsedLog);
+        const newMetadataURI:string = parsedLog?.args.newUri;
+        setDevices(devices.map((device) => {
+          if (device.address == _address) {
+            return { ...device, metadataURI: newMetadataURI};
+          }
+          return device;
+        }));
+      } else {
+        throw Error("Transaction receipt differs from expected");
+      }
+    } catch (error) {
+      console.error("Unable to set device metadata URI", error);
+      return;
+    }
+  }, [ethersProvider, chainId, cucoContract])
+
+  return { devices, fetchDevices, addDevice, setDeviceState, toggleDeviceVisible, setDeviceMetadataURI };
 };

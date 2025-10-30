@@ -10,7 +10,7 @@ import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 const CucoProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   const { ethersProvider } = useWalletProviders();
   const [cucoContract, setCucoContract] = useState<Contract | null>(null);
-  const { devices, fetchDevices, addDevice, setDeviceState, toggleDeviceVisible } = useDevices(cucoContract);
+  const { devices, fetchDevices, addDevice, setDeviceState, toggleDeviceVisible, setDeviceMetadataURI } = useDevices(cucoContract);
   const { customers, fetchCustomers, createCustomer, addAdmin } = useCustomers(cucoContract);
 
   
@@ -70,6 +70,7 @@ const CucoProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
         addDevice,
         setDeviceState,
         toggleDeviceVisible,
+        setDeviceMetadataURI,
         fetchedCustomers: customers,
         refetchCustomers: fetchCustomers,
         createCustomer,

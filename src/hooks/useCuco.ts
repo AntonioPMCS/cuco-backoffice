@@ -65,6 +65,17 @@ export const useCuco = () => {
         throw error;
       }
     },
+
+    setDeviceMetadataURI: async (...args: Parameters<typeof context.setDeviceMetadataURI>) => {
+      try {
+        console.log("Estimating cost for toggleDeviceVisible transaction...");
+        await context.setDeviceMetadataURI(...args);
+        console.log("Transaction would cost approximately: [estimation skipped in this simplified implementation]");
+      } catch (error) {
+        console.error("Error in wrapped setDeviceMetadataURI:", error);
+        throw error;
+      }
+    },
     
     createCustomer: async (...args: Parameters<typeof context.createCustomer>) => {
       try {

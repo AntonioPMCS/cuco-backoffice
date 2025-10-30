@@ -14,7 +14,7 @@ import { useWalletProviders } from "@/hooks/useWalletProviders";
 
 const Device = () => {
   const {deviceSN} = useParams();
-  const {fetchedDevices, setDeviceState, toggleDeviceVisible, fetchedCustomers} = useCuco();
+  const {fetchedDevices, setDeviceState, toggleDeviceVisible, setDeviceMetadataURI, fetchedCustomers} = useCuco();
   const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs} = useIpfs();
   const {selectedWallet} = useWalletProviders();
   const [device, setDevice] = useState<DeviceType | undefined>();
@@ -105,14 +105,14 @@ const Device = () => {
       }
 
       // 3) Unsupported fields for now:
-      // - sn, customer, metadata or any metadata.* keys
-      const unsupportedChanges: Record<string, unknown> = {};
+      // - sn, customer
+      const metadataChanges: Record<string, unknown> = {};
       Object.entries(changes).forEach(([key, value]) => {
-        if (!["deviceState", "visible"].includes(key)) {
-          unsupportedChanges[key] = value;
+        if (!["deviceState", "visible, sn, customer"].includes(key)) {
+          metadataChanges[key] = value;
         }
       });
-      if (Object.keys(unsupportedChanges).length > 0) {
+      if (Object.keys(metadataChanges).length > 0) {
         // Rebuild the metadata object with fields "IT", "BT", "BW","TW", "MaxUC" and "ticketlifetime"
         const metadata = {
           IT: changes.IT?? device.IT,
@@ -123,7 +123,10 @@ const Device = () => {
           ticketlifetime: changes.ticketlifetime?? device.ticketlifetime
         };
        
-        uploadToIpfs(metadata);
+        const metadataURI = await uploadToIpfs(metadata);
+        if (metadataURI) {
+          tasks.push(setDeviceMetadataURI(device.address, metadataURI));
+        }
       }
 
       // 4) Run all supported actions

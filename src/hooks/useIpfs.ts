@@ -63,7 +63,7 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
   
     const response = await res.json();
     console.log("IPFS Hash:", response.IpfsHash);
-    return null;
+    return response.IpfsHash;
   }, []);
 
   const clearData = useCallback(() => {
