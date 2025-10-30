@@ -92,7 +92,7 @@ const Device = () => {
       if (changes.deviceState !== undefined) {
         const newState = Number(changes.deviceState);
         if (newState != device.deviceState) {
-          tasks.push(setDeviceState(newState, device.address));
+          await setDeviceState(newState, device.address);
         }
       }
       
@@ -100,7 +100,7 @@ const Device = () => {
       if (changes.visible !== undefined) {
         const newVisible = changes.visible === "true";
         if (newVisible !== device.visible) {
-          tasks.push(toggleDeviceVisible(device.address));
+          await toggleDeviceVisible(device.address);
         }
       }
 
@@ -125,25 +125,32 @@ const Device = () => {
        
         const metadataURI = await uploadToIpfs(metadata);
         if (metadataURI) {
-          tasks.push(setDeviceMetadataURI(device.address, metadataURI));
+          try {
+            await setDeviceMetadataURI(device.address, metadataURI);
+            clearData();
+            loadData(metadataURI!);
+          } catch (error) {
+            console.error("Error setting device metadata URI:", error);
+          }
+
         }
-        clearData();
-        loadData(metadataURI!);
       }
 
       // 4) Run all supported actions
-      const results = await Promise.allSettled(tasks);
-      const failed = results.filter(r => r.status === "rejected");
-      if (failed.length) {
-        console.error("Some actions failed:", failed);
-      }
+      // Legacy way was relax failure. Now is, first to fail quits update action
+      // const results = await Promise.allSettled(tasks);
+      // const failed = results.filter(r => r.status === "rejected");
+      // if (failed.length) {
+      //   console.error("Some actions failed:", failed);
+      // }
 
-      // 5) Clear form changes after successful save
-      formChangesRef.current = {};
-      setIsEditing(false);
+
     } catch (err) {
       console.error("Save error:", err);
     } finally {
+      // 5) Clear form changes regardless of outcome
+      formChangesRef.current = {};
+      setIsEditing(false);
       setLoading(false);
     }
   };
