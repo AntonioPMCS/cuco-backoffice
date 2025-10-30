@@ -84,7 +84,7 @@ const Device = () => {
     setLoading(true);
 
     try {
-      const tasks: Promise<any>[] = [];
+      // legacy: const tasks: Promise<any>[] = [];
       const changes = formChangesRef.current; // Read all changes from ref
       console.log("Changes:", changes);
 
