@@ -54,20 +54,11 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
 
   const uploadToIpfs = useCallback(async (jsonObject: any): Promise<string | null> => {
     console.log("Uploading to IPFS:", jsonObject);
-    const apiKey = import.meta.env.PINATA_KEY;
-    console.log('API Key:', apiKey);
-    console.log('Uploading to IPFS:', data);
-    // TODO: Implement IPFS upload logic
-    const mockObject = {
-      name: "Cool NFT Metadata",
-      description: "This JSON is pinned to IPFS!",
-      attributes: [{ trait_type: "Awesome", value: "Yes" }],
-    };
-  
+
     const res = await fetch("/api/upload-json", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(mockObject),
+      body: JSON.stringify(jsonObject),
     });
   
     const response = await res.json();

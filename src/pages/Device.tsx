@@ -86,6 +86,7 @@ const Device = () => {
     try {
       const tasks: Promise<any>[] = [];
       const changes = formChangesRef.current; // Read all changes from ref
+      console.log("Changes:", changes);
 
       // 1) deviceState (string in changes → number on chain)
       if (changes.deviceState !== undefined) {
@@ -114,12 +115,12 @@ const Device = () => {
       if (Object.keys(unsupportedChanges).length > 0) {
         // Rebuild the metadata object with fields "IT", "BT", "BW","TW", "MaxUC" and "ticketlifetime"
         const metadata = {
-          IT: changes.installationText,
-          BT: changes.blockText,
-          BW: changes.blockWarning,
-          TW: changes.toleranceWindow,
-          MaxUC: changes.maxUC,
-          ticketlifetime: changes.ticketLifetime
+          IT: changes.IT? changes.IT : device.installationText,
+          BT: changes.BT? changes.BT : device.blockText,
+          BW: changes.BW? changes.BW : device.blockWarning,
+          TW: changes.TW? changes.TW : device.toleranceWindow,
+          MaxUC: changes.MaxUC? changes.MaxUC : device.maxUC,
+          ticketlifetime: changes.ticketlifetime? changes.ticketlifetime : device.ticketLifetime
         };
        
         uploadToIpfs(metadata);
