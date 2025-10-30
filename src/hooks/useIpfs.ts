@@ -13,7 +13,7 @@ interface UseIpfsReturn extends IpfsState {
 }
 
 export const useIpfs = (initialHash?: string): UseIpfsReturn => {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<any>(null); //TODO: ADD metadata type here
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

@@ -15,7 +15,7 @@ import { useWalletProviders } from "@/hooks/useWalletProviders";
 const Device = () => {
   const {deviceSN} = useParams();
   const {fetchedDevices, setDeviceState, toggleDeviceVisible, setDeviceMetadataURI, fetchedCustomers} = useCuco();
-  const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs} = useIpfs();
+  const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs, clearData} = useIpfs();
   const {selectedWallet} = useWalletProviders();
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true);
@@ -127,6 +127,9 @@ const Device = () => {
         if (metadataURI) {
           tasks.push(setDeviceMetadataURI(device.address, metadataURI));
         }
+
+        clearData();
+        loadData(metadataURI!);
       }
 
       // 4) Run all supported actions
