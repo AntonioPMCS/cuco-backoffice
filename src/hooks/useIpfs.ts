@@ -69,7 +69,6 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
   const clearData = useCallback(() => {
     setData(null);
     setError(null);
-    setLoading(false);
   }, []);
 
   // Auto-load data if initialHash is provided

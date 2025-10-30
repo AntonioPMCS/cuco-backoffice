@@ -127,7 +127,6 @@ const Device = () => {
         if (metadataURI) {
           tasks.push(setDeviceMetadataURI(device.address, metadataURI));
         }
-
         clearData();
         loadData(metadataURI!);
       }
