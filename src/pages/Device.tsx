@@ -106,9 +106,9 @@ const Device = () => {
 
       // 3) Unsupported fields for now:
       // - sn, customer
-      const metadataChanges: Record<string, unknown> = {};
+      const metadataChanges: Record<string, string> = {};
       Object.entries(changes).forEach(([key, value]) => {
-        if (!["deviceState", "visible, sn, customer"].includes(key)) {
+        if (!["deviceState", "visible", "sn", " customer"].includes(key)) {
           metadataChanges[key] = value;
         }
       });
