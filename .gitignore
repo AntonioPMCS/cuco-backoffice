@@ -1,3 +1,4 @@
 node_modules/
 CODEBASE_INDEX.md
 dist
+.env
