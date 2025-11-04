@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Edit, Plus, Upload } from "lucide-react"
+import { Edit, Upload } from "lucide-react"
 import ModalTemplate from "./Modals/ModalTemplate"
 import AddDeviceForm from "./Modals/AddDeviceForm";
-import { DeviceType } from "@/context/CucoContext";
 import BatchDeviceImportForm from "./Modals/BatchDeviceImportForm";
 import BatchEditForm from "./Modals/BatchEditForm";
 import { Switch } from "./ui/switch";
@@ -21,20 +20,6 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
   const [batchDevices, setBatchDevices] = useState<string>("")
   const [batchEditProperty, setBatchEditProperty] = useState<string>("")
   const [batchEditValue, setBatchEditValue] = useState<string>("")
-  const [newDevice, setNewDevice] = useState<DeviceType>({
-    address: "",
-    sn: "",
-    customer: "",
-    deviceState: 1,
-    metadataURI: "bafkreihccimod2m7y7txvnm34kocealmr7u2yurqohwgleaslloh2fokzi",
-    visible: true,
-    IT: "Instalacao do CUCo\n\n(esta mensagem repete-se na desativacao...)",
-    BT: "Your computer is locked by CUCo Firmware security\nPlease contact your seller or the CUCo Firmware Support Team at support@cuco-firmware.com",
-    BW: "This is a test warning message This is a test warning message :GNV: :FI:60",
-    TW: 2,
-    MaxUC: 64,
-    ticketlifetime: 0
-  })
   const {selectedWallet} = useWalletProviders()
 
   const handleBatchImport = () => {}
@@ -43,8 +28,8 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
   return (
     <div className="flex items-center justify-between w-full px-8">
       <div className="flex items-center space-x-2">
-        
-        <AddDeviceForm addDevice={addDevice} onHandlerReady={() => {}} selectedWallet={selectedWallet} />
+
+        <AddDeviceForm addDevice={addDevice} selectedWallet={selectedWallet} />
 
         <ModalTemplate
           trigger={<><Upload className="mr-2 h-4 w-4" />BatchImport</>}

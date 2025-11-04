@@ -12,7 +12,7 @@ import { useIpfs } from "@/hooks/useIpfs";
 
 interface AddDeviceFormProps {
   addDevice: (customer:string, sn:string, metadata:string ) => void;
-  selectedWallet: boolean;
+  selectedWallet: EIP6963ProviderDetail | null;
 }
 
 
