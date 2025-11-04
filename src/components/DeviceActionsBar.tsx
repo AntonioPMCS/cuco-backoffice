@@ -7,6 +7,7 @@ import BatchDeviceImportForm from "./Modals/BatchDeviceImportForm";
 import BatchEditForm from "./Modals/BatchEditForm";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
+import { useWalletProviders } from "@/hooks/useWalletProviders";
 
 
 interface DeviceActionsBarProps {
@@ -34,10 +35,7 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
     MaxUC: 64,
     ticketlifetime: 0
   })
-
-  const handleAddDevice = () => {
-    addDevice(newDevice.customer, newDevice.sn, newDevice.metadataURI);
-  }
+  const {selectedWallet} = useWalletProviders()
 
   const handleBatchImport = () => {}
   const handleBatchEdit = () => {}
@@ -45,14 +43,8 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
   return (
     <div className="flex items-center justify-between w-full px-8">
       <div className="flex items-center space-x-2">
-        <ModalTemplate 
-          trigger={<><Plus className="mr-2 h-4 w-4" />Add Device</>}
-          title="Add New Device"
-          handler={handleAddDevice}
-          description={"Fill device SN and customer to add a new device"}
-        >
-          <AddDeviceForm newDevice = {newDevice} setNewDevice = {setNewDevice} />
-        </ModalTemplate>
+        
+        <AddDeviceForm addDevice={addDevice} onHandlerReady={() => {}} selectedWallet={selectedWallet} />
 
         <ModalTemplate
           trigger={<><Upload className="mr-2 h-4 w-4" />BatchImport</>}
