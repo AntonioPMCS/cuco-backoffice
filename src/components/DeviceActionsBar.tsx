@@ -1,16 +1,17 @@
 import { useState } from "react";
-import { Edit, Upload } from "lucide-react"
+import { Upload } from "lucide-react"
 import ModalTemplate from "./Modals/ModalTemplate"
 import AddDeviceForm from "./Modals/AddDeviceForm";
 import BatchDeviceImportForm from "./Modals/BatchDeviceImportForm";
-import BatchEditForm from "./Modals/BatchEditForm";
+import BatchEditDeviceForm from "./Modals/BatchEditDeviceForm";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
+import { DeviceType } from "@/context/CucoContext";
 
 
 interface DeviceActionsBarProps {
-  selectedDevices: string[];
+  selectedDevices: DeviceType[];
   addDevice: (_customer:string, sn:string, _metadata:string ) => void;
   showHidden: boolean;
   setShowHidden: (hidden: boolean) => void;
@@ -18,12 +19,9 @@ interface DeviceActionsBarProps {
 
 const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addDevice, showHidden, setShowHidden}) => {
   const [batchDevices, setBatchDevices] = useState<string>("")
-  const [batchEditProperty, setBatchEditProperty] = useState<string>("")
-  const [batchEditValue, setBatchEditValue] = useState<string>("")
   const {selectedWallet} = useWalletProviders()
 
   const handleBatchImport = () => {}
-  const handleBatchEdit = () => {}
   
   return (
     <div className="flex items-center justify-between w-full px-8">
@@ -40,16 +38,10 @@ const DeviceActionsBar:React.FC<DeviceActionsBarProps> = ({selectedDevices, addD
         </ModalTemplate>
 
         {selectedDevices.length > 0 && (
-          <ModalTemplate
-            trigger={<><Edit className="mr-2 h-4 w-4" />Batch Edit {selectedDevices.length}</>}
-            title="Batch Edit Devices"
-            handler={handleBatchEdit}
-          >
-            <BatchEditForm 
-              batchEditProperty={batchEditProperty} setBatchEditProperty={setBatchEditProperty}
-              batchEditValue={batchEditValue} setBatchEditValue={setBatchEditValue} 
-            />
-          </ModalTemplate>
+          <BatchEditDeviceForm 
+            selectedWallet={selectedWallet}
+            selectedDevices={selectedDevices}
+          />
         )}
       </div>
       <div className="flex items-center space-x-2 ">

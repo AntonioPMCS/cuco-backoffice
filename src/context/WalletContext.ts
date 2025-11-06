@@ -1,11 +1,11 @@
 import { createContext } from "react";
-import { BrowserProvider } from "ethers";
+import { BrowserProvider, FallbackProvider } from "ethers";
 
 
 type WalletContextType = { // The context is an array of providers
   providers: EIP6963ProviderDetail[];
   selectedWallet: EIP6963ProviderDetail | null;
-  ethersProvider: BrowserProvider | null;
+  ethersProvider: BrowserProvider | FallbackProvider | null;
   selectedAccount: string | null;
   chainId: string | null;
   //errorMessage: string | null An error message.

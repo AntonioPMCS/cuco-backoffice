@@ -130,23 +130,13 @@ export const useCustomers = (cucoContract?: Contract | null) => {
   }, [ethersProvider, chainId, customers])
 
   const createCustomer = useCallback(async (_parentAddress: string, _name:string) => {
-    if (!ethersProvider) return;
-    console.log(ethersProvider)
-    let contractAddress;
-    const network = (await ethersProvider.getNetwork()).name;
-    switch (network) {
-      case "sepolia":
-        contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
-        break;
-      default:
-        contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
-        break;
+    if (!ethersProvider || !cucoContract) {
+      console.log("CucoContract or ethersProvider is null at createCustomer");
+      return;
     }
+
     try {
-      console.log("Creating customer...");
-      const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
-      const contract:Contract = new Contract(contractAddress, CuCoBlockchain.abi, signer);
-      const tx:TransactionResponse = await contract.createCustomer(_parentAddress, _name);
+      const tx:TransactionResponse = await cucoContract.createCustomer(_parentAddress, _name);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
       if (receipt) {
@@ -165,7 +155,7 @@ export const useCustomers = (cucoContract?: Contract | null) => {
       console.error("Unable to create customers", error);
       return;
     }
-  }, [ethersProvider, chainId])
+  }, [ethersProvider, chainId, cucoContract, customers])
 
   return { customers, fetchCustomers, createCustomer, addAdmin };
 };

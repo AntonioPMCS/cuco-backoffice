@@ -14,14 +14,15 @@ import { Button } from "./ui/button";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { Link } from "react-router-dom";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
+import { getDeviceStateLabel } from "@/constants/deviceStates";
 
 const DeviceManager = () => {
   const { fetchedDevices, addDevice, fetchedCustomers, toggleDeviceVisible } = useCuco();
   const {selectedWallet} = useWalletProviders();
-  const [selectedDevices, setSelectedDevices] = useState<string[]>([])
+  const [selectedDevices, setSelectedDevices] = useState<DeviceType[]>([])
   const [editDevice, setEditDevice] = useState<DeviceType | null>(null)
   const [showHidden, setShowHidden] = useState(false)
-  const handleCopyAddress = useCopyToClipboard();
+  const handleCopyValue = useCopyToClipboard();
 
   const handleEditDevice = () => {}
   const handleHideDevice = async (deviceAddress:string) => {
@@ -47,15 +48,19 @@ const DeviceManager = () => {
     if (selectedDevices.length === fetchedDevices.length) {
       setSelectedDevices([])
     } else {
-      setSelectedDevices(fetchedDevices.map((device) => device.sn))
+      setSelectedDevices([...fetchedDevices])
     }
   }
 
-  const toggleDeviceSelection = (deviceSN:string) => {
-    setSelectedDevices((prev) => (prev.includes(deviceSN) ?
-        prev.filter((deviceId) => deviceId !== deviceSN) :
-        [...prev, deviceSN]
-      ))
+  const toggleDeviceSelection = (device:DeviceType) => {
+    setSelectedDevices((prev) => {
+      const isSelected = prev.some((d) => d.sn === device.sn);
+      if (isSelected) {
+        return prev.filter((d) => d.sn !== device.sn);
+      } else {
+        return [...prev, device];
+      }
+    })
   }
 
   return (
@@ -79,9 +84,10 @@ const DeviceManager = () => {
                   />
                 </TableHead>
                 <TableHead>Serial Number</TableHead>
-                <TableHead>Contract</TableHead>
-                <TableHead>Assigned to</TableHead>
                 <TableHead>State</TableHead>
+                <TableHead>Metadata URI</TableHead>
+                <TableHead>Assigned to</TableHead>
+                
                 {selectedWallet && 
                   <TableHead className="w-[100px]">Actions</TableHead>}
               </TableRow>
@@ -99,8 +105,8 @@ const DeviceManager = () => {
                     return (<TableRow key={device.sn}>
                       <TableCell>
                         <Checkbox
-                          checked={selectedDevices.includes(device.sn)}
-                          onCheckedChange={() => toggleDeviceSelection(device.sn)}
+                          checked={selectedDevices.some((d) => d.sn === device.sn)}
+                          onCheckedChange={() => toggleDeviceSelection(device)}
                         />
                       </TableCell>
 
@@ -111,11 +117,22 @@ const DeviceManager = () => {
                       </TableCell>
 
                       <TableCell>
-                        {truncateMiddle(device.address)}
+                        <Badge variant={device.deviceState < 2 ? "outline" : "secondary"}>
+                          {device.deviceState < 2 ? (
+                            <Unlock className="mr-1 h-3 w-3" />
+                          ) : (
+                            <Lock className="mr-1 h-3 w-3" />
+                          )}
+                          {getDeviceStateLabel(device.deviceState)}
+                        </Badge>
+                      </TableCell>
+
+                      <TableCell>
+                        {truncateMiddle(device.metadataURI)}
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleCopyAddress(device.address)}
+                          onClick={() => handleCopyValue(device.metadataURI)}
                           title="Copy address"
                         >
                           <Copy className="h-4 w-4" />
@@ -128,17 +145,7 @@ const DeviceManager = () => {
                           {getCustomerName(device.customer)}
                         </Link>
                       </TableCell>
-                      
-                      <TableCell>
-                        <Badge variant={device.deviceState < 2 ? "outline" : "secondary"}>
-                          {device.deviceState < 2 ? (
-                            <Unlock className="mr-1 h-3 w-3" />
-                          ) : (
-                            <Lock className="mr-1 h-3 w-3" />
-                          )}
-                          {device.deviceState == 0 ? "Free" : device.deviceState == 1 ? "Unlocked" : "Locked"}
-                        </Badge>
-                      </TableCell>
+
                       {selectedWallet && <TableCell>
                         <ActionsDropdown 
                           editDevice={editDevice} setEditDevice={setEditDevice}

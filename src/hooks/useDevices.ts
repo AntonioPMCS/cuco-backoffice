@@ -67,25 +67,6 @@ export const useDevices = (cucoContract?: Contract | null) => {
     return deviceObjects;
   }
 
-  const fetchDeviceInstance = async (address: string): Promise<DeviceType> => {
-    const deviceContract = new Contract(address, Device.abi, ethersProvider);
-    // We defer IPFS fetching to the Device page to speed up loading.
-    return {
-      address: await deviceContract.getAddress(),
-      sn: await deviceContract.sn(),
-      customer: await deviceContract.customer(),
-      deviceState: await deviceContract.deviceState(),
-      metadataURI: await deviceContract.metadata(),
-      visible: await deviceContract.visible(),
-      IT: "",
-      BT: "",
-      BW: "",
-      TW: 0,
-      MaxUC: 0,
-      ticketlifetime: 0
-    };
-  };
-
   // More device actions (create, update, etc.) can be added here.
 
   const setDeviceState = useCallback(async (_newState:number, _address:string) => {
@@ -147,7 +128,8 @@ export const useDevices = (cucoContract?: Contract | null) => {
         const parsedLog = cucoInterface.parseLog(logs[logs.length-1]); //last log is event emitted
         console.log(parsedLog);
         const newDeviceAddress:string = parsedLog?.args.deviceAddress;
-        setDevices([...devices, await (fetchDeviceInstance(newDeviceAddress))]);
+        const [newDevice] = await _fetchDeviceInstances([newDeviceAddress]);
+        setDevices([...devices, newDevice]);
       } else {
         throw Error("Transaction receipt differs from expected");
       }

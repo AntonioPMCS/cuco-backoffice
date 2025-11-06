@@ -9,6 +9,7 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
 import { useWalletProviders } from "@/hooks/useWalletProviders";
+import { DEVICE_STATE_OPTIONS } from "@/constants/deviceStates";
 
 
 
@@ -23,12 +24,6 @@ const Device = () => {
   const [isEditing, setIsEditing] = useState(false);
   // Store form changes in ref (no re-renders during editing)
   const formChangesRef = useRef<Record<string, string>>({});
-
-  const stateOptions = [ 
-                    { label: "Free", value:"0"},
-                    { label: "Unlocked", value: "1"},
-                    { label: "Locked", value: "2"}
-                  ]
 
   // Handle field changes - store in ref only (no re-render)
   const handleFieldChange = (field: string, value: string) => {
@@ -257,7 +252,7 @@ const Device = () => {
                   field="deviceState" 
                   value={device.deviceState?.toString() ?? "0"}
                   type="select"
-                  options={stateOptions}
+                  options={DEVICE_STATE_OPTIONS}
                   isEditing={isEditing}
                   onFieldChange={handleFieldChange}
                 />

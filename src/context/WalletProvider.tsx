@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState} from "react";
 import WalletContext from "./WalletContext";
-import { BrowserProvider, ethers } from "ethers";
+import { ethers } from "ethers";
 
 declare global {
   interface WindowEventMap {
@@ -11,7 +11,7 @@ declare global {
 const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   const [providers, setProviders] = useState<EIP6963ProviderDetail[]>([]);
   const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail | null>(null)
-  const [ethersProvider, setEthersProvider] = useState<ethers.BrowserProvider | null>(null)
+  const [ethersProvider, setEthersProvider] = useState<ethers.BrowserProvider | ethers.FallbackProvider | null>(null)
   const [chainId, setChainId] = useState<string>("")
   const [selectedAccount, setselectedAccount] = useState<string>("")
 
@@ -38,13 +38,12 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   useEffect(() => {
     if (!selectedWallet) {
       console.log("MetaMask not installed; using read-only default Provider")
-      setEthersProvider(ethers.getDefaultProvider(
-                            "sepolia",
-                            {
-                              infura: import.meta.env.VITE_INFURA_API_KEY,
-                              exclusive:["infura"]
-                            }
-                          ) as BrowserProvider);
+      
+      const provider = new ethers.FallbackProvider([
+        new ethers.InfuraProvider("sepolia", import.meta.env.VITE_INFURA_API_KEY),
+        new ethers.AlchemyProvider("sepolia", import.meta.env.VITE_ALCHEMY_API_KEY)
+      ])
+      setEthersProvider(provider);
       return;
     }
     console.log("Initializing Ethers")

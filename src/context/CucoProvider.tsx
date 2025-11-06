@@ -3,7 +3,7 @@ import CucoContext from "./CucoContext";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
 import { useDevices } from "@/hooks/useDevices";
 import { useCustomers } from "@/hooks/useCustomers";
-import { Contract } from "ethers";
+import { Contract, BrowserProvider } from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 
 
@@ -31,13 +31,21 @@ const CucoProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
           break;
       }
       
-      // Try to get signer for write operations
-      try {
-        const signer = await ethersProvider.getSigner();
-        setCucoContract(new Contract(cucoAddress, CuCoBlockchain.abi, signer));
-      } catch (error) {
-        // If no signer available, use provider for read-only operations
-        console.log("No signer available, using read-only provider");
+      // Check if provider is BrowserProvider (supports signer) or FallbackProvider (read-only)
+      if (ethersProvider instanceof BrowserProvider) {
+        try {
+          // BrowserProvider supports signer for write operations
+          const signer = await ethersProvider.getSigner();
+          setCucoContract(new Contract(cucoAddress, CuCoBlockchain.abi, signer));
+          console.log("Contract initialized with signer for write operations");
+        } catch (error) {
+          // Fallback to read-only if signer fails
+          console.log("Failed to get signer, using read-only provider");
+          setCucoContract(new Contract(cucoAddress, CuCoBlockchain.abi, ethersProvider));
+        }
+      } else {
+        // FallbackProvider - read-only operations only
+        console.log("Using read-only FallbackProvider");
         setCucoContract(new Contract(cucoAddress, CuCoBlockchain.abi, ethersProvider));
       }
     } catch (error) {

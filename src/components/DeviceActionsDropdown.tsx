@@ -8,6 +8,7 @@ import { Input } from "./ui/input";
 import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
 import { DeviceType } from "@/context/CucoContext";
+import { DEVICE_STATE_OPTIONS } from "@/constants/deviceStates";
 
 interface DeviceActionsDropdownProps {
   editDevice: DeviceType | null;
@@ -85,9 +86,11 @@ const DeviceActionsDropdown:React.FC<DeviceActionsDropdownProps> = ({editDevice,
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="2">Locked</SelectItem>
-                      <SelectItem value="1">Unlocked</SelectItem>
-                      <SelectItem value="0">Free</SelectItem>
+                      {DEVICE_STATE_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

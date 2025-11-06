@@ -9,6 +9,7 @@ import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle, Dialog
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react"
 import { useIpfs } from "@/hooks/useIpfs";
+import { DEVICE_STATE_OPTIONS } from "@/constants/deviceStates";
 
 interface AddDeviceFormProps {
   addDevice: (customer:string, sn:string, metadata:string ) => void;
@@ -107,128 +108,131 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
               Fill device SN and customer to add a new device
             </DialogDescription>
           </DialogHeader> 
-            <div className="grid gap-8">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="serialnumber">SerialNumber</Label>
-                  <Input 
-                    id="serialNumber"
-                    value={newDevice.sn}
-                    onChange={(e) => setNewDevice({
-                      ...newDevice,
-                      sn:e.target.value
-                    })}
-                    placeholder="XPS7G-2K..."
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="deviceState">Device State</Label>
-                  <Select
-                    value={newDevice.deviceState.toString()}
-                    onValueChange={(value) => setNewDevice({
-                      ...newDevice,
-                      deviceState: parseInt(value)
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select device state"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Free</SelectItem>
-                      <SelectItem value="1">Unlocked</SelectItem>
-                      <SelectItem value="2">Locked</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="customerSelect">Customer</Label>
-                  <Select
-                    value={newDevice.customer}
-                    onValueChange={ (value) => setNewDevice({
-                      ...newDevice,
-                      customer: value
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select customer"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                      { fetchedCustomers.map((customer) => {
-                        return <SelectItem key={customer.address} value={customer.address}>{customer.name}</SelectItem>
-                      })
-                      }
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="customerAddress">Customer Address</Label>
-                  <Input
-                    id="customerAddress"
-                    value={newDevice.customer}
-                    readOnly
-                    placeholder="0xdB055877e6c13..."
-                    className="bg-muted"
-                  />
-                </div>
-              </div>
+          <div className="grid gap-8">
+            <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="metadataURI">Metadata URI</Label>
+                <Label htmlFor="serialnumber">SerialNumber</Label>
                 <Input 
-                  id="metadataURI"
-                  value={newDevice.metadataURI}
+                  id="serialNumber"
+                  value={newDevice.sn}
                   onChange={(e) => setNewDevice({
                     ...newDevice,
-                    metadataURI: e.target.value
+                    sn:e.target.value
                   })}
-                  placeholder={DEFAULT_METADATA_URI}
-                />
-              </div>
-              
-              {/* Visual separator */}
-              <div className="border-t border-gray-200 my-2"></div>
-              
-              {/* Informational message */}
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-                <p className="text-sm text-blue-800">
-                  The fields below are populated from the metadata file loaded above.
-                </p>
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="installationText">Installation Text</Label>
-                <Textarea
-                  id="installationText"
-                  value={newDevice.IT || ''}
-                  readOnly
-                  className="bg-muted"
-                  placeholder="Enter installation text..."
-                  rows={2}
+                  placeholder="XPS7G-2K..."
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="blockText">Block Text</Label>
-                <Textarea
-                  id="blockText"
-                  value={newDevice.BT || ''}
-                  readOnly
-                  className="bg-muted"
-                  placeholder="Enter block text..."
-                  rows={2}
-                />
+                <Label htmlFor="deviceState">Device State</Label>
+                <Select
+                  value={newDevice.deviceState.toString()}
+                  onValueChange={(value) => setNewDevice({
+                    ...newDevice,
+                    deviceState: parseInt(value)
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select device state"/>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DEVICE_STATE_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="customerSelect">Customer</Label>
+                <Select
+                  value={newDevice.customer}
+                  onValueChange={ (value) => setNewDevice({
+                    ...newDevice,
+                    customer: value
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select customer"/>
+                  </SelectTrigger>
+                  <SelectContent>
+                    { fetchedCustomers.map((customer) => {
+                      return <SelectItem key={customer.address} value={customer.address}>{customer.name}</SelectItem>
+                    })
+                    }
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="blockWarning">Block Warning</Label>
-                <Textarea
-                  id="blockWarning"
-                  value={newDevice.BW || ''}
+                <Label htmlFor="customerAddress">Customer Address</Label>
+                <Input
+                  id="customerAddress"
+                  value={newDevice.customer}
                   readOnly
+                  placeholder="0xdB055877e6c13..."
                   className="bg-muted"
-                  placeholder="Enter block warning..."
-                  rows={2}
                 />
               </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="metadataURI">Metadata URI</Label>
+              <Input 
+                id="metadataURI"
+                value={newDevice.metadataURI}
+                onChange={(e) => setNewDevice({
+                  ...newDevice,
+                  metadataURI: e.target.value
+                })}
+                placeholder={DEFAULT_METADATA_URI}
+              />
+            </div>
+            
+            {/* Visual separator */}
+            <div className="border-t border-gray-200 my-2"></div>
+            
+            {/* Informational message */}
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+              <p className="text-sm text-blue-800">
+                The fields below are populated from the metadata file loaded above.
+              </p>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="installationText">Installation Text</Label>
+              <Textarea
+                id="installationText"
+                value={newDevice.IT || ''}
+                readOnly
+                className="bg-muted"
+                placeholder="Enter installation text..."
+                rows={2}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="blockText">Block Text</Label>
+              <Textarea
+                id="blockText"
+                value={newDevice.BT || ''}
+                readOnly
+                className="bg-muted"
+                placeholder="Enter block text..."
+                rows={2}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="blockWarning">Block Warning</Label>
+              <Textarea
+                id="blockWarning"
+                value={newDevice.BW || ''}
+                readOnly
+                className="bg-muted"
+                placeholder="Enter block warning..."
+                rows={2}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="toleranceWindow">Tolerance Window (Days)</Label>
                 <Input
@@ -239,6 +243,27 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
                   placeholder=""
                 />
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="maxUC">MaxUC</Label>
+                <Input
+                  id="maxUC"
+                  value={newDevice.MaxUC?.toString() || ''}
+                  readOnly
+                  className="bg-muted"
+                  placeholder=""
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="ticketLifetime">Ticket Lifetime</Label>
+                <Input
+                  id="ticketLifetime"
+                  value={newDevice.ticketlifetime?.toString() || ''}
+                  readOnly
+                  className="bg-muted"
+                  placeholder=""
+                />
+              </div>
+            </div>
           </div>
           <DialogFooter className="pt-8">
             <DialogClose asChild>
