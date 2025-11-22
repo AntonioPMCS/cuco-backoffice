@@ -10,6 +10,7 @@ import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
 import { useWalletProviders } from "@/hooks/useWalletProviders";
 import { DEVICE_STATE_OPTIONS } from "@/constants/deviceStates";
+import { Edit } from "lucide-react";
 
 
 
@@ -183,7 +184,7 @@ const Device = () => {
                 setIsEditing(true);
                 formChangesRef.current = {}; // Initialize empty ref when entering edit mode
               }} variant="outline">
-                Edit
+                <Edit className="mr-2 h-4 w-4" /> Edit Details
               </Button>
             ) : (
               <div className="flex flex-col items-end">

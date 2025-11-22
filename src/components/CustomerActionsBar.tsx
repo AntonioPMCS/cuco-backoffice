@@ -9,7 +9,7 @@ import { useWalletProviders } from "@/hooks/useWalletProviders";
 
 interface CustomerActionsBarProps {
   selectedCustomers: string[];
-  createCustomer: (_parentAddress:string, _name:string) => void;
+  createCustomer: (_parentAddress:string, _name:string, _deviceMetadata:string) => Promise<void>;
 }
 
 const CustomerActionsBar:React.FC<CustomerActionsBarProps> = ({selectedCustomers, createCustomer}) => {

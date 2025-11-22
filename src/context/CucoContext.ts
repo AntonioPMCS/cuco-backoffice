@@ -22,6 +22,7 @@ export interface CustomerType {
   parentName: string,
   address: string;
   authorizedUsers: string[];
+  deviceMetadata: string; // the default metadata for a device created by this customer
 }
 
 
@@ -36,7 +37,7 @@ type CucoContextType = { // The context is an array of providers
   setDeviceMetadataURI: (_address:string, _metadataURI:string) => void;
   fetchedCustomers: Array<CustomerType>;
   refetchCustomers: () => void;
-  createCustomer: (_parentAddress:string, _name:string) => void;
+  createCustomer: (_parentAddress:string, _name:string, _deviceMetadata:string) => Promise<void>;
   addAdmin: (_customerAddress:string, _newAdmin:string) => void;
 };
 
@@ -53,7 +54,7 @@ const CucoContext = createContext<CucoContextType>({
     setDeviceMetadataURI: () => {},
     fetchedCustomers: [],
     refetchCustomers: () => {},
-    createCustomer: () => {},
+    createCustomer: async () => {},
     addAdmin: () => {},
 });
 

@@ -29,7 +29,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
     sn: "",
     customer: "",
     deviceState: 1,
-    metadataURI: DEFAULT_METADATA_URI,
+    metadataURI: "",
     visible: true,
     IT: "",
     BT: "",

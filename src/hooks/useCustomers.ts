@@ -29,14 +29,15 @@ export const useCustomers = (cucoContract?: Contract | null) => {
       return;
     }
     try {
-      const fnNames = ["parent", "name", "getAuthorizedUsers"];
+      const fnNames = ["parent", "name", "getAuthorizedUsers","getDeviceMetadata"];
       const results = await batchCalls(ethersProvider, customerAddresses, fnNames, "Customer");
       const customerObjects: Array<CustomerType> = customerAddresses.map((address, index) => ({
         address,
         name: results[index * fnNames.length + 1] as string,
         parent: results[index * fnNames.length] as string,
         parentName: "",
-        authorizedUsers: results[index * fnNames.length + 2] as string[]
+        authorizedUsers: results[index * fnNames.length + 2] as string[],
+        deviceMetadata: results[index * fnNames.length + 3] as string
       }));
 
       const customerObjectsWithParentNames = customerObjects.map(customer => ({
@@ -79,7 +80,8 @@ export const useCustomers = (cucoContract?: Contract | null) => {
         parent: parentAddress,
         parentName: parentName,
         address,
-        authorizedUsers: authorizedUsers
+        authorizedUsers: authorizedUsers,
+        deviceMetadata: await customerContract.getDeviceMetadata()
       };
 
     } catch (error) {
@@ -129,14 +131,14 @@ export const useCustomers = (cucoContract?: Contract | null) => {
     }
   }, [ethersProvider, chainId, customers])
 
-  const createCustomer = useCallback(async (_parentAddress: string, _name:string) => {
+  const createCustomer = useCallback(async (_parentAddress: string, _name:string, _deviceMetadata:string) => {
     if (!ethersProvider || !cucoContract) {
       console.log("CucoContract or ethersProvider is null at createCustomer");
       return;
     }
 
     try {
-      const tx:TransactionResponse = await cucoContract.createCustomer(_parentAddress, _name);
+      const tx:TransactionResponse = await cucoContract.createCustomer(_parentAddress, _name, _deviceMetadata);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
       if (receipt) {

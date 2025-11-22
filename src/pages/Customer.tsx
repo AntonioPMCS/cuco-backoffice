@@ -113,6 +113,14 @@ const Customer = () => {
                     onChange={(e) => setEditedCustomer((prev) => (prev ? { ...prev, address: e.target.value } : null))}
                   />
                 </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="deviceMetadata">Device Metadata</Label>
+                  <Input
+                    id="deviceMetadata"
+                    value={editedCustomer?.deviceMetadata || ""}
+                    onChange={(e) => setEditedCustomer((prev) => (prev ? { ...prev, deviceMetadata: e.target.value } : null))}
+                  />
+                </div>
               </div>
               <div className="flex justify-end space-x-2 pt-4">
                 <Button
@@ -138,9 +146,13 @@ const Customer = () => {
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Parent Name</h3>
                   <p className="text-base">{customer.parentName || "N/A"}</p>
                 </div>
-                <div className="md:col-span-2">
+                <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Address</h3>
                   <p className="text-base">{customer.address}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Device Metadata URI</h3>
+                  <p className="text-base">{customer.deviceMetadata || "N/A"}</p>
                 </div>
               </div>
             </div>

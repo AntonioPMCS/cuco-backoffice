@@ -1,5 +1,5 @@
 import { Label } from "../ui/label";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Input } from "../ui/input";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose, DialogFooter } from "../ui/dialog";
 import { Button } from "../ui/button";
@@ -7,31 +7,37 @@ import { Plus } from "lucide-react";
 
 interface AddCustomerFormProps {
   selectedWallet: EIP6963ProviderDetail | null;
-  createCustomer: (_parentAddress:string, _name:string) => void;
+  createCustomer: (_parentAddress:string, _name:string, _deviceMetadata:string) => Promise<void>;
 }
 
 const AddCustomerForm: React.FC<AddCustomerFormProps> = ({selectedWallet, createCustomer}) => {
   const [customerName, setCustomerName] = useState<string>("")
   const [customerParent, setCustomerParent] = useState<string>("")
+  const [deviceMetadata, setDeviceMetadata] = useState<string>("")
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = async () => {
+    setLoading(true);
     if (!customerName.trim() || !customerParent.trim()) {
       console.log("Customer name or parent address is empty");
       return;
     }
     console.log("Submitting with:", { customerName, customerParent });
+
     try {
-      await createCustomer(customerParent, customerName);
+      await createCustomer(customerParent, customerName, deviceMetadata);
       // Reset form and close dialog after successful submission
       setCustomerName("");
       setCustomerParent("");
-      setOpen(false);
     } catch (error) {
       console.error("Failed to create customer:", error);
       // Don't close dialog on error so user can retry
     }
-  }, [customerName, customerParent, createCustomer]);
+    setLoading(false);
+    setOpen(false);
+  };
+
   
   return (
     <>
@@ -50,28 +56,46 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({selectedWallet, create
               Fill customer name and parent address to add a new customer
             </DialogDescription>
           </DialogHeader> 
-          <div className="grid gap-2 py-4">
-          <Label htmlFor="name">Name</Label>
-          <Input 
-            id="name"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-          />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="customerAddress">Parent Address</Label>
-            <Input
-              id="parentAddress"
-              value={customerParent}
-              onChange={ (e) => setCustomerParent(e.target.value)}
-            />
-          </div>
-          <DialogFooter className="pt-8">
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button onClick={handleSubmit} disabled={selectedWallet ? false : true}>Add New Customer</Button>
-          </DialogFooter> 
+          {loading && (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          )}
+          {!loading && (
+            <>
+              <div className="grid gap-2 py-4">
+                <Label htmlFor="name">Name</Label>
+                <Input 
+                  id="name"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="customerAddress">Parent Address</Label>
+                <Input
+                  id="parentAddress"
+                  value={customerParent}
+                  onChange={ (e) => setCustomerParent(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="deviceMetadata">Device Metadata</Label>
+                <Input
+                  id="deviceMetadata"
+                  value={deviceMetadata}
+                  onChange={(e) => setDeviceMetadata(e.target.value)}
+                  placeholder="IPFS CID or URI..."
+                />
+              </div>
+              <DialogFooter className="pt-8">
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button onClick={handleSubmit} disabled={selectedWallet ? false : true}>Add New Customer</Button>
+              </DialogFooter>
+            </>
+          )}
           {!selectedWallet && 
             <span className="mb-8 text-red-500 text-sm text-right block">Connect a wallet to transact with the blockchain</span>
           }       
