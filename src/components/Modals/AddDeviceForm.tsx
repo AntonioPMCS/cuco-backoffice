@@ -20,9 +20,7 @@ interface AddDeviceFormProps {
 const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}) => {
   const {fetchedCustomers} = useCuco();
   const {loadData, data: ipfsData, error: ipfsError} = useIpfs();
-  
-  // Default IPFS CID for device metadata
-  const DEFAULT_METADATA_URI = "bafkreihvgegayu5iecf52gulitftv7p3rzmoglpynrfezienxtbbfownza";
+  const {getCustomerDeviceMetadata} = useCuco();
   
   const [newDevice, setNewDevice] = useState<DeviceType>({
     address: "",
@@ -90,6 +88,23 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
     addDevice(newDevice.customer, newDevice.sn, newDevice.metadataURI);
   }, [newDevice, addDevice]);
 
+  const handleCustomerChange = useCallback(async (value: string) => {
+    // fetch the deviceMetadata from the fetchedCustomers array
+    console.log("Fetching deviceMetadata for customer:", value);
+    const customer = fetchedCustomers.find((customer) => customer.address === value);
+    if (!customer) {
+      console.error("Customer not found");
+      return;
+    }
+    const deviceMetadata = customer.deviceMetadata;
+    
+    setNewDevice({
+      ...newDevice,
+      customer: value,
+      metadataURI: deviceMetadata
+    });
+  }, [newDevice, getCustomerDeviceMetadata]);
+
 
   return (
     <> 
@@ -149,10 +164,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
                 <Label htmlFor="customerSelect">Customer</Label>
                 <Select
                   value={newDevice.customer}
-                  onValueChange={ (value) => setNewDevice({
-                    ...newDevice,
-                    customer: value
-                  })}
+                  onValueChange={ handleCustomerChange}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select customer"/>
@@ -177,7 +189,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="metadataURI">Metadata URI</Label>
+              <Label htmlFor="metadataURI">Metadata URI - <span className="text-xs"><i>Optional</i></span></Label>
               <Input 
                 id="metadataURI"
                 value={newDevice.metadataURI}
@@ -185,7 +197,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
                   ...newDevice,
                   metadataURI: e.target.value
                 })}
-                placeholder={DEFAULT_METADATA_URI}
+                placeholder="IPFS CID or URI..."
               />
             </div>
             

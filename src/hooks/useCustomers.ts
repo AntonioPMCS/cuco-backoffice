@@ -159,5 +159,19 @@ export const useCustomers = (cucoContract?: Contract | null) => {
     }
   }, [ethersProvider, chainId, cucoContract, customers])
 
-  return { customers, fetchCustomers, createCustomer, addAdmin };
+  const getCustomerDeviceMetadata = useCallback(async (_customerAddress: string) => {
+    if (!ethersProvider || !cucoContract) {
+      console.log("CucoContract or ethersProvider is null at getCustomerDeviceMetadata");
+      return;
+    }
+    try {
+      const deviceMetadata = await cucoContract.getCustomerDeviceMetadata(_customerAddress);
+      return deviceMetadata;
+    } catch (error) {
+      console.error("Unable to get customer device metadata", error);
+      return;
+    }
+  }, [ethersProvider, chainId, cucoContract])
+
+  return { customers, fetchCustomers, createCustomer, addAdmin, getCustomerDeviceMetadata };
 };

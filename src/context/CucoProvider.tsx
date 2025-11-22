@@ -11,7 +11,7 @@ const CucoProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   const { ethersProvider } = useWalletProviders();
   const [cucoContract, setCucoContract] = useState<Contract | null>(null);
   const { devices, fetchDevices, addDevice, setDeviceState, toggleDeviceVisible, setDeviceMetadataURI } = useDevices(cucoContract);
-  const { customers, fetchCustomers, createCustomer, addAdmin } = useCustomers(cucoContract);
+  const { customers, fetchCustomers, createCustomer, addAdmin, getCustomerDeviceMetadata } = useCustomers(cucoContract);
 
   
   const fetchCuco = useCallback(async () => {
@@ -82,7 +82,8 @@ const CucoProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
         fetchedCustomers: customers,
         refetchCustomers: fetchCustomers,
         createCustomer,
-        addAdmin
+        addAdmin,
+        getCustomerDeviceMetadata
       }}
     >
       {children}
