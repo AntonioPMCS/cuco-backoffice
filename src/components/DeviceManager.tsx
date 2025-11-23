@@ -17,7 +17,7 @@ import { useWalletProviders } from "@/hooks/useWalletProviders";
 import { getDeviceStateLabel } from "@/constants/deviceStates";
 
 const DeviceManager = () => {
-  const { fetchedDevices, addDevice, fetchedCustomers, toggleDeviceVisible } = useCuco();
+  const { fetchedDevices, fetchedCustomers, toggleDeviceVisible } = useCuco();
   const {selectedWallet} = useWalletProviders();
   const [selectedDevices, setSelectedDevices] = useState<DeviceType[]>([])
   const [editDevice, setEditDevice] = useState<DeviceType | null>(null)
@@ -69,7 +69,6 @@ const DeviceManager = () => {
       <div className="flex flex-col justify-between items-center gap-4">
         <DeviceActionsBar 
           selectedDevices={selectedDevices} 
-          addDevice={addDevice}
           showHidden={showHidden}
           setShowHidden={setShowHidden}
         />

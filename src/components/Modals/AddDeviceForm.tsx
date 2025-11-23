@@ -12,15 +12,15 @@ import { useIpfs } from "@/hooks/useIpfs";
 import { DEVICE_STATE_OPTIONS } from "@/constants/deviceStates";
 
 interface AddDeviceFormProps {
-  addDevice: (customer:string, sn:string, metadata:string ) => void;
   selectedWallet: EIP6963ProviderDetail | null;
 }
 
 
-const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}) => {
-  const {fetchedCustomers} = useCuco();
+const AddDeviceForm: React.FC<AddDeviceFormProps> = ({selectedWallet}) => {
+  const {fetchedCustomers, addDevice} = useCuco();
   const {loadData, data: ipfsData, error: ipfsError} = useIpfs();
-  const {getCustomerDeviceMetadata} = useCuco();
+
+  console.log("Fetched customers:", fetchedCustomers);
   
   const [newDevice, setNewDevice] = useState<DeviceType>({
     address: "",
@@ -91,6 +91,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
   const handleCustomerChange = useCallback(async (value: string) => {
     // fetch the deviceMetadata from the fetchedCustomers array
     console.log("Fetching deviceMetadata for customer:", value);
+    console.log("Fetched customers:", fetchedCustomers);
     const customer = fetchedCustomers.find((customer) => customer.address === value);
     if (!customer) {
       console.error("Customer not found");
@@ -98,12 +99,12 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
     }
     const deviceMetadata = customer.deviceMetadata;
     
-    setNewDevice({
-      ...newDevice,
+    setNewDevice(prev => ({
+      ...prev,
       customer: value,
       metadataURI: deviceMetadata
-    });
-  }, [newDevice, getCustomerDeviceMetadata]);
+    }));
+  }, [fetchedCustomers]);
 
 
   return (
@@ -218,7 +219,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
                 value={newDevice.IT || ''}
                 readOnly
                 className="bg-muted"
-                placeholder="Enter installation text..."
                 rows={2}
               />
             </div>
@@ -229,7 +229,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
                 value={newDevice.BT || ''}
                 readOnly
                 className="bg-muted"
-                placeholder="Enter block text..."
                 rows={2}
               />
             </div>
@@ -240,7 +239,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
                 value={newDevice.BW || ''}
                 readOnly
                 className="bg-muted"
-                placeholder="Enter block warning..."
                 rows={2}
               />
             </div>
@@ -252,7 +250,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
                   value={newDevice.TW?.toString() || ''}
                   readOnly
                   className="bg-muted"
-                  placeholder=""
                 />
               </div>
               <div className="grid gap-2">
@@ -262,7 +259,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
                   value={newDevice.MaxUC?.toString() || ''}
                   readOnly
                   className="bg-muted"
-                  placeholder=""
                 />
               </div>
               <div className="grid gap-2">
@@ -272,7 +268,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({addDevice, selectedWallet}
                   value={newDevice.ticketlifetime?.toString() || ''}
                   readOnly
                   className="bg-muted"
-                  placeholder=""
                 />
               </div>
             </div>

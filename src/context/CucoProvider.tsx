@@ -65,7 +65,7 @@ const CucoProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
 
     fetchDevices();
     fetchCustomers();   
-  }, [cucoContract, fetchDevices, fetchCustomers, ethersProvider]);
+  }, [cucoContract, ethersProvider]);
 
 
   return (

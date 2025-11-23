@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input } from "../ui/input";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose, DialogFooter } from "../ui/dialog";
 import { Button } from "../ui/button";
+import { Switch } from "../ui/switch";
 import { Plus } from "lucide-react";
 
 interface AddCustomerFormProps {
@@ -16,6 +17,7 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({selectedWallet, create
   const [deviceMetadata, setDeviceMetadata] = useState<string>("")
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [useParentMetadata, setUseParentMetadata] = useState(true);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -63,7 +65,8 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({selectedWallet, create
           )}
           {!loading && (
             <>
-              <div className="grid gap-2 py-4">
+            <div className="grid gap-8">
+              <div className="grid gap-2">
                 <Label htmlFor="name">Name</Label>
                 <Input 
                   id="name"
@@ -79,15 +82,28 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({selectedWallet, create
                   onChange={ (e) => setCustomerParent(e.target.value)}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="deviceMetadata">Device Metadata</Label>
-                <Input
-                  id="deviceMetadata"
-                  value={deviceMetadata}
-                  onChange={(e) => setDeviceMetadata(e.target.value)}
-                  placeholder="IPFS CID or URI..."
-                />
+              <div className="grid gap-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="useParentMetadata"
+                    checked={useParentMetadata}
+                    onCheckedChange={setUseParentMetadata}
+                  />
+                  <Label htmlFor="useParentMetadata" className="cursor-pointer">Use Default Device Metadata</Label>
+                </div>
               </div>
+              {!useParentMetadata && (
+                <div className="grid gap-2">
+                  <Label htmlFor="deviceMetadata">Custom Device Metadata</Label>
+                  <Input
+                    id="deviceMetadata"
+                    value={deviceMetadata}
+                    onChange={(e) => setDeviceMetadata(e.target.value)}
+                    placeholder="IPFS CID or URI..."
+                  />
+                </div>
+              )}
+            </div>
               <DialogFooter className="pt-8">
                 <DialogClose asChild>
                   <Button variant="outline">Cancel</Button>
