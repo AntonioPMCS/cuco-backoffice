@@ -9,10 +9,9 @@ import { useWalletProviders } from "@/hooks/useWalletProviders";
 
 interface CustomerActionsBarProps {
   selectedCustomers: string[];
-  createCustomer: (_parentAddress:string, _name:string, _deviceMetadata:string) => Promise<void>;
 }
 
-const CustomerActionsBar:React.FC<CustomerActionsBarProps> = ({selectedCustomers, createCustomer}) => {
+const CustomerActionsBar:React.FC<CustomerActionsBarProps> = ({selectedCustomers}) => {
   const [batchCustomers, setBatchCustomers] = useState<string>("")
   const {selectedWallet} = useWalletProviders()
 
@@ -22,7 +21,7 @@ const CustomerActionsBar:React.FC<CustomerActionsBarProps> = ({selectedCustomers
   return (
     <div className="flex items-center gap-2">
 
-      <AddCustomerForm selectedWallet={selectedWallet} createCustomer={createCustomer} />
+      <AddCustomerForm selectedWallet={selectedWallet} />
 
       <ModalTemplate
         trigger={<><Upload className="mr-2 h-4 w-4" />BatchImport</>}

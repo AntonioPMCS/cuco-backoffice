@@ -12,7 +12,7 @@ import { Copy } from "lucide-react";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 const CustomerManager = () => {
-  const { fetchedCustomers, createCustomer } = useCuco();
+  const { fetchedCustomers } = useCuco();
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([])
   const [editCustomer, setEditCustomer] = useState<CustomerType | null>(null)
   const handleCopyAddress = useCopyToClipboard();
@@ -39,7 +39,7 @@ const CustomerManager = () => {
     <>
     <div className="space-y-6">
       <div className="flex flex-col justify-between items-center gap-4">
-        <CustomerActionsBar selectedCustomers={selectedCustomers} createCustomer={createCustomer}/>
+        <CustomerActionsBar selectedCustomers={selectedCustomers} />
         <div className="border rounded-md w-full">
           <Table>
             <TableHeader>

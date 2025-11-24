@@ -19,9 +19,6 @@ interface AddDeviceFormProps {
 const AddDeviceForm: React.FC<AddDeviceFormProps> = ({selectedWallet}) => {
   const {fetchedCustomers, addDevice} = useCuco();
   const {loadData, data: ipfsData, error: ipfsError} = useIpfs();
-
-  console.log("Fetched customers:", fetchedCustomers);
-  
   const [newDevice, setNewDevice] = useState<DeviceType>({
     address: "",
     sn: "",
