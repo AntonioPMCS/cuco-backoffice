@@ -31,7 +31,7 @@ type CucoContextType = { // The context is an array of providers
   fetchCuco: () => void;
   fetchedDevices: Array<DeviceType>;
   refetchDevices: () => void;
-  addDevice: (_customer:string, _sn:string, _metadata:string) => void;
+  addDevice: (_customer:string, _sn:string, _metadata:string, _deviceState:number) => void;
   setDeviceState: (_state:number, _address:string) => void;
   toggleDeviceVisible: (_address:string) => void;
   setDeviceMetadataURI: (_address:string, _metadataURI:string) => void;
