@@ -5,12 +5,14 @@ import { FormField } from "@/components/FormField";
 import { DeviceType } from "@/context/CucoContext";
 import { useCuco } from "@/hooks/useCuco";
 import { useIpfs } from "@/hooks/useIpfs";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
 import { useWalletProviders } from "@/hooks/useWalletProviders";
 import { DEVICE_STATE_OPTIONS } from "@/constants/deviceStates";
-import { Edit } from "lucide-react";
+import { Edit, Copy } from "lucide-react";
+import { truncateMiddle } from "../utils";
 
 
 
@@ -18,6 +20,7 @@ const Device = () => {
   const {deviceSN} = useParams();
   const {fetchedDevices, setDeviceState, toggleDeviceVisible, setDeviceMetadataURI, fetchedCustomers} = useCuco();
   const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs, clearData} = useIpfs();
+  const handleCopyValue = useCopyToClipboard();
   const {selectedWallet} = useWalletProviders();
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true);
@@ -286,7 +289,19 @@ const Device = () => {
               {device.metadataURI && (
                 <div className="mt-6 pt-6 border-t">
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Metadata URI</h3>
-                  <p className="text-base">{device.metadataURI}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-base">{truncateMiddle(device.metadataURI)}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => handleCopyValue(device.metadataURI)}
+                      title="Copy URI"
+                    >
+                      <Copy className="h-4 w-4" />
+                      <span className="sr-only">Copy URI</span>
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
