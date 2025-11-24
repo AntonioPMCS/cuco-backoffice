@@ -82,25 +82,32 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({selectedWallet}) => {
 
   // Create handler that uses internal state
   const handleSubmit = useCallback(() => {
-    addDevice(newDevice.customer, newDevice.sn, newDevice.metadataURI);
+    addDevice(newDevice.customer, newDevice.sn, newDevice.metadataURI, newDevice.deviceState);
   }, [newDevice, addDevice]);
 
   const handleCustomerChange = useCallback(async (value: string) => {
     // fetch the deviceMetadata from the fetchedCustomers array
     console.log("Fetching deviceMetadata for customer:", value);
     console.log("Fetched customers:", fetchedCustomers);
+    console.log("value:", value);
     const customer = fetchedCustomers.find((customer) => customer.address === value);
     if (!customer) {
       console.error("Customer not found");
       return;
     }
     const deviceMetadata = customer.deviceMetadata;
+    console.log("Found deviceMetadata:", deviceMetadata);
+    console.log("Current newDevice.metadataURI before update:", newDevice.metadataURI);
     
-    setNewDevice(prev => ({
-      ...prev,
-      customer: value,
-      metadataURI: deviceMetadata
-    }));
+    setNewDevice(prev => {
+      const updated = {
+        ...prev,
+        customer: value,
+        metadataURI: deviceMetadata || ""
+      };
+      console.log("Setting newDevice with metadataURI:", updated.metadataURI);
+      return updated;
+    });
   }, [fetchedCustomers]);
 
 

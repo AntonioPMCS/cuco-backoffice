@@ -113,7 +113,6 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({selectedWallet}) => {
                     id="parentAddress"
                     value={customerParent}
                     readOnly
-                    placeholder="0xdB055877e6c13..."
                     className="bg-muted"
                   />
                 </div>          

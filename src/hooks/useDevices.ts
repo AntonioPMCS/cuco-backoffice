@@ -112,13 +112,13 @@ export const useDevices = (cucoContract?: Contract | null) => {
     }
   }, [ethersProvider, chainId, cucoContract])
 
-  const addDevice = useCallback(async (customer: string, sn:string, metadata:string) => {
+  const addDevice = useCallback(async (customer: string, sn:string, metadata:string, deviceState:number) => {
     if (!ethersProvider || !cucoContract) {
       console.log("CucoContract or ethersProvider is null at addDevice");
       return;
     }
     try {
-      const tx:TransactionResponse = await cucoContract.createDevice(customer, sn, metadata);
+      const tx:TransactionResponse = await cucoContract.createDevice(customer, sn, metadata, deviceState);
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
       if (receipt) {
@@ -152,7 +152,7 @@ export const useDevices = (cucoContract?: Contract | null) => {
       if (receipt) {
         console.log("Transaction confirmed:", receipt);
         const logs = receipt.logs;
-        const cucoInterface = new Interface(CuCoBlockchain.abi);
+        const cucoInterface = new Interface(Device.abi);
         const parsedLog = cucoInterface.parseLog(logs[logs.length-1]); //last log is event emitted
         if (!parsedLog || parsedLog.args['0'] === undefined) {
           throw Error("Could not parse new device visibility from log");
@@ -161,7 +161,7 @@ export const useDevices = (cucoContract?: Contract | null) => {
         setDevices((prevDevices) =>
           prevDevices.map((device) => {
             if (device.address === _deviceAddress) {
-              return { ...device, deviceState: parsedLog.args['0'] };
+              return { ...device, visible: parsedLog.args['0'] };
             }
             return device;
           }));
@@ -170,7 +170,7 @@ export const useDevices = (cucoContract?: Contract | null) => {
       }
       
     } catch (error) {
-      console.error("Unable to create device", error);
+      console.error("Toggle Device Visibility", error);
       return;
     }
   }, [ethersProvider, chainId, cucoContract])
