@@ -8,23 +8,25 @@ import { CustomerType } from "@/context/CucoContext";
 import { useCuco } from "@/hooks/useCuco";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
-import { truncateMiddle } from "@/utils";
+import { useIpfs } from "@/hooks/useIpfs";
+import { truncateMiddle } from "../utils";
 import { Copy, Edit, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
-
+import { ETHERSCAN_ADDRESS_URL } from "@/constants/Urls";
 
 const Customer = () => {
   const {customerName} = useParams();
   const {fetchedCustomers, addAdmin} = useCuco();
+  const handleCopyValue = useCopyToClipboard();
   const {selectedWallet} = useWalletProviders();
+  const {createLink} = useIpfs();
   const [customer, setCustomer] = useState<CustomerType | undefined>();
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [editedCustomer, setEditedCustomer] = useState<CustomerType | null>(null)
   const [newAdmin, setNewAdmin] = useState<string>("")
-  const handleCopyAddress = useCopyToClipboard();
 
   const handleSaveChanges = () => {
     if (editedCustomer) {
@@ -148,11 +150,37 @@ const Customer = () => {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Address</h3>
-                  <p className="text-base">{customer.address}</p>
+                  <div className="flex items-center gap-2">
+                    <a href={`${ETHERSCAN_ADDRESS_URL}${customer.address}`} target="_blank" rel="noopener noreferrer">
+                      <p className="text-base">{truncateMiddle(customer.address)}</p>
+                    </a>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 cursor-pointer"
+                      onClick={() => handleCopyValue(customer.address)}
+                      title="Copy address"
+                    >
+                      <Copy className="h-4 w-4" />
+                      <span className="sr-only">Copy address</span>
+                    </Button>
+                  </div>         
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Device Metadata URI</h3>
-                  <p className="text-base">{customer.deviceMetadata || "N/A"}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-base"><a href={createLink(customer.deviceMetadata)} target="_blank" rel="noopener noreferrer">{truncateMiddle(customer.deviceMetadata)}</a></p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 cursor-pointer"
+                      onClick={() => handleCopyValue(customer.deviceMetadata)}
+                      title="Copy URI"
+                    >
+                      <Copy className="h-4 w-4" />
+                      <span className="sr-only">Copy URI</span>
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -224,8 +252,9 @@ const Customer = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleCopyAddress(address)}
+                          onClick={() => handleCopyValue(address)}
                           title="Copy address"
+                          className="cursor-pointer"
                         >
                           <Copy className="h-4 w-4" />
                           <span className="sr-only">Copy address</span>

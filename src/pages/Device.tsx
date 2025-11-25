@@ -20,6 +20,7 @@ const Device = () => {
   const {deviceSN} = useParams();
   const {fetchedDevices, setDeviceState, toggleDeviceVisible, setDeviceMetadataURI, fetchedCustomers} = useCuco();
   const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs, clearData} = useIpfs();
+  const {createLink} = useIpfs();
   const handleCopyValue = useCopyToClipboard();
   const {selectedWallet} = useWalletProviders();
   const [device, setDevice] = useState<DeviceType | undefined>();
@@ -290,11 +291,11 @@ const Device = () => {
                 <div className="mt-6 pt-6 border-t">
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Metadata URI</h3>
                   <div className="flex items-center gap-2">
-                    <p className="text-base">{truncateMiddle(device.metadataURI)}</p>
+                    <p className="text-base"><a href={createLink(device.metadataURI)} target="_blank" rel="noopener noreferrer">{truncateMiddle(device.metadataURI)}</a></p>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6"
+                      className="h-6 w-6 cursor-pointer"
                       onClick={() => handleCopyValue(device.metadataURI)}
                       title="Copy URI"
                     >

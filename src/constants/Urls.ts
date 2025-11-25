@@ -1,0 +1,1 @@
+export const ETHERSCAN_ADDRESS_URL = "https://sepolia.etherscan.io/address/";
