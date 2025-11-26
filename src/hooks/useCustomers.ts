@@ -131,6 +131,45 @@ export const useCustomers = (cucoContract?: Contract | null) => {
     }
   }, [ethersProvider, chainId, customers])
 
+  const removeAdmin = useCallback(async (_customerAddress: string, _exAdminAddress: string) => {
+    try {
+      if (!ethersProvider || !cucoContract) {
+        throw Error("CucoContract or ethersProvider is null at createCustomer");
+      } 
+      if (ethersProvider instanceof FallbackProvider) {
+        throw Error("Connect to your wallet")
+      }
+
+      const tx:TransactionResponse = await cucoContract.removeUserFromCustomer(_customerAddress, _exAdminAddress);
+      console.log("Transaction sent:", tx.hash);
+      const receipt = await tx.wait();
+      if (receipt) {
+        console.log("Transaction confirmed:", receipt);
+        const logs = receipt.logs;
+        const customerInterface = new Interface(Customer.abi);
+        const parsedLog = customerInterface.parseLog(logs[logs.length-1]); //last log is event emitted
+        if (!parsedLog || parsedLog.args['0'] === undefined) {
+          throw Error("Could not parse revoked address from log");
+        }
+        console.log("Address revoked: "+parsedLog.args['0']);
+        // Get the customer and remove the revoked address from its authorizedUsers array
+        setCustomers(customers.map( (customer) => {
+          if (customer.address == _customerAddress) {
+            console.log("Removing address from admin list: "+parsedLog.args['0']);
+            return {...customer, authorizedUsers: customer.authorizedUsers.filter(user => user != parsedLog.args['0']) }
+          }
+          return customer;
+        }));
+      } else {
+        throw Error("Transaction receipt differs from expected");
+      }
+
+    } catch (error) {
+      console.error("Unable to remove admin", error);
+      return;
+    }
+  }, [ethersProvider, chainId, customers])
+
   const createCustomer = useCallback(async (_parentAddress: string, _name:string, _deviceMetadata:string) => {
     if (!ethersProvider || !cucoContract) {
       console.log("CucoContract or ethersProvider is null at createCustomer");
@@ -173,5 +212,5 @@ export const useCustomers = (cucoContract?: Contract | null) => {
     }
   }, [ethersProvider, chainId, cucoContract])
 
-  return { customers, fetchCustomers, createCustomer, addAdmin, getCustomerDeviceMetadata };
+  return { customers, fetchCustomers, createCustomer, addAdmin, removeAdmin, getCustomerDeviceMetadata };
 };

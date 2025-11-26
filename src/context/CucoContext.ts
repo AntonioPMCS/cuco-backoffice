@@ -39,6 +39,7 @@ type CucoContextType = { // The context is an array of providers
   refetchCustomers: () => void;
   createCustomer: (_parentAddress:string, _name:string, _deviceMetadata:string) => Promise<void>;
   addAdmin: (_customerAddress:string, _newAdmin:string) => void;
+  removeAdmin: (_customerAddress:string, _adminAddress:string) => void;
   getCustomerDeviceMetadata: (_customerAddress:string) => Promise<string>;
 };
 
@@ -57,6 +58,7 @@ const CucoContext = createContext<CucoContextType>({
     refetchCustomers: () => {},
     createCustomer: async () => {},
     addAdmin: () => {},
+    removeAdmin: () => {},
     getCustomerDeviceMetadata: async () => "",
 });
 

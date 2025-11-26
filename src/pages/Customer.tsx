@@ -10,7 +10,7 @@ import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
 import { useIpfs } from "@/hooks/useIpfs";
 import { truncateMiddle } from "../utils";
-import { Copy, Edit, Plus } from "lucide-react";
+import { Copy, Edit, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
@@ -18,7 +18,7 @@ import { ETHERSCAN_ADDRESS_URL } from "@/constants/Urls";
 
 const Customer = () => {
   const {customerName} = useParams();
-  const {fetchedCustomers, addAdmin} = useCuco();
+  const {fetchedCustomers, addAdmin, removeAdmin} = useCuco();
   const handleCopyValue = useCopyToClipboard();
   const {selectedWallet} = useWalletProviders();
   const {createLink} = useIpfs();
@@ -43,6 +43,14 @@ const Customer = () => {
     console.log("New admin: "+newAdmin)
     // In a real app, you would make an API call here
     addAdmin(customer?.address, newAdmin)
+  }
+
+  const handleRemoveAddress = (address:string) => {
+    if (!customer)
+      return;
+    console.log("Removing admin: "+address)
+    // In a real app, you would make an API call here
+    removeAdmin(customer?.address, address)
   }
 
   useEffect(() => {
@@ -258,6 +266,16 @@ const Customer = () => {
                         >
                           <Copy className="h-4 w-4" />
                           <span className="sr-only">Copy address</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveAddress(address)}
+                          title="Remove address"
+                          className="cursor-pointer"  
+                        >
+                          <Trash className="h-4 w-4" />
+                          <span className="sr-only">Remove address</span>
                         </Button>
                       </div>
                     </TableCell>
