@@ -1,7 +1,6 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FormField } from "@/components/FormField";
 import { DeviceType } from "@/context/CucoContext";
 import { useCuco } from "@/hooks/useCuco";
 import { useIpfs } from "@/hooks/useIpfs";
@@ -10,9 +9,9 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
 import { useWalletProviders } from "@/hooks/useWalletProviders";
-import { DEVICE_STATE_OPTIONS } from "@/constants/deviceStates";
-import { Edit, Copy } from "lucide-react";
-import { truncateMiddle } from "../utils";
+import { Edit } from "lucide-react";
+import { DeviceInfoTab } from "./DeviceInfoTab";
+import { DeviceMetadataTab } from "./DeviceMetadataTab";
 
 
 
@@ -20,7 +19,7 @@ const Device = () => {
   const {deviceSN} = useParams();
   const {fetchedDevices, setDeviceState, toggleDeviceVisible, setDeviceMetadataURI, fetchedCustomers} = useCuco();
   const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs, clearData} = useIpfs();
-  const {createLink} = useIpfs();
+  const {buildUrl} = useIpfs();
   const handleCopyValue = useCopyToClipboard();
   const {selectedWallet} = useWalletProviders();
   const [device, setDevice] = useState<DeviceType | undefined>();
@@ -243,110 +242,26 @@ const Device = () => {
 
           {/* Tab Content */}
           {activeTab === 'main' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField 
-                  label="Serial Number" 
-                  field="sn" 
-                  value={device.sn}
-                  isEditing={isEditing}
-                  onFieldChange={handleFieldChange}
-                />
-                <FormField
-                  label="State" 
-                  field="deviceState" 
-                  value={device.deviceState?.toString() ?? "0"}
-                  type="select"
-                  options={DEVICE_STATE_OPTIONS}
-                  isEditing={isEditing}
-                  onFieldChange={handleFieldChange}
-                />
-                <FormField
-                  label="Visible" 
-                  field="visible" 
-                  value={device.visible?.toString() ?? "false"}
-                  type="select"
-                  options={[
-                    {label: "True", value: "true"},
-                    {label: "False", value: "false"}
-                  ]}
-                  isEditing={isEditing}
-                  onFieldChange={handleFieldChange}
-                />
-                <FormField
-                  label="Belongs to customer" 
-                  field="customer" 
-                  value={customerName}
-                  isEditing={isEditing}
-                  onFieldChange={handleFieldChange}
-                />
-                <div className="md:col-span-1">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Device Contract (immutable)</h3>
-                  <p className="text-base">{device.address}</p>
-                </div>
-              </div>
-              
-              {/* Metadata URL in Main tab for quick access */}
-              {device.metadataURI && (
-                <div className="mt-6 pt-6 border-t">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Metadata URI</h3>
-                  <div className="flex items-center gap-2">
-                    <p className="text-base"><a href={createLink(device.metadataURI)} target="_blank" rel="noopener noreferrer">{truncateMiddle(device.metadataURI)}</a></p>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 cursor-pointer"
-                      onClick={() => handleCopyValue(device.metadataURI)}
-                      title="Copy URI"
-                    >
-                      <Copy className="h-4 w-4" />
-                      <span className="sr-only">Copy URI</span>
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <DeviceInfoTab
+              device={device}
+              isEditing={isEditing}
+              onFieldChange={handleFieldChange}
+              customerName={customerName}
+              metadataURI={device.metadataURI}
+              buildUrl={buildUrl}
+              onCopyValue={handleCopyValue}
+            />
           )}
 
           {activeTab === 'metadata' && (
-            <div className="space-y-4">
-              {device.metadataURI ? (
-                <>
-                  {ipfsLoading && (
-                    <div className="flex items-center space-x-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                      <span className="text-sm text-muted-foreground">Loading metadata...</span>
-                    </div>
-                  )}
-
-                  {ipfsError && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                      <h4 className="text-red-800 font-medium mb-2">Error loading metadata</h4>
-                      <p className="text-red-600 text-sm">{ipfsError}</p>
-                    </div>
-                  )}
-
-                  {data && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Object.entries(data).map(([key, value]) => (
-                        <FormField
-                          key={key}
-                          label={key}
-                          field={key}
-                          value={typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                          isEditing={isEditing}
-                          onFieldChange={handleFieldChange}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>No metadata available for this device.</p>
-                </div>
-              )}
-            </div>
+            <DeviceMetadataTab
+              metadataURI={device.metadataURI}
+              ipfsLoading={ipfsLoading}
+              ipfsError={ipfsError}
+              data={data}
+              isEditing={isEditing}
+              onFieldChange={handleFieldChange}
+            />
           )}
         </CardContent>
       </Card>

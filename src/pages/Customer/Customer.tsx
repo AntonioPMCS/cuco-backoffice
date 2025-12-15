@@ -9,33 +9,43 @@ import { useCuco } from "@/hooks/useCuco";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
 import { useIpfs } from "@/hooks/useIpfs";
-import { truncateMiddle } from "../utils";
+import { truncateMiddle } from "../../utils";
 import { Copy, Edit, Plus, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
-import { ETHERSCAN_ADDRESS_URL } from "@/constants/Urls";
+import { CustomerInfoTab } from "./CustomerInfoTab";
 
 const Customer = () => {
   const {customerName} = useParams();
   const {fetchedCustomers, addAdmin, removeAdmin} = useCuco();
   const handleCopyValue = useCopyToClipboard();
   const {selectedWallet} = useWalletProviders();
-  const {createLink} = useIpfs();
+  const {buildUrl, data, loading: ipfsLoading, error: ipfsError, loadData} = useIpfs();
   const [customer, setCustomer] = useState<CustomerType | undefined>();
   const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [editedCustomer, setEditedCustomer] = useState<CustomerType | null>(null)
   const [newAdmin, setNewAdmin] = useState<string>("")
+  const [activeTab, setActiveTab] = useState<'main' | 'deviceDefaults'>('main');
+  // Store form changes in ref (no re-renders during editing)
+  const formChangesRef = useRef<Record<string, string>>({});
 
   const handleSaveChanges = () => {
     if (editedCustomer) {
       // In a real app, you would make an API call here
       console.log(editedCustomer);
       //setCustomer(editedCustomer)
-      setEditing(false)
+      setIsEditing(false)
     }
   } 
+
+
+  // Handle field changes - store in ref only (no re-render)
+  const handleFieldChange = (field: string, value: string) => {
+    formChangesRef.current[field] = value;
+  };
+
 
   const handleAddAddress = () => {
     if (!customer)
@@ -58,6 +68,12 @@ const Customer = () => {
     setLoading(false);
     setCustomer(fetchedCustomers.find((_customer) => _customer.name == customerName));
   }, [fetchedCustomers]);
+
+  useEffect(() => {
+    if (customer?.deviceMetadata && !data) {
+      loadData(customer.deviceMetadata);
+    }
+  }, [customer?.deviceMetadata, data, loadData]);
 
   if (loading) {
     return (
@@ -86,112 +102,52 @@ const Customer = () => {
               {customer.parentName ? `Parent: ${customer.parentName}` : "No parent company"}
             </CardDescription>
           </div>
-          {!editing && (
-            <Button variant="outline" onClick={() => setEditing(true)}>
+          {!isEditing && (
+            <Button variant="outline" onClick={() => setIsEditing(true)}>
               <Edit className="mr-2 h-4 w-4" />
               Edit Details
             </Button>
           )}
         </CardHeader>
         <CardContent className="pt-6">
-          {editing ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    value={editedCustomer?.name || ""}
-                    onChange={(e) => setEditedCustomer((prev) => (prev ? { ...prev, name: e.target.value } : null))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="parentName">Parent Name</Label>
-                  <Input
-                    id="parentName"
-                    value={editedCustomer?.parentName || ""}
-                    onChange={(e) =>
-                      setEditedCustomer((prev) => (prev ? { ...prev, parentName: e.target.value } : null))
-                    }
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    id="address"
-                    value={editedCustomer?.address || ""}
-                    onChange={(e) => setEditedCustomer((prev) => (prev ? { ...prev, address: e.target.value } : null))}
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="deviceMetadata">Device Metadata</Label>
-                  <Input
-                    id="deviceMetadata"
-                    value={editedCustomer?.deviceMetadata || ""}
-                    onChange={(e) => setEditedCustomer((prev) => (prev ? { ...prev, deviceMetadata: e.target.value } : null))}
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setEditing(false)
-                    setEditedCustomer(customer)
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleSaveChanges}>Save Changes</Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Name</h3>
-                  <p className="text-base">{customer.name}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Parent Name</h3>
-                  <p className="text-base">{customer.parentName || "N/A"}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Address</h3>
-                  <div className="flex items-center gap-2">
-                    <a href={`${ETHERSCAN_ADDRESS_URL}${customer.address}`} target="_blank" rel="noopener noreferrer">
-                      <p className="text-base">{truncateMiddle(customer.address)}</p>
-                    </a>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 cursor-pointer"
-                      onClick={() => handleCopyValue(customer.address)}
-                      title="Copy address"
-                    >
-                      <Copy className="h-4 w-4" />
-                      <span className="sr-only">Copy address</span>
-                    </Button>
-                  </div>         
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Device Metadata URI</h3>
-                  <div className="flex items-center gap-2">
-                    <p className="text-base"><a href={createLink(customer.deviceMetadata)} target="_blank" rel="noopener noreferrer">{truncateMiddle(customer.deviceMetadata)}</a></p>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 cursor-pointer"
-                      onClick={() => handleCopyValue(customer.deviceMetadata)}
-                      title="Copy URI"
-                    >
-                      <Copy className="h-4 w-4" />
-                      <span className="sr-only">Copy URI</span>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Tab Navigation */}
+          <div className="flex space-x-1 mb-6 border-b">
+            <Button
+              variant={activeTab === 'main' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('main')}
+              className="rounded-none border-b-2 border-transparent"
+              style={activeTab === 'main' ? { 
+                borderBottomColor: 'black', 
+                color: 'black',
+                backgroundColor: 'transparent'
+              } : {}}
+            >
+              Customer Info
+            </Button>
+            <Button
+              variant={activeTab === 'deviceDefaults' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('deviceDefaults')}
+              className="rounded-none border-b-2 border-transparent"
+              style={activeTab === 'deviceDefaults' ? { 
+                borderBottomColor: 'black', 
+                color: 'black',
+                backgroundColor: 'transparent'
+              } : {}}
+            >
+              Device Defaults
+            </Button>
+          </div>
+
+          {/* Tab Content */}
+          {activeTab === 'main' && (
+            <CustomerInfoTab
+              customer={customer}
+              isEditing={isEditing}
+              onFieldChange={handleFieldChange}
+              deviceMetadataURI={customer.deviceMetadata}
+              buildUrl={buildUrl}
+              onCopyValue={handleCopyValue}
+            />
           )}
         </CardContent>
       </Card>

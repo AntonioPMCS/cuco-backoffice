@@ -3,11 +3,11 @@ import Layout from "@/pages/Layout";
 import NotFoundPage from "@/pages/NotFound";
 import Devices from "@/pages/Devices";
 import Customers from "@/pages/Customers";
-import Customer from "@/pages/Customer";
+import Customer from "@/pages/Customer/Customer";
 import CustomerManager from "@/components/CustomerManager";
 import { Navigate } from "react-router-dom";
 import DeviceManager from "@/components/DeviceManager";
-import Device from "@/pages/Device";
+import Device from "@/pages/Device/Device";
 
 const router = createBrowserRouter([
   {

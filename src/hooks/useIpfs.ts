@@ -10,7 +10,7 @@ interface UseIpfsReturn extends IpfsState {
   loadData: (hash: string) => Promise<void>;
   uploadToIpfs: (data: any) => Promise<string | null>;
   clearData: () => void;
-  createLink: (CID: string) => string;
+  buildUrl: (CID: string) => string;
 }
 
 export const useIpfs = (initialHash?: string): UseIpfsReturn => {
@@ -72,7 +72,8 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
     setError(null);
   }, []);
 
-  const createLink = useCallback((CID: string) => {
+  // Composes a full IPFS URL from a CID
+  const buildUrl = useCallback((CID: string) => {
     return `https://ipfs.io/ipfs/${CID.replace('ipfs://', '')}`;
   }, []);
 
@@ -90,6 +91,6 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
     loadData,
     uploadToIpfs,
     clearData,
-    createLink
+    buildUrl
   };
 };
