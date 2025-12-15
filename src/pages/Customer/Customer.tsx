@@ -1,67 +1,95 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CustomerType } from "@/context/CucoContext";
 import { useCuco } from "@/hooks/useCuco";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { useWalletProviders } from "@/hooks/useWalletProviders";
 import { useIpfs } from "@/hooks/useIpfs";
-import { truncateMiddle } from "../../utils";
-import { Copy, Edit, Plus, Trash } from "lucide-react";
+import { Edit } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
 import { CustomerInfoTab } from "./CustomerInfoTab";
+import { CustomerDeviceDefaultsTab } from "./CustomerDeviceDefaultsTab";
 
 const Customer = () => {
   const {customerName} = useParams();
   const {fetchedCustomers, addAdmin, removeAdmin} = useCuco();
   const handleCopyValue = useCopyToClipboard();
   const {selectedWallet} = useWalletProviders();
-  const {buildUrl, data, loading: ipfsLoading, error: ipfsError, loadData} = useIpfs();
+  const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs, clearData} = useIpfs();
   const [customer, setCustomer] = useState<CustomerType | undefined>();
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
-  const [editedCustomer, setEditedCustomer] = useState<CustomerType | null>(null)
-  const [newAdmin, setNewAdmin] = useState<string>("")
   const [activeTab, setActiveTab] = useState<'main' | 'deviceDefaults'>('main');
   // Store form changes in ref (no re-renders during editing)
   const formChangesRef = useRef<Record<string, string>>({});
-
-  const handleSaveChanges = () => {
-    if (editedCustomer) {
-      // In a real app, you would make an API call here
-      console.log(editedCustomer);
-      //setCustomer(editedCustomer)
-      setIsEditing(false)
-    }
-  } 
-
 
   // Handle field changes - store in ref only (no re-render)
   const handleFieldChange = (field: string, value: string) => {
     formChangesRef.current[field] = value;
   };
 
+  // Handle save all changes
+  const handleSaveAll = async () => {
+    console.log("Hello from Save button!");
+    console.log("Form changes:", formChangesRef.current);
+    console.log("Original customer data:", customer);
+    
+    if (!customer) return;
+    setLoading(true);
 
-  const handleAddAddress = () => {
-    if (!customer)
-      return;
-    console.log("New admin: "+newAdmin)
-    // In a real app, you would make an API call here
-    addAdmin(customer?.address, newAdmin)
-  }
+    try {
+      const changes = formChangesRef.current; // Read all changes from ref
+      console.log("Changes:", changes);
 
-  const handleRemoveAddress = (address:string) => {
-    if (!customer)
-      return;
-    console.log("Removing admin: "+address)
-    // In a real app, you would make an API call here
-    removeAdmin(customer?.address, address)
-  }
+      // Filter out non-metadata fields (name, parentName, address are not updatable on-chain)
+      const metadataChanges: Record<string, string> = {};
+      Object.entries(changes).forEach(([key, value]) => {
+        if (!["name", "parentName", "address"].includes(key)) {
+          metadataChanges[key] = value;
+        }
+      });
+
+      // Save metadata changes to IPFS if any
+      if (Object.keys(metadataChanges).length > 0) {
+        // Rebuild the metadata object with all fields, using changes if available, otherwise existing data
+        const metadata = {
+          IT: changes.IT ?? data?.IT ?? "",
+          BT: changes.BT ?? data?.BT ?? "",
+          BW: changes.BW ?? data?.BW ?? "",
+          TW: changes.TW ?? data?.TW ?? "",
+          MaxUC: changes.MaxUC ?? data?.MaxUC ?? "",
+          ticketlifetime: changes.ticketlifetime ?? data?.ticketlifetime ?? ""
+        };
+       
+        const metadataURI = await uploadToIpfs(metadata);
+        if (metadataURI) {
+          try {
+            // Note: There's no setCustomerDeviceMetadata function available in the context
+            // The metadata URI would need to be updated on-chain through a separate transaction
+            // For now, we'll upload to IPFS and log the new URI
+            console.log("Device metadata uploaded to IPFS:", metadataURI);
+            console.warn("Note: Customer deviceMetadata needs to be updated on-chain separately");
+            clearData();
+            loadData(metadataURI);
+          } catch (error) {
+            console.error("Error uploading device metadata:", error);
+          }
+        }
+      }
+
+    } catch (err) {
+      console.error("Save error:", err);
+    } finally {
+      // Clear form changes regardless of outcome
+      formChangesRef.current = {};
+      setIsEditing(false);
+      setLoading(false);
+    }
+  };
+
+
 
   useEffect(() => {
     if (!fetchedCustomers) return;
@@ -102,12 +130,35 @@ const Customer = () => {
               {customer.parentName ? `Parent: ${customer.parentName}` : "No parent company"}
             </CardDescription>
           </div>
-          {!isEditing && (
-            <Button variant="outline" onClick={() => setIsEditing(true)}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Details
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {!isEditing ? (
+              <Button onClick={() => {
+                setIsEditing(true);
+                formChangesRef.current = {}; // Initialize empty ref when entering edit mode
+              }} variant="outline">
+                <Edit className="mr-2 h-4 w-4" /> Edit Details
+              </Button>
+            ) : (
+              <div className="flex flex-col items-end">
+                <div className="flex gap-2">
+                  <Button onClick={handleSaveAll} disabled={loading || !selectedWallet}>
+                    {loading ? "Saving..." : "Save"}
+                  </Button>
+                  <Button onClick={() => {
+                    setIsEditing(false);
+                    formChangesRef.current = {}; // Clear unsaved changes
+                  }} variant="outline">
+                    Cancel
+                  </Button>
+                </div>
+                {!selectedWallet && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Connect a wallet to transact with the blockchain
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="pt-6">
           {/* Tab Navigation */}
@@ -115,7 +166,7 @@ const Customer = () => {
             <Button
               variant={activeTab === 'main' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('main')}
-              className="rounded-none border-b-2 border-transparent"
+              className="rounded-none border-b-2 border-transparent cursor-pointer"
               style={activeTab === 'main' ? { 
                 borderBottomColor: 'black', 
                 color: 'black',
@@ -127,7 +178,7 @@ const Customer = () => {
             <Button
               variant={activeTab === 'deviceDefaults' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('deviceDefaults')}
-              className="rounded-none border-b-2 border-transparent"
+              className="rounded-none border-b-2 border-transparent cursor-pointer"
               style={activeTab === 'deviceDefaults' ? { 
                 borderBottomColor: 'black', 
                 color: 'black',
@@ -144,101 +195,22 @@ const Customer = () => {
               customer={customer}
               isEditing={isEditing}
               onFieldChange={handleFieldChange}
-              deviceMetadataURI={customer.deviceMetadata}
-              buildUrl={buildUrl}
               onCopyValue={handleCopyValue}
+              addAdmin={addAdmin}
+              removeAdmin={removeAdmin}
+              selectedWallet={selectedWallet}
             />
           )}
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle>Admin Accounts</CardTitle>
-            <CardDescription>Wallet addresses with admin access to this Customer</CardDescription>
-          </div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Address
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add Admin Address</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="blockchain-address">Wallet Address</Label>
-                  <Input
-                    id="blockchain-address"
-                    value={newAdmin}
-                    onChange={(e) => setNewAdmin(e.target.value)}
-                    placeholder="0x1234... or bc1q..."
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                <DialogClose asChild>
-                  <Button onClick={handleAddAddress} disabled={selectedWallet ? false : true}>Add Address</Button>
-                </DialogClose>
-              </DialogFooter>
-              {!selectedWallet && 
-                <span className="text-red-500 text-sm text-right block">You must connect your wallet to transact with the blockchain</span>
-              }
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-        <CardContent>
-          {customer.authorizedUsers?.length === 0 ? (
-            <div className="text-center py-6 text-muted-foreground">
-              No authorized users found. Add an address to get started.
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Address</TableHead>
-                  <TableHead className="w-[150px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {customer.authorizedUsers.map((address) => (
-                  <TableRow key={address}>
-                    <TableCell className="font-mono">{truncateMiddle(address)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleCopyValue(address)}
-                          title="Copy address"
-                          className="cursor-pointer"
-                        >
-                          <Copy className="h-4 w-4" />
-                          <span className="sr-only">Copy address</span>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleRemoveAddress(address)}
-                          title="Remove address"
-                          className="cursor-pointer"  
-                        >
-                          <Trash className="h-4 w-4" />
-                          <span className="sr-only">Remove address</span>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          {activeTab === 'deviceDefaults' && (
+            <CustomerDeviceDefaultsTab
+              deviceMetadataURI={customer.deviceMetadata}
+              ipfsLoading={ipfsLoading}
+              ipfsError={ipfsError}
+              data={data}
+              isEditing={isEditing}
+              onFieldChange={handleFieldChange}
+            />
           )}
         </CardContent>
       </Card>

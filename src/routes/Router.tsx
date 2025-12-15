@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Layout from "@/pages/Layout";
 import NotFoundPage from "@/pages/NotFound";
 import Devices from "@/pages/Devices";
-import Customers from "@/pages/Customers";
+import Customers from "@/pages/Customers";  
 import Customer from "@/pages/Customer/Customer";
 import CustomerManager from "@/components/CustomerManager";
 import { Navigate } from "react-router-dom";

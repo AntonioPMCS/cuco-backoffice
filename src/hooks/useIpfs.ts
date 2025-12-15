@@ -56,15 +56,26 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
   const uploadToIpfs = useCallback(async (jsonObject: any): Promise<string | null> => {
     console.log("Uploading to IPFS:", jsonObject);
 
-    const res = await fetch("/api/upload-json", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(jsonObject),
-    });
+    try {
+      const res = await fetch("/api/upload-json", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(jsonObject),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: `HTTP ${res.status}: ${res.statusText}` }));
+        throw new Error(errorData.error || `Failed to upload: ${res.status} ${res.statusText}`);
+      }
   
-    const response = await res.json();
-    console.log("IPFS Hash:", response.IpfsHash);
-    return response.IpfsHash;
+      const response = await res.json();
+      console.log("IPFS Hash:", response.IpfsHash);
+      return response.IpfsHash;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      console.error('Error uploading to IPFS:', errorMessage);
+      throw err;
+    }
   }, []);
 
   const clearData = useCallback(() => {

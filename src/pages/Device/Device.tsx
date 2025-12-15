@@ -217,7 +217,7 @@ const Device = () => {
             <Button
               variant={activeTab === 'main' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('main')}
-              className="rounded-none border-b-2 border-transparent"
+              className="rounded-none border-b-2 border-transparent cursor-pointer"
               style={activeTab === 'main' ? { 
                 borderBottomColor: 'black', 
                 color: 'black',
@@ -229,7 +229,7 @@ const Device = () => {
             <Button
               variant={activeTab === 'metadata' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('metadata')}
-              className="rounded-none border-b-2 border-transparent"
+              className="rounded-none border-b-2 border-transparent cursor-pointer"
               style={activeTab === 'metadata' ? { 
                 borderBottomColor: 'black', 
                 color: 'black',
