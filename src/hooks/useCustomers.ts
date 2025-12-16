@@ -90,7 +90,7 @@ export const useCustomers = (cucoContract?: Contract | null) => {
     } 
   };
 
-  const setCustomerName = useCallback(async (_customerAddress: string, _newName:string) => {
+  const setCustomerName = useCallback(async (_newName:string, _customerAddress: string) => {
     try {
       if (!ethersProvider || !cucoContract) {
         throw Error("CucoContract or ethersProvider is null at setCustomerName");
