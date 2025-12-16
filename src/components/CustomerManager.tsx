@@ -75,7 +75,7 @@ const CustomerManager = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        <Link to={`/customers/${encodeURIComponent(customer.name)}`} >
+                        <Link to={`/customers/${encodeURIComponent(customer.address)}`} >
                           {customer.name}
                         </Link>
                       </TableCell>

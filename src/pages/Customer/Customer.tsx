@@ -13,11 +13,11 @@ import { CustomerInfoTab } from "./CustomerInfoTab";
 import { CustomerDeviceDefaultsTab } from "./CustomerDeviceDefaultsTab";
 
 const Customer = () => {
-  const {customerName} = useParams();
-  const {fetchedCustomers, addAdmin, removeAdmin} = useCuco();
+  const {customerAddress} = useParams();
+  const {fetchedCustomers, setCustomerName, addAdmin, removeAdmin, setCustomerDeviceMetadata} = useCuco();
   const handleCopyValue = useCopyToClipboard();
   const {selectedWallet} = useWalletProviders();
-  const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs, clearData} = useIpfs();
+  const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs, clearData, buildUrl} = useIpfs();
   const [customer, setCustomer] = useState<CustomerType | undefined>();
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
@@ -43,6 +43,17 @@ const Customer = () => {
       const changes = formChangesRef.current; // Read all changes from ref
       console.log("Changes:", changes);
 
+
+      // 1) customerName 
+      if (changes.name !== undefined) {
+        const newName = changes.name;
+        if (newName != customer.name) {
+          await setCustomerName(newName, customer.address);
+        }
+      }
+
+
+
       // Filter out non-metadata fields (name, parentName, address are not updatable on-chain)
       const metadataChanges: Record<string, string> = {};
       Object.entries(changes).forEach(([key, value]) => {
@@ -66,11 +77,7 @@ const Customer = () => {
         const metadataURI = await uploadToIpfs(metadata);
         if (metadataURI) {
           try {
-            // Note: There's no setCustomerDeviceMetadata function available in the context
-            // The metadata URI would need to be updated on-chain through a separate transaction
-            // For now, we'll upload to IPFS and log the new URI
-            console.log("Device metadata uploaded to IPFS:", metadataURI);
-            console.warn("Note: Customer deviceMetadata needs to be updated on-chain separately");
+            await setCustomerDeviceMetadata(customer.address, metadataURI);
             clearData();
             loadData(metadataURI);
           } catch (error) {
@@ -94,7 +101,7 @@ const Customer = () => {
   useEffect(() => {
     if (!fetchedCustomers) return;
     setLoading(false);
-    setCustomer(fetchedCustomers.find((_customer) => _customer.name == customerName));
+    setCustomer(fetchedCustomers.find((_customer) => _customer.address == customerAddress));
   }, [fetchedCustomers]);
 
   useEffect(() => {
@@ -199,6 +206,8 @@ const Customer = () => {
               addAdmin={addAdmin}
               removeAdmin={removeAdmin}
               selectedWallet={selectedWallet}
+              deviceMetadataURI={customer.deviceMetadata}
+              buildUrl={buildUrl}
             />
           )}
 

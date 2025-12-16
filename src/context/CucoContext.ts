@@ -38,9 +38,11 @@ type CucoContextType = { // The context is an array of providers
   fetchedCustomers: Array<CustomerType>;
   refetchCustomers: () => void;
   createCustomer: (_parentAddress:string, _name:string, _deviceMetadata:string) => Promise<void>;
+  setCustomerName: (_customerAddress:string, _newName:string) => Promise<void>;
   addAdmin: (_customerAddress:string, _newAdmin:string) => void;
   removeAdmin: (_customerAddress:string, _adminAddress:string) => void;
   getCustomerDeviceMetadata: (_customerAddress:string) => Promise<string>;
+  setCustomerDeviceMetadata: (_customerAddress:string, _metadataURI:string) => Promise<void>;
 };
 
 
@@ -57,9 +59,11 @@ const CucoContext = createContext<CucoContextType>({
     fetchedCustomers: [],
     refetchCustomers: () => {},
     createCustomer: async () => {},
+    setCustomerName: async () => {},
     addAdmin: () => {},
     removeAdmin: () => {},
     getCustomerDeviceMetadata: async () => "",
+    setCustomerDeviceMetadata: async () => {},
 });
 
 export default CucoContext;

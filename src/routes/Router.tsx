@@ -29,7 +29,7 @@ const router = createBrowserRouter([
         element: <Customers />, 
         children: [
           { index: true, element: <CustomerManager />},
-          { path: ":customerName", element: <Customer />}  // dynamic segment for customer name
+          { path: ":customerAddress", element: <Customer />}  // dynamic segment for customer name
         ]
     }
     ]

@@ -18,6 +18,8 @@ interface CustomerInfoTabProps {
   addAdmin: (customerAddress: string, newAdmin: string) => void;
   removeAdmin: (customerAddress: string, adminAddress: string) => void;
   selectedWallet: any;
+  deviceMetadataURI?: string;
+  buildUrl: (uri: string) => string;
 }
 
 export const CustomerInfoTab = ({
@@ -28,6 +30,8 @@ export const CustomerInfoTab = ({
   addAdmin,
   removeAdmin,
   selectedWallet,
+  deviceMetadataURI,
+  buildUrl,
 }: CustomerInfoTabProps) => {
   const [newAdmin, setNewAdmin] = useState<string>("");
 
@@ -62,34 +66,50 @@ export const CustomerInfoTab = ({
             isEditing={isEditing}
             onFieldChange={onFieldChange}
           />
-          {isEditing ? (
-            <FormField 
-              label="Address" 
-              field="address" 
-              value={customer.address}
-              isEditing={isEditing}
-              onFieldChange={onFieldChange}
-            />
-          ) : (
+          <div>
+            <h3 className="text-sm font-medium text-muted-foreground mb-1">Address</h3>
+            <div className="flex items-center gap-2">
+              <a 
+                href={`${ETHERSCAN_ADDRESS_URL}${customer.address}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <p className="text-base">{truncateMiddle(customer.address)}</p>
+              </a>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 cursor-pointer"
+                onClick={() => onCopyValue(customer.address)}
+                title="Copy address"
+              >
+                <Copy className="h-4 w-4" />
+                <span className="sr-only">Copy address</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Device Defaults URI - Read-only field */}
+          {deviceMetadataURI && (
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Address</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Device Defaults URI</h3>
               <div className="flex items-center gap-2">
                 <a 
-                  href={`${ETHERSCAN_ADDRESS_URL}${customer.address}`} 
+                  href={buildUrl(deviceMetadataURI)} 
                   target="_blank" 
                   rel="noopener noreferrer"
                 >
-                  <p className="text-base">{truncateMiddle(customer.address)}</p>
+                  <p className="text-base">{truncateMiddle(deviceMetadataURI)}</p>
                 </a>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6 cursor-pointer"
-                  onClick={() => onCopyValue(customer.address)}
-                  title="Copy address"
+                  onClick={() => onCopyValue(deviceMetadataURI)}
+                  title="Copy URI"
                 >
                   <Copy className="h-4 w-4" />
-                  <span className="sr-only">Copy address</span>
+                  <span className="sr-only">Copy URI</span>
                 </Button>
               </div>
             </div>

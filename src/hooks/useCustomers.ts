@@ -90,7 +90,50 @@ export const useCustomers = (cucoContract?: Contract | null) => {
     } 
   };
 
-  // Additional customer actions (edit, create, etc.) can be added here.
+  const setCustomerName = useCallback(async (_customerAddress: string, _newName:string) => {
+    try {
+      if (!ethersProvider || !cucoContract) {
+        throw Error("CucoContract or ethersProvider is null at setCustomerName");
+      }
+      if (ethersProvider instanceof FallbackProvider) {
+        throw Error("Connect to your wallet")
+      }
+
+      let contractAddress;
+      const network = (await ethersProvider.getNetwork()).name;
+      switch (network) {
+        case "sepolia":
+          contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
+          break;
+        default:
+          contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
+          break;
+      }
+
+      const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
+      const contract:Contract = new Contract(contractAddress, CuCoBlockchain.abi, signer);
+      const tx:TransactionResponse = await contract.setCustomerName(_newName, _customerAddress);
+      console.log("Transaction sent:", tx.hash);
+      const receipt = await tx.wait();
+      if (receipt) {
+        console.log("Transaction confirmed:", receipt);
+        setCustomers(customers.map( (customer) => {
+          if (customer.address == _customerAddress) {
+            return {...customer, name: _newName }
+          }
+          return customer;
+        }));
+      } else {
+        throw Error("Transaction receipt differs from expected");
+      }
+    } catch (error) {
+      console.error("Unable to set customer name", error);
+      return;
+    }
+  }, [ethersProvider, chainId, cucoContract])
+
+
+
   const addAdmin = useCallback(async (_customerAddress: string, _newAdmin:string) => {
     try {
       if (!ethersProvider) return;
@@ -212,5 +255,48 @@ export const useCustomers = (cucoContract?: Contract | null) => {
     }
   }, [ethersProvider, chainId, cucoContract])
 
-  return { customers, fetchCustomers, createCustomer, addAdmin, removeAdmin, getCustomerDeviceMetadata };
+
+  const setCustomerDeviceMetadata = useCallback(async (_customerAddress: string, _metadataURI:string) => {
+    try {
+      if (!ethersProvider || !cucoContract) {
+        throw Error("CucoContract or ethersProvider is null at setCustomerDeviceMetadata");
+      }
+      if (ethersProvider instanceof FallbackProvider) {
+        throw Error("Connect to your wallet")
+      }
+
+      let contractAddress;
+      const network = (await ethersProvider.getNetwork()).name;
+      switch (network) {
+        case "sepolia":
+          contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_SEPOLIA;
+          break;
+        default:
+          contractAddress = import.meta.env.VITE_CUCOBLOCKCHAIN_LOCALHOST;
+          break;
+      }
+
+      const signer:Signer = await ethersProvider.getSigner(); // Get the connected account
+      const contract:Contract = new Contract(contractAddress, CuCoBlockchain.abi, signer);
+      const tx:TransactionResponse = await contract.setCustomerDeviceMetadata(_metadataURI, _customerAddress);
+      console.log("Transaction sent:", tx.hash);
+      const receipt = await tx.wait();
+      if (receipt) {
+        console.log("Transaction confirmed:", receipt);
+        setCustomers(customers.map( (customer) => {
+          if (customer.address == _customerAddress) {
+            return {...customer, deviceMetadata: _metadataURI }
+          }
+          return customer;
+        }));
+      } else {
+        throw Error("Transaction receipt differs from expected");
+      }
+    } catch (error) {
+      console.error("Unable to set customer device metadata", error);
+      return;
+    }
+  }, [ethersProvider, chainId, cucoContract])
+
+  return { customers, fetchCustomers, createCustomer, setCustomerName, addAdmin, removeAdmin, getCustomerDeviceMetadata, setCustomerDeviceMetadata };
 };

@@ -87,7 +87,17 @@ export const useCuco = () => {
         throw error;
       }
     },
-    
+
+    setCustomerName: async (...args: Parameters<typeof context.setCustomerName>) => {
+      try {
+        console.log("Estimating cost for setCustomerName transaction...");
+        await context.setCustomerName(...args);
+        console.log("Transaction would cost approximately: [estimation skipped in this simplified implementation]");
+      } catch (error) {
+        console.error("Error in wrapped setCustomerName:", error);
+        throw error;
+      }
+    },
     addAdmin: async (...args: Parameters<typeof context.addAdmin>) => {
       try {
         console.log("Estimating cost for addAdmin transaction...");
@@ -97,7 +107,18 @@ export const useCuco = () => {
         console.error("Error in wrapped addAdmin:", error);
         throw error;
       }
-    }
+    },
+
+    setCustomerDeviceMetadata: async (...args: Parameters<typeof context.setCustomerDeviceMetadata>) => {
+      try {
+        console.log("Estimating cost for setCustomerDeviceMetadata transaction...");
+        await context.setCustomerDeviceMetadata(...args);
+        console.log("Transaction would cost approximately: [estimation skipped in this simplified implementation]");
+      } catch (error) {
+        console.error("Error in wrapped setCustomerDeviceMetadata:", error);
+        throw error;
+      }
+    },
   };
   
   return wrappedContext;
