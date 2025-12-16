@@ -173,15 +173,15 @@ const Device = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="w-[800px]">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <Card>
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 space-y-0 pb-2">
           <div>
             <CardTitle className="text-2xl">{device.sn}</CardTitle>
             <CardDescription>
               {device.customer ? `Customer: ${device.customer}` : "Device's customer not found"}
             </CardDescription>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             {!isEditing ? (
               <Button onClick={() => {
                 setIsEditing(true);

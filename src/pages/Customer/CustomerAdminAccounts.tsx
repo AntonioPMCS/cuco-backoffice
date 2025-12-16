@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,11 +39,11 @@ export const CustomerAdminAccounts = ({
   };
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+    <div className="space-y-6">
+      <div className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Admin Accounts</CardTitle>
-          <CardDescription>Wallet addresses with admin access to this Customer</CardDescription>
+          <h3 className="text-lg font-semibold">Admin Accounts</h3>
+          <p className="text-sm text-muted-foreground">Wallet addresses with admin access to this Customer</p>
         </div>
         <Dialog>
           <DialogTrigger asChild>
@@ -85,55 +84,53 @@ export const CustomerAdminAccounts = ({
             )}
           </DialogContent>
         </Dialog>
-      </CardHeader>
-      <CardContent>
-        {customer.authorizedUsers?.length === 0 ? (
-          <div className="text-center py-6 text-muted-foreground">
-            No authorized users found. Add an address to get started.
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Address</TableHead>
-                <TableHead className="w-[150px]">Actions</TableHead>
+      </div>
+      {customer.authorizedUsers?.length === 0 ? (
+        <div className="text-center py-6 text-muted-foreground">
+          No authorized users found. Add an address to get started.
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Address</TableHead>
+              <TableHead className="w-[150px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {customer.authorizedUsers.map((address) => (
+              <TableRow key={address}>
+                <TableCell className="font-mono">{truncateMiddle(address)}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onCopyValue(address)}
+                      title="Copy address"
+                      className="cursor-pointer"
+                    >
+                      <Copy className="h-4 w-4" />
+                      <span className="sr-only">Copy address</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveAddress(address)}
+                      title="Remove address"
+                      className="cursor-pointer"
+                    >
+                      <Trash className="h-4 w-4" />
+                      <span className="sr-only">Remove address</span>
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {customer.authorizedUsers.map((address) => (
-                <TableRow key={address}>
-                  <TableCell className="font-mono">{truncateMiddle(address)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onCopyValue(address)}
-                        title="Copy address"
-                        className="cursor-pointer"
-                      >
-                        <Copy className="h-4 w-4" />
-                        <span className="sr-only">Copy address</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveAddress(address)}
-                        title="Remove address"
-                        className="cursor-pointer"
-                      >
-                        <Trash className="h-4 w-4" />
-                        <span className="sr-only">Remove address</span>
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 };
 

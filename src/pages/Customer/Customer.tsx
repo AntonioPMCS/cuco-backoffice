@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomerType } from "@/context/CucoContext";
 import { useCuco } from "@/hooks/useCuco";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
@@ -11,6 +11,7 @@ import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
 import { CustomerInfoTab } from "./CustomerInfoTab";
 import { CustomerDeviceDefaultsTab } from "./CustomerDeviceDefaultsTab";
+import { CustomerAdminAccounts } from "./CustomerAdminAccounts";
 
 const Customer = () => {
   const {customerAddress} = useParams();
@@ -21,7 +22,7 @@ const Customer = () => {
   const [customer, setCustomer] = useState<CustomerType | undefined>();
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
-  const [activeTab, setActiveTab] = useState<'main' | 'deviceDefaults'>('main');
+  const [activeTab, setActiveTab] = useState<'main' | 'deviceDefaults' | 'adminAccounts'>('main');
   // Store form changes in ref (no re-renders during editing)
   const formChangesRef = useRef<Record<string, string>>({});
 
@@ -132,10 +133,7 @@ const Customer = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
-            <CardTitle className="text-2xl">{customer.name}</CardTitle>
-            <CardDescription>
-              {customer.parentName ? `Parent: ${customer.parentName}` : "No parent company"}
-            </CardDescription>
+            <CardTitle className="text-2xl">Customer: {customer.name}</CardTitle>
           </div>
           <div className="flex gap-2">
             {!isEditing ? (
@@ -167,7 +165,7 @@ const Customer = () => {
             )}
           </div>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-2">
           {/* Tab Navigation */}
           <div className="flex space-x-1 mb-6 border-b">
             <Button
@@ -194,6 +192,18 @@ const Customer = () => {
             >
               Device Defaults
             </Button>
+            <Button
+              variant={activeTab === 'adminAccounts' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('adminAccounts')}
+              className="rounded-none border-b-2 border-transparent cursor-pointer"
+              style={activeTab === 'adminAccounts' ? { 
+                borderBottomColor: 'black', 
+                color: 'black',
+                backgroundColor: 'transparent'
+              } : {}}
+            >
+              Admin Accounts
+            </Button>
           </div>
 
           {/* Tab Content */}
@@ -203,9 +213,6 @@ const Customer = () => {
               isEditing={isEditing}
               onFieldChange={handleFieldChange}
               onCopyValue={handleCopyValue}
-              addAdmin={addAdmin}
-              removeAdmin={removeAdmin}
-              selectedWallet={selectedWallet}
               deviceMetadataURI={customer.deviceMetadata}
               buildUrl={buildUrl}
             />
@@ -219,6 +226,16 @@ const Customer = () => {
               data={data}
               isEditing={isEditing}
               onFieldChange={handleFieldChange}
+            />
+          )}
+
+          {activeTab === 'adminAccounts' && (
+            <CustomerAdminAccounts
+              customer={customer}
+              addAdmin={addAdmin}
+              removeAdmin={removeAdmin}
+              selectedWallet={selectedWallet}
+              onCopyValue={handleCopyValue}
             />
           )}
         </CardContent>
