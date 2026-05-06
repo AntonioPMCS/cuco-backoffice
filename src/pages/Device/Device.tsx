@@ -46,6 +46,8 @@ const Device = () => {
     if (foundDevice.metadataURI && !data) {
       console.log("Loading IPFS data for device:", foundDevice.sn, "with metadata hash:", foundDevice.metadataURI);
       loadData(foundDevice.metadataURI);
+      console.log("IPFS data loaded successfully for device:", foundDevice.sn);
+      console.log("IPFS data content:", data);
       setDevice(foundDevice);
       setLoading(false);
       return; // Don't set device yet, wait for IPFS data

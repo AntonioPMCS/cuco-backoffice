@@ -17,6 +17,7 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
   const [data, setData] = useState<any>(null); //TODO: ADD metadata type here
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const ipfsGateways = import.meta.env.VITE_IPFS_GATEWAYS.split(',');
 
   const loadData = useCallback(async (hash: string) => {
     if (!hash) {
@@ -27,30 +28,44 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
     setLoading(true);
     setError(null);
 
-    try {
-      // You can customize the IPFS gateway URL here
-      // hash example: ipfs://bafkreihccimod2m7y7txvnm34kocealmr7u2yurqohwgleaslloh2fokzi
-      // remove the ipfs:// prefix
-      const cid = hash.replace('ipfs://', '');
-      // add #x-ipfs-companion-no-redirect to the end of the url 
-      const ipfsUrl = `https://ipfs.io/ipfs/${cid}#x-ipfs-companion-no-redirect`;
-      const response = await fetch(ipfsUrl);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch IPFS data: ${response.status} ${response.statusText}`);
+    let gatewayIndex = 0;
+    // remove the ipfs:// prefix
+    const cid = hash.replace('ipfs://', '');
+    
+    while (gatewayIndex < ipfsGateways.length) {
+      const ipfsUrl = `https://${ipfsGateways[gatewayIndex]}/ipfs/${cid}#x-ipfs-companion-no-redirect`;
+
+      try {
+        console.log(`Fetching IPFS data from ${ipfsUrl}`);
+    
+        const response = await fetch(ipfsUrl);
+    
+        if (!response.ok) {
+          throw new Error(`IPFS gateway ${ipfsGateways[gatewayIndex]} returned an error: ${response.status} ${response.statusText}`);
+        }
+    
+        const text = await response.text();
+        if (!text) {
+          throw new Error("Empty response");
+        }
+    
+        const jsonData = JSON.parse(text);
+        if (!jsonData) {
+          throw new Error("Null JSON");
+        }
+    
+        setData(jsonData);
+        return; // ✅ SUCCESS → exit function
+    
+      } catch (err) {
+        console.log(`Gateway failed (${ipfsGateways[gatewayIndex]}):`, err);
+        gatewayIndex++; // try next
       }
-      
-      const jsonData = await response.json();
-      setData(jsonData);
-      console.log('IPFS data loaded successfully:', jsonData);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(errorMessage);
-      console.error('Error loading IPFS data:', errorMessage);
-      setData(null);
-    } finally {
-      setLoading(false);
     }
+    
+    setLoading(false);
+    throw new Error('All IPFS gateways failed');
+
   }, []);
 
   const uploadToIpfs = useCallback(async (jsonObject: any): Promise<string | null> => {
