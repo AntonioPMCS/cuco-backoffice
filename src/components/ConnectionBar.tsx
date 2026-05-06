@@ -1,14 +1,21 @@
 import "../styles/ConnectionBar.css";
 import { DiscoverWalletProviders } from '../components/DiscoverWalletProviders';
 import { useEffect } from "react";
-import { truncateMiddle, formatChainAsString } from "../utils";
+import { formatChainAsString } from "../utils";
 import { useWalletProviders } from "../hooks/useWalletProviders";
+import { useCuco } from "@/hooks/useCuco";
 import { Dialog, DialogContent, DialogClose, DialogTitle, DialogTrigger, DialogDescription} from "./ui/dialog";
-import { KeyRound} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { ChevronDown, KeyRound} from "lucide-react";
 import { Button } from "./ui/button";
 
 const ConnectionBar = () => {
   const {selectedAccount, chainId, connectWallet, ethersProvider} = useWalletProviders()
+  const { cucoContract } = useCuco()
   //const { getBalance } = useCuco();
   // Connect to the selected provider using eth_requestAccounts.
   const handleConnect = async (providerWithInfo: EIP6963ProviderDetail) => {
@@ -57,9 +64,37 @@ const ConnectionBar = () => {
         </Dialog>
       }
       { selectedAccount && chainId &&
-        <>
-          <p>🟢 {truncateMiddle(selectedAccount)} @ {formatChainAsString(chainId)}</p>
-        </>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="button" variant="default" size="sm" className="gap-1.5 font-normal">
+              <span className="font-medium whitespace-nowrap">🟢 Connected</span>
+              <ChevronDown className="size-4 shrink-0" aria-hidden />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            sideOffset={6}
+            className="w-72 p-3 text-xs"
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
+            <div className="space-y-3 select-text">
+              <div>
+                <div className="text-muted-foreground font-medium mb-1">Blockchain:</div>
+                <div className="font-mono text-sm text-foreground">{formatChainAsString(chainId)}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground font-medium mb-1">Account:</div>
+                <div className="font-mono text-sm text-foreground break-all">{selectedAccount}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground font-medium mb-1">CUCo Address:</div>
+                <div className="font-mono text-sm text-foreground break-all">
+                  {cucoContract ? String(cucoContract.target) : "—"}
+                </div>
+              </div>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
       }
     </div>
   )
