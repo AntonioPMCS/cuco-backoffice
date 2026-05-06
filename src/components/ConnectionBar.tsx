@@ -10,12 +10,14 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { ChevronDown, KeyRound} from "lucide-react";
+import { ChevronDown, Copy, KeyRound} from "lucide-react";
 import { Button } from "./ui/button";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 const ConnectionBar = () => {
   const {selectedAccount, chainId, connectWallet, ethersProvider} = useWalletProviders()
   const { cucoContract } = useCuco()
+  const handleCopyValue = useCopyToClipboard()
   //const { getBalance } = useCuco();
   // Connect to the selected provider using eth_requestAccounts.
   const handleConnect = async (providerWithInfo: EIP6963ProviderDetail) => {
@@ -84,13 +86,47 @@ const ConnectionBar = () => {
               </div>
               <div>
                 <div className="text-muted-foreground font-medium mb-1">Account:</div>
-                <div className="font-mono text-sm text-foreground break-all">{selectedAccount}</div>
+                <div className="flex items-start gap-2">
+                  <div className="font-mono text-sm text-foreground break-all min-w-0 flex-1">
+                    {selectedAccount}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 shrink-0 cursor-pointer"
+                    type="button"
+                    onClick={() => handleCopyValue(selectedAccount)}
+                    title="Copy address"
+                  >
+                    <Copy className="h-4 w-4" />
+                    <span className="sr-only">Copy account address</span>
+                  </Button>
+                </div>
               </div>
               <div>
                 <div className="text-muted-foreground font-medium mb-1">CUCo Address:</div>
-                <div className="font-mono text-sm text-foreground break-all">
-                  {cucoContract ? String(cucoContract.target) : "—"}
-                </div>
+                {cucoContract ? (
+                  <div className="flex items-start gap-2">
+                    <div className="font-mono text-sm text-foreground break-all min-w-0 flex-1">
+                      {String(cucoContract.target)}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 shrink-0 cursor-pointer"
+                      type="button"
+                      onClick={() =>
+                        handleCopyValue(String(cucoContract.target))
+                      }
+                      title="Copy address"
+                    >
+                      <Copy className="h-4 w-4" />
+                      <span className="sr-only">Copy CUCo contract address</span>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="font-mono text-sm text-foreground">—</div>
+                )}
               </div>
             </div>
           </DropdownMenuContent>
