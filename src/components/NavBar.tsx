@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import "../styles/NavBar.css";
 import ConnectionBar from "./ConnectionBar";
 import { useState } from "react";
@@ -32,12 +32,22 @@ const NavBar = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex gap-10">
-              <Link to="/devices" className="text-base font-medium transition-colors hover:text-primary">
+              <NavLink 
+                to="/devices" 
+                className={({ isActive }) =>
+                  `text-base font-medium transition-colors hover:text-primary ${isActive ? "underline underline-offset-4 text-primary" : ""}`
+                }
+              >
                 Devices
-              </Link>
-              <Link to="/customers" className="text-base font-medium transition-colors hover:text-primary">
+              </NavLink>
+              <NavLink
+                to="/customers" 
+                className={({ isActive }) =>
+                  `text-base font-medium transition-colors hover:text-primary ${isActive ? "underline underline-offset-4 text-primary" : ""}`
+                }
+              >
                 Customers
-              </Link>
+              </NavLink>
           </nav>
 
           {/* Action Buttons */}
