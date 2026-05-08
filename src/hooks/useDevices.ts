@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Contract, TransactionResponse, Interface } from "ethers";
+import { Contract, TransactionResponse, Interface, isError } from "ethers";
 import CuCoBlockchain from "../../abi/CuCoBlockchain.json";
 import Device from "../../abi/Device.json";
 import { DeviceType } from "../context/CucoContext";
@@ -72,7 +72,7 @@ export const useDevices = (cucoContract?: Contract | null) => {
   const setDeviceState = useCallback(async (_newState:number, _address:string) => {
     if (!ethersProvider || !cucoContract) {
       console.log("CucoContract or ethersProvider is null at setDeviceState");
-      return;
+      throw Error("Couldn't establish connection to the blockchain");
     } 
     try {
       
@@ -108,7 +108,15 @@ export const useDevices = (cucoContract?: Contract | null) => {
       
     } catch (error) {
       console.error("Unable to change device state", error);
-      return;
+        // Extract ethers revert reason
+      if (isError(error, "CALL_EXCEPTION")) {
+        if (error.shortMessage.includes("Unauthorized operation")) {  
+          throw Error("You are not authorized to change the device state.");
+        }
+        throw Error(error.shortMessage);
+      } else {
+        throw Error("Transaction failed");
+      }
     }
   }, [ethersProvider, chainId, cucoContract])
 

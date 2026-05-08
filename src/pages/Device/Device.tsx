@@ -9,10 +9,11 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { Link } from "react-router-dom"
 import { useParams } from 'react-router-dom';
 import { useWalletProviders } from "@/hooks/useWalletProviders";
-import { Edit } from "lucide-react";
+import { AlertCircle, Edit } from "lucide-react";
 import { DeviceInfoTab } from "./DeviceInfoTab";
 import { DeviceMetadataTab } from "./DeviceMetadataTab";
-
+import { Dialog, DialogHeader, DialogDescription, DialogContent} from "@/components/ui/dialog";
+import { truncateMiddle } from "@/utils";
 
 
 const Device = () => {
@@ -21,11 +22,12 @@ const Device = () => {
   const {data, loading: ipfsLoading, error: ipfsError, loadData, uploadToIpfs, clearData} = useIpfs();
   const {buildUrl} = useIpfs();
   const handleCopyValue = useCopyToClipboard();
-  const {selectedWallet} = useWalletProviders();
+  const {selectedWallet, selectedAccount} = useWalletProviders();
   const [device, setDevice] = useState<DeviceType | undefined>();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'main' | 'metadata'>('main');
   const [isEditing, setIsEditing] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
   // Store form changes in ref (no re-renders during editing)
   const formChangesRef = useRef<Record<string, string>>({});
 
@@ -77,12 +79,12 @@ const Device = () => {
 
   // Handle save all changes
   const handleSaveAll = async () => {
-    console.log("Hello from Save button!");
     console.log("Form changes:", formChangesRef.current);
     console.log("Original device data:", device);
     
     if (!device) return;
     setLoading(true);
+    setEditError(null);
 
     try {
       // legacy: const tasks: Promise<any>[] = [];
@@ -145,13 +147,12 @@ const Device = () => {
       //   console.error("Some actions failed:", failed);
       // }
 
-
-    } catch (err) {
-      console.error("Save error:", err);
-    } finally {
-      // 5) Clear form changes regardless of outcome
       formChangesRef.current = {};
       setIsEditing(false);
+    } catch (err) {
+      // Any tx error should be handled here
+      setEditError((err as Error).message);
+    } finally {
       setLoading(false);
     }
   };
@@ -266,6 +267,28 @@ const Device = () => {
             />
           )}
         </CardContent>
+        <Dialog
+          open={editError !== null}
+          onOpenChange={(open) => !open && setEditError(null)}
+        >
+          <DialogContent className="gap-6 border-destructive/40 sm:max-w-md">
+            <DialogHeader className="space-y-0 mt-4 mb-4 text-left">
+              <div className="flex gap-4">
+                <div
+                  className="flex size-11 shrink-0 items-center justify-center rounded-full bg-destructive/15"
+                  aria-hidden
+                >
+                  <AlertCircle className="size-6 text-destructive" />
+                </div>
+                <DialogDescription className="rounded-md border border-destructive/25 bg-destructive/5 px-3 py-2.5 text-sm leading-relaxed text-foreground">
+                  {editError}
+                  <br/>Address used: {truncateMiddle(selectedAccount ?? "")}
+                </DialogDescription>
+              </div>
+              
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </Card>
       <Link to="/">{`<<< Home`}</Link>
     </div>

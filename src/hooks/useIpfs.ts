@@ -55,17 +55,15 @@ export const useIpfs = (initialHash?: string): UseIpfsReturn => {
         }
     
         setData(jsonData);
-        return; // ✅ SUCCESS → exit function
-    
+        setLoading(false);
+        return; // SUCCESS → exit function
       } catch (err) {
         console.log(`Gateway failed (${ipfsGateways[gatewayIndex]}):`, err);
         gatewayIndex++; // try next
       }
     }
-    
     setLoading(false);
     throw new Error('All IPFS gateways failed');
-
   }, []);
 
   const uploadToIpfs = useCallback(async (jsonObject: any): Promise<string | null> => {

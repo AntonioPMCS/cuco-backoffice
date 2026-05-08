@@ -45,14 +45,9 @@ export const useCuco = () => {
     },
     
     setDeviceState: async (...args: Parameters<typeof context.setDeviceState>) => {
-      try {
-        console.log("Estimating cost for setDeviceState transaction...");
-        await context.setDeviceState(...args);
-        console.log("Transaction would cost approximately: [estimation skipped in this simplified implementation]");
-      } catch (error) {
-        console.error("Error in wrapped setDeviceState:", error);
-        throw error;
-      }
+      console.log("Estimating cost for setDeviceState transaction...");
+      await context.setDeviceState(...args);
+      console.log("Transaction would cost approximately: [estimation skipped in this simplified implementation]");
     },
     
     toggleDeviceVisible: async (...args: Parameters<typeof context.toggleDeviceVisible>) => {
